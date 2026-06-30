@@ -899,13 +899,18 @@ impl AutomateBackend for RealBackend {
     }
 
     async fn settle(&self, app: &str) {
-        // M2: poll the element count until the UI stops changing (≤2s), instead
-        // of a blind fixed wait. Removes the timing-race class (tracker §1.11/
-        // §1.13) — the next perceive sees a settled tree. `ax_wait_settled` is
-        // blocking (synchronous helper IPC), so run it off the async runtime.
+        // M2: poll the element count until the UI stops changing (≤5s on Windows),
+        // instead of a blind fixed wait. Removes the timing-race class
+        // (tracker §1.11/§1.13) — the next perceive sees a settled tree.
+        // `ax_wait_settled` is blocking (synchronous helper IPC), so run it off
+        // the async runtime. Windows needs a longer timeout for window creation.
+        #[cfg(target_os = "windows")]
+        let timeout_ms = 5000;
+        #[cfg(not(target_os = "windows"))]
+        let timeout_ms = 2000;
         let app = app.to_string();
         let _ = tokio::task::spawn_blocking(move || {
-            ax::ax_wait_settled(&app, 240, 2000);
+            ax::ax_wait_settled(&app, 240, timeout_ms);
         })
         .await;
     }

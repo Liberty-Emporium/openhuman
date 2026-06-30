@@ -29,7 +29,7 @@ use uiautomation::patterns::{
 
 /// Matcher retry-wait budget. UIA windows/elements can lag behind a launch or a
 /// navigation; the matcher polls until this deadline before giving up.
-const FIND_TIMEOUT_MS: u64 = 2000;
+const FIND_TIMEOUT_MS: u64 = 5000;
 
 /// How deep to walk an app's UI subtree. Deep enough for nested panes/lists,
 /// shallow enough to stay fast; the tool layer caps and filters the output.
@@ -73,38 +73,46 @@ fn is_interactive(ct: ControlType) -> bool {
 /// `Name` equals (preferred) or contains `app_name`, case-insensitively. UWP
 /// apps nest under `ApplicationFrameWindow`, so we allow a few levels of depth.
 fn find_window(automation: &UIAutomation, app_name: &str) -> Result<UIElement, String> {
-    let root = automation
-        .get_root_element()
-        .map_err(|e| format!("UIA root element unavailable: {e}"))?;
-    let matcher = automation
-        .create_matcher()
-        .from(root)
-        .control_type(ControlType::Window)
-        .depth(6)
-        .timeout(FIND_TIMEOUT_MS);
-    let windows = matcher.find_all().unwrap_or_default();
-
     let needle = app_name.trim().to_lowercase();
-    let mut contains: Option<UIElement> = None;
-    for w in windows {
-        let Ok(name) = w.get_name() else { continue };
-        let nl = name.trim().to_lowercase();
-        if nl.is_empty() {
-            continue;
+    // Retry up to 3 times — Windows windows can take a moment to appear after launch
+    for attempt in 0..3 {
+        let root = automation
+            .get_root_element()
+            .map_err(|e| format!("UIA root element unavailable: {e}"))?;
+        let matcher = automation
+            .create_matcher()
+            .from(root)
+            .control_type(ControlType::Window)
+            .depth(8)
+            .timeout(FIND_TIMEOUT_MS);
+        let windows = matcher.find_all().unwrap_or_default();
+
+        let mut contains: Option<UIElement> = None;
+        for w in windows {
+            let Ok(name) = w.get_name() else { continue };
+            let nl = name.trim().to_lowercase();
+            if nl.is_empty() {
+                continue;
+            }
+            if nl == needle {
+                return Ok(w); // exact title match wins
+            }
+            if contains.is_none() && !needle.is_empty() && nl.contains(&needle) {
+                contains = Some(w);
+            }
         }
-        if nl == needle {
-            return Ok(w); // exact title match wins
+        if let Some(w) = contains {
+            return Ok(w);
         }
-        if contains.is_none() && !needle.is_empty() && nl.contains(&needle) {
-            contains = Some(w);
+        // Wait before retry
+        if attempt < 2 {
+            std::thread::sleep(std::time::Duration::from_millis(1000));
         }
     }
-    contains.ok_or_else(|| {
-        format!(
-            "No open window matches app '{app_name}'. Make sure it is running \
-             (try launch_app first), then retry."
-        )
-    })
+    Err(format!(
+        "No open window matches app '{app_name}'. Make sure it is running \
+         (try launch_app first), then retry."
+    ))
 }
 
 /// Find an element under `window` by label. Exact (case-insensitive) match is
