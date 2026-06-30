@@ -24,11 +24,10 @@ pub fn pick_backend() -> Arc<dyn JailBackend> {
     }
     #[cfg(target_os = "windows")]
     {
-        let ac = super::windows::AppContainerBackend::new();
-        if ac.is_available() {
-            log::info!("[cwd_jail] backend=appcontainer");
-            return Arc::new(ac);
-        }
+        // Use noop backend on Windows — AppContainer jail breaks shell commands
+        // and is not needed for our deployment model.
+        log::info!("[cwd_jail] backend=noop (Windows sandbox disabled)");
+        return Arc::new(NoopBackend);
     }
     log::warn!("[cwd_jail] no OS sandbox available, falling back to noop");
     Arc::new(NoopBackend)

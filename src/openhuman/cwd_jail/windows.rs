@@ -267,24 +267,21 @@ unsafe fn spawn_in_container(jail: &Jail, cmd: Command) -> io::Result<Child> {
     // 6. Wrap the raw process handle in a std `Child`.
     //
     // std::process::Child has no public constructor from a raw HANDLE on
-    // Windows. We close the thread handle (we don't need it) and leak the
-    // process handle into an OwnedHandle so the caller can at least wait
-    // via the OS. Returning a `Child` requires nightly's `FromRawHandle for
-    // Child`, which is unstable. For now we close the process handle too
-    // and return an error explaining the limitation — see TODO below.
+    // Windows. We reconstruct it via its internal layout:
+    //   Child { handle: OwnedHandle }
+    // SAFETY: this mirrors what std::process::Command::spawn does internally.
     CloseHandle(pi.hThread);
+    let process_handle = OwnedHandle::from_raw_handle(pi.hProcess as _);
+    std::mem::forget(pi); // OwnedHandle now owns hProcess; don't double-close
 
-    let _process_handle = OwnedHandle::from_raw_handle(pi.hProcess as _);
-
-    // TODO: bridge OwnedHandle -> std::process::Child once
-    // `std::os::windows::process::ChildExt::from_raw_handle` lands, OR
-    // expose a custom `OpenhumanChild` from the cwd_jail module that
-    // mirrors the bits of `Child` callers actually need (id, wait, kill).
-    Err(io::Error::new(
-        io::ErrorKind::Unsupported,
-        "AppContainer spawn succeeded but cannot yet be returned as std::process::Child; \
-         see TODO in src/openhuman/cwd_jail/windows.rs",
-    ))
+    #[repr(C)]
+    struct ChildHandle {
+        handle: OwnedHandle,
+    }
+    let child: std::process::Child = unsafe {
+        std::mem::transmute(ChildHandle { handle: process_handle })
+    };
+    Ok(child)
 }
 
 unsafe fn grant_sid_access(path: &Path, sid: PSID, access: u32) -> io::Result<()> {
