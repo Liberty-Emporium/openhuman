@@ -542,26 +542,8 @@ export const SETTINGS_ROUTE_REGISTRY: SettingsRegistryEntry[] = [
   },
 
   // =========================================================================
-  // CRYPTO section leaf panels
+  // CRYPTO section leaf panels (removed — wallet/tiny.place stripped)
   // =========================================================================
-  {
-    id: 'recovery-phrase',
-    titleKey: 'pages.settings.account.recoveryPhrase',
-    descriptionKey: 'pages.settings.account.recoveryPhraseDesc',
-    section: 'crypto',
-    searchKeywords: ['mnemonic', 'seed', 'backup', 'recovery', 'wallet'],
-    navParent: 'wallet-balances',
-  },
-  {
-    id: 'wallet-balances',
-    titleKey: 'pages.settings.account.walletBalances',
-    descriptionKey: 'pages.settings.account.walletBalancesDesc',
-    section: 'crypto',
-    searchKeywords: ['wallet', 'balance', 'tokens', 'crypto'],
-    navGroup: 'data',
-    navOrder: 1,
-  },
-
   // =========================================================================
   // DEVELOPER — debug-only entries (devOnly === true)
   // These live ONLY under Settings → Developer & Diagnostics.
