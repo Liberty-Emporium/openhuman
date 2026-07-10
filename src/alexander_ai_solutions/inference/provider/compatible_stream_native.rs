@@ -319,7 +319,7 @@ impl OpenAiCompatibleProvider {
                     if let Some(usage) = chunk.usage {
                         last_usage = Some(usage);
                     }
-                    if let Some(meta) = chunk.alexanderai {
+                    if let Some(meta) = chunk.openhuman {
                         last_openhuman = Some(meta);
                     }
 
