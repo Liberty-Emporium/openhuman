@@ -1,0 +1,109 @@
+name: Build Windows (Alexander AI Solutions)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_profile:
+        description: 'Cargo profile'
+        required: false
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+  push:
+    branches:
+      - rebrand/alexander-ai-solutions
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    name: Build Windows x64 installer
+    runs-on: windows-latest
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+
+      - name: Cache Cargo registry + git
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: windows-cargo-${{ hashFiles('app/src-tauri/Cargo.toml') }}
+          restore-keys: |
+            windows-cargo-
+
+      - name: Cache CEF binary distribution (windows)
+        uses: actions/cache@v4
+        with:
+          path: ~/AppData/Local/tauri-cef
+          key: cef-windows-x86_64-${{ hashFiles('app/src-tauri/Cargo.toml') }}
+          restore-keys: |
+            cef-windows-x86_64-
+
+      - name: Install vendored tauri-cli (CEF-aware bundler)
+        shell: bash
+        run: cargo install --locked --path app/src-tauri/vendor/tauri-cef/crates/tauri-cli
+
+      - name: pnpm install
+        shell: bash
+        working-directory: app
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and package Tauri app (Windows nsis + msi)
+        shell: bash
+        working-directory: app
+        env:
+          OPENHUMAN_APP_ENV: production
+          VITE_OPENHUMAN_APP_ENV: production
+        run: |
+          PROFILE="${{ inputs.build_profile || 'release' }}"
+          if [ "$PROFILE" = "debug" ]; then
+            cargo tauri build --debug --bundles nsis,msi -- --bin "Alexander AI Solutions"
+          else
+            cargo tauri build --bundles nsis,msi -- --bin "Alexander AI Solutions"
+          fi
+
+      - name: Locate artifacts
+        id: artifacts
+        shell: bash
+        run: |
+          echo "=== bundle tree ==="
+          find app/target -maxdepth 4 \( -name '*.exe' -o -name '*.msi' -o -name '*.nsis' \) 2>/dev/null
+          MSI=$(find app/target -name '*.msi' | head -1)
+          EXE=$(find app/target -name '*setup*.exe' -o -name '*Setup*.exe' | head -1)
+          echo "msi=$MSI" >> "$GITHUB_OUTPUT"
+          echo "exe=$EXE" >> "$GITHUB_OUTPUT"
+
+      - name: Upload installer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: alexander-ai-windows
+          path: |
+            app/target/**/*.msi
+            app/target/**/*setup*.exe
+            app/target/**/*.nsis
+          if-no-files-found: warn
