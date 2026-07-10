@@ -24,11 +24,13 @@ pub const MODEL_SUMMARIZATION_V1: &str = "summarization-v1";
 pub const MODEL_VISION_V1: &str = "vision-v1";
 /// Default model used when no explicit model is configured.
 ///
-/// Set to `chat-v1`, the backend's low-latency conversational tier. The
-/// orchestrator (user-facing front-line agent) rides on this tier by default
-/// via `hint:chat`; reach for the slower `reasoning-v1` only when deep
-/// reasoning is needed.
-pub const DEFAULT_MODEL: &str = MODEL_CHAT_V1;
+/// Alexander AI Solutions: defaults to OpenRouter's Stealth model
+/// (`tencent/hy3:free`) so a fresh install runs on OpenRouter out of the box.
+/// The user supplies their own OpenRouter API key in Settings → AI. The
+/// `normalize_default_model_tier` migration only rewrites stale *reasoning*
+/// tiers to `chat-v1` and leaves any `openrouter:*` value untouched, so this
+/// default survives first-launch migration.
+pub const DEFAULT_MODEL: &str = "openrouter:tencent/hy3:free";
 
 /// Effective default global memory-sync cadence (seconds) used when
 /// [`Config::memory_sync_interval_secs`] is `None` — i.e. the user has not
