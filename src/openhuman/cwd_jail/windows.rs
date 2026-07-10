@@ -264,24 +264,19 @@ unsafe fn spawn_in_container(jail: &Jail, cmd: Command) -> io::Result<Child> {
         return Err(io::Error::last_os_error());
     }
 
-    // 6. Wrap the raw process handle in a std `Child`.
+    // 6. Finalize handles.
     //
-    // std::process::Child has no public constructor from a raw HANDLE on
-    // Windows. We reconstruct it via its internal layout:
-    //   Child { handle: OwnedHandle }
-    // SAFETY: this mirrors what std::process::Command::spawn does internally.
+    // NOTE: On Windows we route the cwd_jail to the noop backend
+    // (see detect.rs), so this AppContainer spawn path is not used in
+    // production. Returning a clear error here keeps the crate compiling
+    // without relying on `std::mem::transmute` into `std::process::Child`,
+    // which is unsound (layout/size mismatch) and fails to compile.
     CloseHandle(pi.hThread);
-    let process_handle = OwnedHandle::from_raw_handle(pi.hProcess as _);
-    std::mem::forget(pi); // OwnedHandle now owns hProcess; don't double-close
-
-    #[repr(C)]
-    struct ChildHandle {
-        handle: OwnedHandle,
-    }
-    let child: std::process::Child = unsafe {
-        std::mem::transmute(ChildHandle { handle: process_handle })
-    };
-    Ok(child)
+    CloseHandle(pi.hProcess);
+    Err(io::Error::new(
+        io::ErrorKind::Unsupported,
+        "AppContainer spawn is disabled; cwd_jail uses the noop backend on Windows",
+    ))
 }
 
 unsafe fn grant_sid_access(path: &Path, sid: PSID, access: u32) -> io::Result<()> {
