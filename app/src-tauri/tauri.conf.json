@@ -32,55 +32,28 @@
   "bundle": {
     "active": true,
     "targets": [
-      "app",
-      "dmg",
-      "deb",
       "nsis",
-      "msi",
-      "appimage"
+      "msi"
     ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
-      "icons/icon.icns",
       "icons/icon.ico"
     ],
     "resources": [
       "../../src/openhuman/agent/prompts",
       "recipes/**/*"
     ],
-    "linux": {
-      "deb": {
-        "depends": [
-          "libgtk-3-0",
-          "libwebkit2gtk-4.1-0",
-          "libx11-6",
-          "libxdo3",
-          "libgdk-pixbuf-2.0-0",
-          "libglib2.0-0"
-        ],
-        "desktopTemplate": "main.desktop"
-      }
-    },
     "createUpdaterArtifacts": false,
-    "macOS": {
-      "minimumSystemVersion": "10.15",
-      "entitlements": "entitlements.sidecar.plist",
-      "infoPlist": "Info.plist",
-      "dmg": {
-        "background": "./images/background-dmg.png"
+    "windows": {
+      "nsis": {
+        "displayLanguageSelector": false,
+        "languages": ["English"]
       }
     }
   },
   "plugins": {
-    "updater": {
-      "active": true,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDc0OTREMjkxREFCNUIzRTEKUldUaHM3WGFrZEtVZEJzZWtMTlc5dGxnT0R2Q3hUTWVaclJWSm9JUFpPcVFUV2RBSG5oNFN6UjQK",
-      "endpoints": [
-        "https://github.com/tinyhumansai/openhuman/releases/latest/download/latest.json"
-      ]
-    },
     "deep-link": {
       "desktop": {
         "schemes": [
