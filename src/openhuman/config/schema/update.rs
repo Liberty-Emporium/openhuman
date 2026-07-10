@@ -23,7 +23,8 @@ impl Default for UpdateRestartStrategy {
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 #[serde(default)]
 pub struct UpdateConfig {
-    /// Enable periodic update checks. Defaults to `true`.
+    /// Enable periodic update checks. Defaults to `false` — Alexander AI
+    /// Solutions ships its own installers; we do not phone home for updates.
     #[serde(default = "default_update_enabled")]
     pub enabled: bool,
 
@@ -43,7 +44,7 @@ pub struct UpdateConfig {
 }
 
 fn default_update_enabled() -> bool {
-    true
+    false
 }
 
 fn default_update_interval_minutes() -> u32 {
