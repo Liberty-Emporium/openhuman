@@ -3444,7 +3444,7 @@ const en: TranslationMap = {
   'app.persistRehydration.heading': 'Restoring your data',
   'app.persistRehydration.resetCta': 'Resetting…',
   'app.persistRehydration.resetting': 'Resetting…',
-  'app.routeLoading.initializing': 'Initializing OpenHuman...',
+  'app.routeLoading.initializing': 'Initializing Alexander AI Solutions...',
   'app.update.currentlyOn': '{version}',
   'app.update.errorFallback': 'Something went wrong while updating.',
   'app.update.header.default': 'Update',
@@ -3499,7 +3499,7 @@ const en: TranslationMap = {
   'chat.approval.tool': 'Tool:',
 
   // Auth mode labels
-  'channels.authMode.managed_dm': 'Login with OpenHuman',
+  'channels.authMode.managed_dm': 'Login with Alexander AI Solutions',
   'channels.authMode.oauth': 'OAuth Sign-in',
   'channels.authMode.bot_token': 'Use your own Bot Token',
   'channels.authMode.api_key': 'Use your own API Key',
