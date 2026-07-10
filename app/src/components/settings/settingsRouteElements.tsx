@@ -38,7 +38,6 @@ import PersonalityPanel from './panels/PersonalityPanel';
 import PrivacyPanel from './panels/PrivacyPanel';
 import ProfileEditorPage from './panels/ProfileEditorPage';
 import ProfilesPanel from './panels/ProfilesPanel';
-import RecoveryPhrasePanel from './panels/RecoveryPhrasePanel';
 import SandboxSettingsPanel from './panels/SandboxSettingsPanel';
 import ScreenAwarenessDebugPanel from './panels/ScreenAwarenessDebugPanel';
 import ScreenIntelligencePanel from './panels/ScreenIntelligencePanel';
@@ -54,7 +53,6 @@ import ToolPolicyDiagnosticsPanel from './panels/ToolPolicyDiagnosticsPanel';
 import ToolsPanel from './panels/ToolsPanel';
 import UsagePanel from './panels/UsagePanel';
 import VoiceDebugPanel from './panels/VoiceDebugPanel';
-import WalletBalancesPanel from './panels/WalletBalancesPanel';
 import WebhooksDebugPanel from './panels/WebhooksDebugPanel';
 import WorkflowRunnerPanel from './panels/WorkflowRunnerPanel';
 
@@ -141,8 +139,6 @@ export function settingsRouteElements(): ReactNode {
 
       {/* ── Data ────────────────────────────────────────────────── */}
       <Route path="memory-sync" element={wrapSettingsPage(<MemorySyncPanel />)} />
-      <Route path="wallet-balances" element={wrapSettingsPage(<WalletBalancesPanel />)} />
-      <Route path="recovery-phrase" element={wrapSettingsPage(<RecoveryPhrasePanel />)} />
 
       {/* ── Connections ─────────────────────────────────────────── */}
       <Route path="integrations" element={wrapSettingsPage(<IntegrationsPanel />)} />
@@ -197,7 +193,6 @@ export function settingsRouteElements(): ReactNode {
       <Route path="ai" element={<Navigate to="/connections?tab=llm" replace />} />
       <Route path="agents-settings" element={<SettingsRedirect to="/settings/agents" />} />
       <Route path="features" element={<SettingsRedirect to="/settings/screen-intelligence" />} />
-      <Route path="crypto" element={<SettingsRedirect to="/settings/wallet-balances" />} />
       <Route path="notifications-hub" element={<SettingsRedirect to="/settings/notifications" />} />
       {/* Composio (API key + routing) moved to Connections → API keys. */}
       <Route path="composio" element={<Navigate to="/connections?tab=composio-key" replace />} />
