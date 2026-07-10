@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { AVATAR_MENU_ITEMS, NAV_TABS } from '../navConfig';
 
 describe('NAV_TABS', () => {
-  it('has exactly 5 entries', () => {
-    expect(NAV_TABS).toHaveLength(5);
+  it('has exactly 4 entries', () => {
+    expect(NAV_TABS).toHaveLength(4);
   });
 
   it('has the correct ids in order', () => {
@@ -12,7 +12,6 @@ describe('NAV_TABS', () => {
       'chat',
       'human',
       'brain',
-      'agent-world',
       'connections',
     ]);
   });
@@ -22,7 +21,6 @@ describe('NAV_TABS', () => {
       '/chat',
       '/human',
       '/brain',
-      '/agent-world',
       '/connections',
     ]);
   });
@@ -32,7 +30,6 @@ describe('NAV_TABS', () => {
       'nav.chat',
       'nav.human',
       'nav.brain',
-      'nav.agentWorld',
       'nav.connections',
     ]);
   });
@@ -42,7 +39,6 @@ describe('NAV_TABS', () => {
       'tab-chat',
       'tab-human',
       'tab-brain',
-      'tab-agent-world',
       'tab-connections',
     ]);
   });
@@ -64,6 +60,10 @@ describe('NAV_TABS', () => {
     expect(NAV_TABS.find(t => t.id === 'rewards')).toBeUndefined();
   });
 
+  it('does not contain an agent-world tab (tiny.place stripped)', () => {
+    expect(NAV_TABS.find(t => t.id === 'agent-world')).toBeUndefined();
+  });
+
   it('does not contain an intelligence or skills tab id', () => {
     expect(NAV_TABS.find(t => t.id === 'intelligence')).toBeUndefined();
     expect(NAV_TABS.find(t => t.id === 'skills')).toBeUndefined();
@@ -71,8 +71,8 @@ describe('NAV_TABS', () => {
 });
 
 describe('AVATAR_MENU_ITEMS', () => {
-  it('has exactly 5 entries', () => {
-    expect(AVATAR_MENU_ITEMS).toHaveLength(5);
+  it('has exactly 4 entries', () => {
+    expect(AVATAR_MENU_ITEMS).toHaveLength(4);
   });
 
   it('has the correct ids in order', () => {
@@ -81,11 +81,10 @@ describe('AVATAR_MENU_ITEMS', () => {
       'billing',
       'rewards',
       'invites',
-      'wallet',
     ]);
   });
 
-  it('billing, rewards, and invites are cloudOnly; account and wallet are not', () => {
+  it('billing, rewards, and invites are cloudOnly; account is not', () => {
     const cloudOnly = AVATAR_MENU_ITEMS.filter(i => i.cloudOnly).map(i => i.id);
     expect(cloudOnly).toEqual(['billing', 'rewards', 'invites']);
   });
@@ -93,5 +92,9 @@ describe('AVATAR_MENU_ITEMS', () => {
   it('billing uses openUrl; all others use navigate', () => {
     const openUrlItems = AVATAR_MENU_ITEMS.filter(i => i.kind === 'openUrl').map(i => i.id);
     expect(openUrlItems).toEqual(['billing']);
+  });
+
+  it('does not contain a wallet menu item (digital wallet stripped)', () => {
+    expect(AVATAR_MENU_ITEMS.find(i => i.id === 'wallet')).toBeUndefined();
   });
 });
