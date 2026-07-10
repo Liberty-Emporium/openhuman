@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "OpenHuman",
+  "productName": "Alexander AI Solutions",
   "version": "0.57.18",
-  "identifier": "com.tinyhumansai.openhuman",
+  "identifier": "com.alexanderai.app",
   "build": {
     "beforeDevCommand": "pnpm --filter openhuman-app run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "OpenHuman",
+        "title": "Alexander AI Solutions",
         "width": 390,
         "height": 844,
         "decorations": true,
