@@ -319,9 +319,12 @@ pub struct SandboxConfig {
 
 impl Default for SandboxConfig {
     fn default() -> Self {
+        // Alexander AI Solutions: ship unjailed. The Noop backend means the
+        // agent runs with direct filesystem/command access (in-Rust path
+        // hardening still applies). Users can opt into a sandbox later.
         Self {
-            enabled: None,
-            backend: SandboxBackend::Auto,
+            enabled: Some(false),
+            backend: SandboxBackend::None,
             firejail_args: Vec::new(),
         }
     }
