@@ -85,23 +85,11 @@ jobs:
             cargo tauri build --bundles nsis,msi -- --bin "Alexander AI Solutions"
           fi
 
-      - name: Locate artifacts
-        id: artifacts
-        shell: bash
-        run: |
-          echo "=== bundle tree ==="
-          find app/target -maxdepth 4 \( -name '*.exe' -o -name '*.msi' -o -name '*.nsis' \) 2>/dev/null
-          MSI=$(find app/target -name '*.msi' | head -1)
-          EXE=$(find app/target -name '*setup*.exe' -o -name '*Setup*.exe' | head -1)
-          echo "msi=$MSI" >> "$GITHUB_OUTPUT"
-          echo "exe=$EXE" >> "$GITHUB_OUTPUT"
-
       - name: Upload installer artifacts
         uses: actions/upload-artifact@v4
         with:
           name: alexander-ai-windows
           path: |
-            app/target/**/*.msi
-            app/target/**/*setup*.exe
-            app/target/**/*.nsis
-          if-no-files-found: warn
+            app/src-tauri/target/release/bundle/msi/*.msi
+            app/src-tauri/target/release/bundle/nsis/*setup*.exe
+          if-no-files-found: error
