@@ -1,25 +1,27 @@
 #![cfg(not(windows))]
 
-use anyhow::Result;
-use async_trait::async_trait;
-use openhuman_core::openhuman::agent::dispatcher::NativeToolDispatcher;
-use openhuman_core::openhuman::agent::harness::run_queue::RunQueue;
-use openhuman_core::openhuman::agent::harness::session::Agent;
-use openhuman_core::openhuman::agent::host_runtime::NativeRuntime;
-use openhuman_core::openhuman::config::AgentConfig;
-use openhuman_core::openhuman::inference::provider::thread_context::with_thread_id;
-use openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::NativeToolDispatcher;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::run_queue::RunQueue;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::session::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::host_runtime::NativeRuntime;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::AgentConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::thread_context::with_thread_id;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, ChatResponse, Provider, ToolCall,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts,
 };
-use openhuman_core::openhuman::monitor::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::monitor::tools::{
     MonitorListTool, MonitorReadTool, MonitorStopTool, MonitorTool,
 };
-use openhuman_core::openhuman::security::{AuditLogger, AutonomyLevel, SecurityPolicy};
-use openhuman_core::openhuman::tools::Tool;
+use alexander_ai_solutions_core::alexander_ai_solutions::security::{
+    AuditLogger, AutonomyLevel, SecurityPolicy,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::Tool;
+use anyhow::Result;
+use async_trait::async_trait;
 use parking_lot::Mutex;
 use serde_json::json;
 use std::collections::VecDeque;

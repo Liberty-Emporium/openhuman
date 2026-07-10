@@ -52,7 +52,7 @@ static LOG_DIR: OnceLock<PathBuf> = OnceLock::new();
 pub enum CliLogDefault {
     /// Typical server/CLI logging (`info`, or `debug` when `verbose`).
     Global,
-    /// Silence other modules; only `openhuman_core::openhuman::autocomplete::*` emits logs.
+    /// Silence other modules; only `alexander_ai_solutions_core::alexander_ai_solutions::autocomplete::*` emits logs.
     AutocompleteOnly,
 }
 
@@ -123,7 +123,7 @@ fn level_tag(level: &Level) -> &'static str {
     }
 }
 
-/// Shortens a Rust module path (e.g., `openhuman_core::rpc` -> `rpc`).
+/// Shortens a Rust module path (e.g., `alexander_ai_solutions_core::rpc` -> `rpc`).
 fn short_target(target: &str) -> &str {
     target.rsplit("::").next().unwrap_or(target)
 }
@@ -371,7 +371,7 @@ fn seed_rust_log(verbose: bool, default_scope: CliLogDefault) {
         }
         CliLogDefault::AutocompleteOnly => {
             let level = if verbose { "trace" } else { "debug" };
-            format!("off,openhuman_core::openhuman::autocomplete={level}")
+            format!("off,alexander_ai_solutions_core::alexander_ai_solutions::autocomplete={level}")
         }
     };
     std::env::set_var("RUST_LOG", default);
@@ -385,7 +385,7 @@ fn build_env_filter(verbose: bool, default_scope: CliLogDefault) -> tracing_subs
         CliLogDefault::AutocompleteOnly => {
             let level = if verbose { "trace" } else { "debug" };
             tracing_subscriber::EnvFilter::new(format!(
-                "off,openhuman_core::openhuman::autocomplete={level}"
+                "off,alexander_ai_solutions_core::alexander_ai_solutions::autocomplete={level}"
             ))
         }
     })
@@ -451,7 +451,10 @@ mod tests {
 
     #[test]
     fn short_target_strips_module_path() {
-        assert_eq!(short_target("openhuman_core::core::rpc"), "rpc");
+        assert_eq!(
+            short_target("alexander_ai_solutions_core::core::rpc"),
+            "rpc"
+        );
         // Non-namespaced target stays as-is.
         assert_eq!(short_target("plain"), "plain");
     }
@@ -478,14 +481,14 @@ mod tests {
             seed_rust_log(false, CliLogDefault::AutocompleteOnly);
             assert_eq!(
                 std::env::var("RUST_LOG").unwrap(),
-                "off,openhuman_core::openhuman::autocomplete=debug"
+                "off,alexander_ai_solutions_core::alexander_ai_solutions::autocomplete=debug"
             );
         });
         with_clean_rust_log(|| {
             seed_rust_log(true, CliLogDefault::AutocompleteOnly);
             assert_eq!(
                 std::env::var("RUST_LOG").unwrap(),
-                "off,openhuman_core::openhuman::autocomplete=trace"
+                "off,alexander_ai_solutions_core::alexander_ai_solutions::autocomplete=trace"
             );
         });
     }

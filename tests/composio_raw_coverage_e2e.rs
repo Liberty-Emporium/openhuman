@@ -14,31 +14,30 @@ use axum::{Json, Router};
 use serde_json::{json, Value};
 use tempfile::tempdir;
 
-use openhuman_core::core::all::RegisteredController;
-use openhuman_core::openhuman::composio::client::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::client::{
     create_composio_client, direct_execute, ComposioClientKind,
 };
-use openhuman_core::openhuman::composio::error_mapping::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::error_mapping::{
     classify_composio_error, format_provider_error, remap_transport_error, ComposioErrorClass,
 };
-use openhuman_core::openhuman::composio::execute_dispatch::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::execute_dispatch::{
     execute_composio_action, execute_composio_action_kind,
 };
-use openhuman_core::openhuman::composio::execute_prepare::prepare_execute_arguments;
-use openhuman_core::openhuman::composio::oauth_handoff::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::execute_prepare::prepare_execute_arguments;
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::oauth_handoff::{
     clear_non_active_connections, is_authorize_rate_limited, is_clearable_oauth_status,
     is_inflight_oauth_status, is_meta_oauth_toolkit, meta_oauth_rate_limit_message,
     wrap_authorize_rate_limit_error,
 };
-use openhuman_core::openhuman::composio::providers::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::providers::{
     classify_unknown, find_curated, toolkit_from_slug, CuratedTool, ToolScope, UserScopePref,
 };
-use openhuman_core::openhuman::composio::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::tools::{
     ComposioAction, ComposioAuthorizeTool, ComposioConnectedAccount, ComposioExecuteTool,
     ComposioListConnectionsTool, ComposioListToolkitsTool, ComposioListToolsTool,
 };
-use openhuman_core::openhuman::composio::trigger_history::ComposioTriggerHistoryStore;
-use openhuman_core::openhuman::composio::types::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::trigger_history::ComposioTriggerHistoryStore;
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::types::{
     ComposioActiveTrigger, ComposioActiveTriggersResponse, ComposioAgentReadyToolkitsResponse,
     ComposioAuthorizeResponse, ComposioAvailableTrigger, ComposioAvailableTriggerRepo,
     ComposioAvailableTriggersResponse, ComposioCapabilitiesResponse, ComposioCapability,
@@ -48,23 +47,26 @@ use openhuman_core::openhuman::composio::types::{
     ComposioToolSchema, ComposioToolkitsResponse, ComposioToolsResponse, ComposioTriggerEvent,
     ComposioTriggerHistoryEntry, ComposioTriggerHistoryResult, ComposioTriggerMetadata,
 };
-use openhuman_core::openhuman::composio::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::{
     all_composio_agent_tools, all_composio_controller_schemas, all_composio_registered_controllers,
     cached_active_integrations, connected_set_hash, connection_identity,
     fetch_connected_integrations, fetch_connected_integrations_status,
     init_composio_trigger_history, invalidate_connected_integrations_cache, ComposioActionTool,
     ComposioClient, FetchConnectedIntegrationsStatus,
 };
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::context::prompt::ConnectedIntegration;
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::ConnectedIntegration;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::integrations::IntegrationClient;
-use openhuman_core::openhuman::security::{AutonomyLevel, SecurityPolicy};
-use openhuman_core::openhuman::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::integrations::IntegrationClient;
+use alexander_ai_solutions_core::alexander_ai_solutions::security::{
+    AutonomyLevel, SecurityPolicy,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
     ComposioTool, PermissionLevel, Tool, ToolCallOptions, ToolCategory,
 };
+use alexander_ai_solutions_core::core::all::RegisteredController;
 
 #[test]
 fn composio_prepare_execute_arguments_normalizes_calendar_and_notion_payloads() {
@@ -372,7 +374,10 @@ async fn composio_ops_mode_and_trigger_history_are_local_and_deterministic() {
     };
     config.composio.mode = "direct".into();
 
-    let mode = openhuman_core::openhuman::composio::ops::composio_get_mode(&config)
+    let mode =
+        alexander_ai_solutions_core::alexander_ai_solutions::composio::ops::composio_get_mode(
+            &config,
+        )
         .await
         .expect("get mode should not call backend")
         .into_cli_compatible_json()
@@ -382,7 +387,7 @@ async fn composio_ops_mode_and_trigger_history_are_local_and_deterministic() {
 
     init_composio_trigger_history(dir.path().to_path_buf())
         .expect("global trigger history initializes for temp workspace");
-    let store = openhuman_core::openhuman::composio::global_composio_trigger_history()
+    let store = alexander_ai_solutions_core::alexander_ai_solutions::composio::global_composio_trigger_history()
         .expect("global history store");
     store
         .record_trigger(
@@ -395,7 +400,7 @@ async fn composio_ops_mode_and_trigger_history_are_local_and_deterministic() {
         .expect("record global trigger");
 
     let history =
-        openhuman_core::openhuman::composio::ops::composio_list_trigger_history(&config, Some(0))
+        alexander_ai_solutions_core::alexander_ai_solutions::composio::ops::composio_list_trigger_history(&config, Some(0))
             .await
             .expect("history listing is local")
             .into_cli_compatible_json()
@@ -843,7 +848,8 @@ async fn composio_controller_registry_and_scope_handlers_cover_validation_edges(
             .starts_with("openhuman.composio_")
     }));
 
-    let unknown = openhuman_core::openhuman::composio::schemas::schemas("not_real");
+    let unknown =
+        alexander_ai_solutions_core::alexander_ai_solutions::composio::schemas::schemas("not_real");
     assert_eq!(unknown.function, "unknown");
     assert_eq!(unknown.inputs[0].name, "function");
 
@@ -906,7 +912,10 @@ fn composio_controller_schema_catalog_covers_all_declared_functions() {
     ];
 
     for (function, input_count, first_output) in expected {
-        let schema = openhuman_core::openhuman::composio::schemas::schemas(function);
+        let schema =
+            alexander_ai_solutions_core::alexander_ai_solutions::composio::schemas::schemas(
+                function,
+            );
         assert_eq!(schema.namespace, "composio");
         assert_eq!(schema.function, function);
         assert_eq!(schema.inputs.len(), input_count, "{function}");

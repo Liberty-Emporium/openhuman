@@ -17,8 +17,8 @@ use axum::Router;
 use serde_json::{json, Value};
 use tempfile::tempdir;
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
@@ -226,7 +226,7 @@ async fn skill_registry_e2e_sources_browse_search_install() {
 
     let tmp = tempdir().expect("create tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -234,7 +234,7 @@ async fn skill_registry_e2e_sources_browse_search_install() {
     let _keyring_guard = EnvVarGuard::set("OPENHUMAN_KEYRING_BACKEND", "file");
 
     let cfg_dir = openhuman_home.clone();
-    std::fs::create_dir_all(&cfg_dir).expect("create .openhuman dir");
+    std::fs::create_dir_all(&cfg_dir).expect("create .alexanderai dir");
     std::fs::write(
         cfg_dir.join("config.toml"),
         r#"api_url = "http://127.0.0.1:9"
@@ -488,7 +488,7 @@ encrypt = false
 
     // Verify the SKILL.md file actually landed on disk.
     let skill_file = home
-        .join(".openhuman")
+        .join(".alexanderai")
         .join("skills")
         .join(entry_id)
         .join("SKILL.md");

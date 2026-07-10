@@ -67,10 +67,12 @@ fn core_process_handle_new_creates_instance() {
 #[test]
 fn ready_signal_updates_runtime_port_and_fallback_notice() {
     let handle = CoreProcessHandle::new(7788);
-    handle.apply_embedded_ready_signal(openhuman_core::core::jsonrpc::EmbeddedReadySignal {
-        port: 7789,
-        fallback_from: Some(7788),
-    });
+    handle.apply_embedded_ready_signal(
+        alexander_ai_solutions_core::core::jsonrpc::EmbeddedReadySignal {
+            port: 7789,
+            fallback_from: Some(7788),
+        },
+    );
     assert_eq!(handle.port(), 7789);
     assert_eq!(handle.rpc_url(), "http://127.0.0.1:7789/rpc");
     let notice = handle

@@ -213,7 +213,7 @@ docker run -d --name openhuman-core -p 7788:7788 \
   -e OPENHUMAN_CORE_TOKEN="$(openssl rand -hex 32)" \
   -e BACKEND_URL=https://api.tinyhumans.ai \
   -e OPENHUMAN_APP_ENV=production \
-  -v openhuman-workspace:/home/openhuman/.openhuman \
+  -v openhuman-workspace:/home/openhuman/.alexanderai \
   ghcr.io/tinyhumansai/openhuman-core:latest
 ```
 
@@ -466,12 +466,12 @@ primary_region = '<your-region>'
 [env]
   OPENHUMAN_CORE_HOST = "0.0.0.0"
   OPENHUMAN_CORE_PORT = "7788"
-  OPENHUMAN_WORKSPACE = "/home/openhuman/.openhuman"
+  OPENHUMAN_WORKSPACE = "/home/openhuman/.alexanderai"
   RUST_LOG = "info"
 
 [[mounts]]
   source = "openhuman_workspace"
-  destination = "/home/openhuman/.openhuman"
+  destination = "/home/openhuman/.alexanderai"
 
 [http_service]
   internal_port = 7788
@@ -620,7 +620,7 @@ Fix by SSH-ing in and re-owning the workspace:
 
 ```bash
 fly ssh console --config .fly/fly.toml
-chown -R openhuman:openhuman /home/openhuman/.openhuman/
+chown -R openhuman:openhuman /home/openhuman/.alexanderai/
 exit
 fly machine restart --config .fly/fly.toml
 ```
@@ -658,7 +658,7 @@ docker rm -f oh-smoke
 # Fresh-volume / no-token path (Docker Compose, VPS):
 docker volume create oh-vol-test
 docker run -d --name oh-vol-smoke -p 7789:7788 \
-  -v oh-vol-test:/home/openhuman/.openhuman \
+  -v oh-vol-test:/home/openhuman/.alexanderai \
   openhuman-core:smoke
 curl -fsS http://localhost:7789/health
 docker rm -f oh-vol-smoke

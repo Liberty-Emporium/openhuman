@@ -10,7 +10,7 @@ use std::sync::{Mutex, OnceLock};
 
 use tempfile::tempdir;
 
-use openhuman_core::openhuman::autocomplete::history;
+use alexander_ai_solutions_core::alexander_ai_solutions::autocomplete::history;
 
 // ── Env isolation ────────────────────────────────────────────────────
 

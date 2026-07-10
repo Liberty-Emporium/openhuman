@@ -15,8 +15,10 @@ use anyhow::Result;
 use std::io::Read;
 use std::path::PathBuf;
 
-use crate::openhuman::memory::ingestion::{MemoryIngestionConfig, MemoryIngestionRequest};
-use crate::openhuman::memory_store::NamespaceDocumentInput;
+use crate::alexander_ai_solutions::memory::ingestion::{
+    MemoryIngestionConfig, MemoryIngestionRequest,
+};
+use crate::alexander_ai_solutions::memory_store::NamespaceDocumentInput;
 
 /// Entry point for `openhuman memory <subcommand>`.
 pub fn run_memory_command(args: &[String]) -> Result<()> {
@@ -132,7 +134,7 @@ fn run_ingest(args: &[String]) -> Result<()> {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: crate::openhuman::memory::MemoryTaint::Internal,
+            taint: crate::alexander_ai_solutions::memory::MemoryTaint::Internal,
         };
 
         let ingestion_config = MemoryIngestionConfig::default();
@@ -433,11 +435,13 @@ fn read_input(path: &str) -> Result<String> {
     }
 }
 
-async fn create_memory_client() -> Result<crate::openhuman::memory_store::MemoryClientRef> {
-    let config = crate::openhuman::config::Config::load_or_init()
+async fn create_memory_client(
+) -> Result<crate::alexander_ai_solutions::memory_store::MemoryClientRef> {
+    let config = crate::alexander_ai_solutions::config::Config::load_or_init()
         .await
         .unwrap_or_default();
-    crate::openhuman::memory::global::init(config.workspace_dir).map_err(anyhow::Error::msg)
+    crate::alexander_ai_solutions::memory::global::init(config.workspace_dir)
+        .map_err(anyhow::Error::msg)
 }
 
 fn print_memory_help() {

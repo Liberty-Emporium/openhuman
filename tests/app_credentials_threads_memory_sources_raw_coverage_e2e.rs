@@ -2,29 +2,31 @@ use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 
-use chrono::Utc;
-use openhuman_core::openhuman::app_state::{
+use alexander_ai_solutions_core::alexander_ai_solutions::app_state::{
     snapshot, update_local_state, StoredAppStatePatch, StoredOnboardingTasks,
 };
-use openhuman_core::openhuman::config::rpc as config_rpc;
-use openhuman_core::openhuman::credentials::profiles::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::rpc as config_rpc;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::profiles::{
     profile_id, AuthProfile, AuthProfilesStore, TokenSet,
 };
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     list_provider_credentials_by_prefix, AuthService, APP_SESSION_PROVIDER,
     DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     AppendConversationMessageRequest, ConversationMessageRecord, ConversationMessagesRequest,
     CreateConversationThreadRequest, DeleteConversationThreadRequest, EmptyRequest,
     GenerateConversationThreadTitleRequest, UpdateConversationMessageRequest,
     UpdateConversationThreadLabelsRequest, UpdateConversationThreadTitleRequest,
 };
-use openhuman_core::openhuman::memory_sources::readers::SourceReader;
-use openhuman_core::openhuman::memory_sources::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::readers::SourceReader;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::{
     self, MemorySourceEntry, MemorySourcePatch, SourceKind,
 };
-use openhuman_core::openhuman::threads::{migrate_welcome_agent_artifacts, ops as thread_ops};
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::{
+    migrate_welcome_agent_artifacts, ops as thread_ops,
+};
+use chrono::Utc;
 use serde_json::{json, Value};
 use tempfile::{Builder, TempDir};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -72,7 +74,7 @@ struct Harness {
 }
 
 impl Harness {
-    async fn config(&self) -> openhuman_core::openhuman::config::Config {
+    async fn config(&self) -> alexander_ai_solutions_core::alexander_ai_solutions::config::Config {
         config_rpc::load_config_with_timeout()
             .await
             .expect("isolated config should load")
@@ -141,7 +143,7 @@ embedding_strict = false
 "#
     );
     std::fs::write(root.join("config.toml"), &cfg).expect("write config.toml");
-    let _: openhuman_core::openhuman::config::Config =
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
         toml::from_str(&cfg).expect("round19 config must match schema");
 }
 
@@ -688,7 +690,7 @@ async fn round19_memory_sources_registry_readers_sync_and_reconcile_edges() {
         .expect_err("disabled source rejected");
     assert!(disabled_sync.contains("disabled"));
 
-    let reader = openhuman_core::openhuman::memory_sources::readers::folder::FolderReader;
+    let reader = alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::readers::folder::FolderReader;
     let listed = reader
         .list_items(&folder, &config)
         .await
@@ -730,7 +732,7 @@ async fn round19_memory_sources_registry_readers_sync_and_reconcile_edges() {
     assert_eq!(updated_composio.id, upserted.id);
     assert_eq!(updated_composio.label, "Gmail updated");
 
-    let github_reader = openhuman_core::openhuman::memory_sources::readers::github::GithubReader;
+    let github_reader = alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::readers::github::GithubReader;
     let github_err = github_reader
         .list_items(
             &MemorySourceEntry {
@@ -765,7 +767,7 @@ async fn round19_memory_sources_registry_readers_sync_and_reconcile_edges() {
         max_items: Some(1),
         ..source_entry("src-rss", SourceKind::RssFeed, "Feed")
     };
-    let rss_reader = openhuman_core::openhuman::memory_sources::readers::rss::RssReader;
+    let rss_reader = alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::readers::rss::RssReader;
     let feed_items = rss_reader
         .list_items(&rss, &config)
         .await

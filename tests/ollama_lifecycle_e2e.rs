@@ -27,13 +27,13 @@
 
 use std::sync::{Mutex, OnceLock};
 
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::inference::local::LocalAiService;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::LocalAiService;
 
 // ── Environment serialization lock ───────────────────────────────────────────
 //
 // Each test temporarily sets OPENHUMAN_WORKSPACE to redirect the marker path
-// away from ~/.openhuman/. The mutex prevents parallel tests from stomping
+// away from ~/.alexanderai/. The mutex prevents parallel tests from stomping
 // each other's env state.
 
 static ENV_LOCK: OnceLock<Mutex<()>> = OnceLock::new();

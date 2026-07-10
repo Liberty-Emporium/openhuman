@@ -19,16 +19,20 @@
 
 use std::sync::{Arc, Mutex as StdMutex, OnceLock};
 
-use openhuman_core::core::event_bus::{global, init_global, DomainEvent};
-use openhuman_core::openhuman::agent::triage::{TriageAction, TriageDecision};
-use openhuman_core::openhuman::subconscious::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::triage::{
+    TriageAction, TriageDecision,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::subconscious::{
     notify_user, ORCHESTRATOR_THREAD_ID, USER_THREAD_ID,
 };
-use openhuman_core::openhuman::subconscious_triggers::gate::{apply_budget, map_triage_to_gate};
-use openhuman_core::openhuman::subconscious_triggers::{
+use alexander_ai_solutions_core::alexander_ai_solutions::subconscious_triggers::gate::{
+    apply_budget, map_triage_to_gate,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::subconscious_triggers::{
     normalize, AdmitOutcome, DedupeWindow, EnqueueOutcome, GateDecision, OrchestratorQueue,
     PromotionBudget, RateLimiter, Trigger, TriggerPriority, TriggerRegistry, TriggerSource,
 };
+use alexander_ai_solutions_core::core::event_bus::{global, init_global, DomainEvent};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Event constructors for the four v1 trigger sources.
@@ -521,8 +525,11 @@ async fn scenario_notify_user_delivers_and_persists() {
 
     // 2) The message landed in the reserved user-facing thread.
     let persisted =
-        openhuman_core::openhuman::memory_conversations::get_messages(workspace, USER_THREAD_ID)
-            .expect("read user thread");
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_conversations::get_messages(
+            workspace,
+            USER_THREAD_ID,
+        )
+        .expect("read user thread");
     assert!(
         persisted
             .iter()
@@ -537,7 +544,7 @@ async fn scenario_notify_user_delivers_and_persists() {
 
 #[test]
 fn scenario_reserved_threads_are_distinct_and_persist() {
-    use openhuman_core::openhuman::memory_conversations::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::memory_conversations::{
         append_message, ensure_thread, get_messages, ConversationMessage, CreateConversationThread,
     };
 

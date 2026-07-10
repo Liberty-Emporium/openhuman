@@ -25,7 +25,7 @@ fn main() {
         #[cfg(target_os = "windows")]
         attach_parent_console();
 
-        if let Err(err) = openhuman::run_core_from_args(&args[2..]) {
+        if let Err(err) = alexander_ai_solutions::run_core_from_args(&args[2..]) {
             eprintln!("core process failed: {err}");
             std::process::exit(1);
         }
@@ -33,7 +33,7 @@ fn main() {
     }
 
     // MCP clients (e.g. the Claude Code CLI provider) spawn this binary as
-    // `<bin> mcp` to get a stdio MCP server. The standalone `openhuman-core`
+    // `<bin> mcp` to get a stdio MCP server. The standalone `alexander-ai-solutions-core`
     // binary already accepts `mcp` directly; route it here too so the desktop
     // app binary behaves the same instead of falling through to GUI startup.
     // (CEF helper re-execs carry `--type=…`, handled earlier by the entry
@@ -42,14 +42,14 @@ fn main() {
         #[cfg(target_os = "windows")]
         attach_parent_console();
 
-        if let Err(err) = openhuman::run_core_from_args(&args[1..]) {
+        if let Err(err) = alexander_ai_solutions::run_core_from_args(&args[1..]) {
             eprintln!("core mcp server failed: {err}");
             std::process::exit(1);
         }
         return;
     }
 
-    openhuman::run()
+    alexander_ai_solutions::run()
 }
 
 #[cfg(target_os = "windows")]

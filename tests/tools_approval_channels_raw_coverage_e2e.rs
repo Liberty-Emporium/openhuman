@@ -18,41 +18,39 @@ use reqwest::StatusCode as ReqwestStatusCode;
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::event_bus::{DomainEvent, EventHandler};
-use openhuman_core::core::jsonrpc::build_core_http_router;
-use openhuman_core::core::socketio::WebChannelEvent;
-use openhuman_core::openhuman::agent::harness::definition::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::definition::{
     AgentDefinition, AgentDefinitionRegistry, AgentTier, DefinitionSource, ModelSpec, PromptSource,
     SandboxMode, SkillsWildcard, SubagentEntry, ToolScope as AgentToolScope,
 };
-use openhuman_core::openhuman::agent::host_runtime::NativeRuntime;
-use openhuman_core::openhuman::channels::email_channel::EmailConfig;
-use openhuman_core::openhuman::channels::irc::IrcChannelConfig;
-use openhuman_core::openhuman::channels::proactive::ProactiveMessageSubscriber;
-use openhuman_core::openhuman::channels::traits::ChannelMessage;
-use openhuman_core::openhuman::channels::yuanbao::config::YuanbaoConfig;
-use openhuman_core::openhuman::channels::yuanbao::errors::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::host_runtime::NativeRuntime;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::email_channel::EmailConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::irc::IrcChannelConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::proactive::ProactiveMessageSubscriber;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::traits::ChannelMessage;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::config::YuanbaoConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::errors::{
     AUTH_FAILED_CODES, AUTH_RETRYABLE_CODES, NO_RECONNECT_CLOSE_CODES,
 };
-use openhuman_core::openhuman::channels::yuanbao::inbound::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::inbound::{
     InboundPipeline, PipelineOutcome, PipelineState,
 };
-use openhuman_core::openhuman::channels::yuanbao::media::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::media::{
     build_file_msg_body, build_image_msg_body, guess_mime_type, image_format_code, is_image,
     parse_image_size,
 };
-use openhuman_core::openhuman::channels::yuanbao::proto::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::proto::{
     decode_auth_bind_rsp, decode_conn_msg, decode_inbound_json, decode_inbound_push,
     decode_push_msg, encode_auth_bind, encode_conn_msg, encode_msg_body_element, encode_ping,
     encode_push_ack,
 };
-use openhuman_core::openhuman::channels::yuanbao::proto_constants::{cmd, cmd_type, module};
-use openhuman_core::openhuman::channels::yuanbao::sign::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::proto_constants::{
+    cmd, cmd_type, module,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::sign::{
     build_timestamp, compute_signature, generate_nonce, SignManager,
 };
-use openhuman_core::openhuman::channels::yuanbao::splitter::split_markdown;
-use openhuman_core::openhuman::channels::yuanbao::types::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::splitter::split_markdown;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::types::{
     Account as YuanbaoAccount, ConnFrame as YuanbaoConnFrame,
     ConnectionState as YuanbaoConnectionState, GroupInfo as YuanbaoGroupInfo,
     GroupMember as YuanbaoGroupMember, GroupMemberListPage as YuanbaoGroupMemberListPage,
@@ -61,46 +59,50 @@ use openhuman_core::openhuman::channels::yuanbao::types::{
     MsgBodyElement as YuanbaoMsgBodyElement, MsgContent as YuanbaoMsgContent,
     Source as YuanbaoSource,
 };
-use openhuman_core::openhuman::channels::yuanbao::wire::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::wire::{
     decode_varint, encode_field_bytes, encode_field_string, encode_field_varint, encode_varint,
     get_bytes, get_repeated_bytes, get_string, get_varint, next_seq_no, parse_fields, FieldValue,
 };
-use openhuman_core::openhuman::channels::yuanbao::YuanbaoChannel;
-use openhuman_core::openhuman::channels::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::yuanbao::YuanbaoChannel;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::{
     doctor_channels, Channel, CliChannel, DingTalkChannel, EmailChannel, IMessageChannel,
     IrcChannel, LinqChannel, MattermostChannel, QQChannel, SendMessage, SignalChannel,
     SlackChannel, WhatsAppChannel,
 };
-use openhuman_core::openhuman::composio::all_composio_agent_tools;
-use openhuman_core::openhuman::config::schema::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::all_composio_agent_tools;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::schema::{
     CapabilityProviderConfig, CapabilityProviderTrustState, NodeConfig, WhatsAppConfig,
 };
-use openhuman_core::openhuman::config::{Config, IMessageConfig, WebhookConfig};
-use openhuman_core::openhuman::context::prompt::ConnectedIntegration;
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
+    Config, IMessageConfig, WebhookConfig,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::ConnectedIntegration;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::javascript::NodeBootstrap;
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::javascript::NodeBootstrap;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts,
 };
-use openhuman_core::openhuman::security::{AuditLogger, AutonomyLevel, SecurityPolicy};
-use openhuman_core::openhuman::tokenjuice::AgentTokenjuiceCompression;
-use openhuman_core::openhuman::tool_registry::ops::diagnostics_for_config;
-use openhuman_core::openhuman::tool_registry::{
+use alexander_ai_solutions_core::alexander_ai_solutions::security::{
+    AuditLogger, AutonomyLevel, SecurityPolicy,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tokenjuice::AgentTokenjuiceCompression;
+use alexander_ai_solutions_core::alexander_ai_solutions::tool_registry::ops::diagnostics_for_config;
+use alexander_ai_solutions_core::alexander_ai_solutions::tool_registry::{
     all_tool_registry_controller_schemas, all_tool_registry_registered_controllers,
     capability_provider_by_id, capability_provider_diagnostics, capability_provider_registry,
     denials, get_tool, is_capability_provider_trusted_enabled, list_capability_providers,
     list_tools, normalize_capability_provider_id, registry_entries,
     CapabilityProviderRegistryError,
 };
-use openhuman_core::openhuman::tools::generated::{
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::generated::{
     admit_generated_tool_definitions, generated_tools_from_definitions, GeneratedToolAdapter,
     GeneratedToolAdmissionConfig, GeneratedToolDefinition, GeneratedToolRisk,
 };
-use openhuman_core::openhuman::tools::local_cli::tools_wrappers_list_json;
-use openhuman_core::openhuman::tools::orchestrator_tools::collect_orchestrator_tools;
-use openhuman_core::openhuman::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::local_cli::tools_wrappers_list_json;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::orchestrator_tools::collect_orchestrator_tools;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
     all_tools, all_tools_controller_schemas, all_tools_registered_controllers,
     decode_data_url_bytes, default_tools, extract_data_url, extract_saved_path,
     write_bytes_to_path, ApplyPatchTool, BrowserAction, BrowserTool, CleaningStrategy,
@@ -111,6 +113,10 @@ use openhuman_core::openhuman::tools::{
     SchemaCleanr, Tool, ToolCallOptions, ToolCategory, ToolPolicy, ToolResult, ToolScope,
     UpdateApplyTool, UpdateMemoryMdTool, WebFetchTool, WorkspaceStateTool,
 };
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::event_bus::{DomainEvent, EventHandler};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
+use alexander_ai_solutions_core::core::socketio::WebChannelEvent;
 
 const TEST_RPC_TOKEN: &str = "tools-approval-channels-raw-e2e-token";
 
@@ -330,7 +336,7 @@ fn coverage_connected_integration(
 struct DefaultPathTool;
 
 #[async_trait]
-impl openhuman_core::openhuman::tools::Tool for DefaultPathTool {
+impl alexander_ai_solutions_core::alexander_ai_solutions::tools::Tool for DefaultPathTool {
     fn name(&self) -> &str {
         "default_path_tool"
     }
@@ -685,7 +691,7 @@ async fn setup() -> Harness {
     let api_url = format!("http://{backend_addr}");
 
     write_config(&workspace, &api_url);
-    write_config(&home.join(".openhuman"), &api_url);
+    write_config(&home.join(".alexanderai"), &api_url);
 
     let guards = vec![
         EnvVarGuard::set_to_path("HOME", home),
@@ -2066,15 +2072,17 @@ async fn channel_provider_public_paths_cover_pre_network_errors_and_utilities() 
 
 #[tokio::test]
 async fn web_channel_public_paths_cover_event_delivery_and_validation_errors() {
-    let mut rx = openhuman_core::openhuman::channels::web::subscribe_web_channel_events();
-    openhuman_core::openhuman::channels::web::publish_web_channel_event(WebChannelEvent {
-        event: "coverage_event".to_string(),
-        client_id: "client-1".to_string(),
-        thread_id: "thread-1".to_string(),
-        request_id: "request-1".to_string(),
-        message: Some("hello web channel".to_string()),
-        ..Default::default()
-    });
+    let mut rx = alexander_ai_solutions_core::alexander_ai_solutions::channels::web::subscribe_web_channel_events();
+    alexander_ai_solutions_core::alexander_ai_solutions::channels::web::publish_web_channel_event(
+        WebChannelEvent {
+            event: "coverage_event".to_string(),
+            client_id: "client-1".to_string(),
+            thread_id: "thread-1".to_string(),
+            request_id: "request-1".to_string(),
+            message: Some("hello web channel".to_string()),
+            ..Default::default()
+        },
+    );
     let event = tokio::time::timeout(Duration::from_secs(1), rx.recv())
         .await
         .expect("web channel event should be delivered")
@@ -2085,7 +2093,7 @@ async fn web_channel_public_paths_cover_event_delivery_and_validation_errors() {
     assert_eq!(event.message.as_deref(), Some("hello web channel"));
 
     assert_eq!(
-        openhuman_core::openhuman::channels::web::start_chat(
+        alexander_ai_solutions_core::alexander_ai_solutions::channels::web::start_chat(
             "",
             "thread-1",
             "hello",
@@ -2094,14 +2102,14 @@ async fn web_channel_public_paths_cover_event_delivery_and_validation_errors() {
             None,
             None,
             None,
-            openhuman_core::openhuman::channels::web::ChatRequestMetadata::default(),
+            alexander_ai_solutions_core::alexander_ai_solutions::channels::web::ChatRequestMetadata::default(),
         )
         .await
         .expect_err("blank client_id"),
         "client_id is required"
     );
     assert_eq!(
-        openhuman_core::openhuman::channels::web::start_chat(
+        alexander_ai_solutions_core::alexander_ai_solutions::channels::web::start_chat(
             "client-1",
             "",
             "hello",
@@ -2110,14 +2118,14 @@ async fn web_channel_public_paths_cover_event_delivery_and_validation_errors() {
             None,
             None,
             None,
-            openhuman_core::openhuman::channels::web::ChatRequestMetadata::default(),
+            alexander_ai_solutions_core::alexander_ai_solutions::channels::web::ChatRequestMetadata::default(),
         )
         .await
         .expect_err("blank thread_id"),
         "thread_id is required"
     );
     assert_eq!(
-        openhuman_core::openhuman::channels::web::start_chat(
+        alexander_ai_solutions_core::alexander_ai_solutions::channels::web::start_chat(
             "client-1",
             "thread-1",
             "   ",
@@ -2126,7 +2134,7 @@ async fn web_channel_public_paths_cover_event_delivery_and_validation_errors() {
             None,
             None,
             None,
-            openhuman_core::openhuman::channels::web::ChatRequestMetadata::default(),
+            alexander_ai_solutions_core::alexander_ai_solutions::channels::web::ChatRequestMetadata::default(),
         )
         .await
         .expect_err("blank message"),
@@ -2134,26 +2142,35 @@ async fn web_channel_public_paths_cover_event_delivery_and_validation_errors() {
     );
 
     assert_eq!(
-        openhuman_core::openhuman::channels::web::cancel_chat("", "thread-1")
-            .await
-            .expect_err("blank cancel client_id"),
+        alexander_ai_solutions_core::alexander_ai_solutions::channels::web::cancel_chat(
+            "", "thread-1"
+        )
+        .await
+        .expect_err("blank cancel client_id"),
         "client_id is required"
     );
     assert_eq!(
-        openhuman_core::openhuman::channels::web::cancel_chat("client-1", "")
-            .await
-            .expect_err("blank cancel thread_id"),
+        alexander_ai_solutions_core::alexander_ai_solutions::channels::web::cancel_chat(
+            "client-1", ""
+        )
+        .await
+        .expect_err("blank cancel thread_id"),
         "thread_id is required"
     );
     assert!(
-        openhuman_core::openhuman::channels::web::cancel_chat("client-1", "thread-1")
-            .await
-            .expect("cancel with no in-flight request")
-            .is_none()
+        alexander_ai_solutions_core::alexander_ai_solutions::channels::web::cancel_chat(
+            "client-1", "thread-1"
+        )
+        .await
+        .expect("cancel with no in-flight request")
+        .is_none()
     );
-    openhuman_core::openhuman::channels::web::invalidate_thread_sessions("thread-1").await;
+    alexander_ai_solutions_core::alexander_ai_solutions::channels::web::invalidate_thread_sessions(
+        "thread-1",
+    )
+    .await;
     assert!(
-        openhuman_core::openhuman::channels::web::in_flight_entries_for_test()
+        alexander_ai_solutions_core::alexander_ai_solutions::channels::web::in_flight_entries_for_test()
             .await
             .is_empty()
     );
@@ -2180,7 +2197,7 @@ async fn proactive_subscriber_routes_web_and_active_external_channel_without_net
         }
     }
 
-    let mut rx = openhuman_core::openhuman::channels::web::subscribe_web_channel_events();
+    let mut rx = alexander_ai_solutions_core::alexander_ai_solutions::channels::web::subscribe_web_channel_events();
     let capture = Arc::new(CapturingChannel::default());
     let mut channels: HashMap<String, Arc<dyn Channel>> = HashMap::new();
     channels.insert("capture".into(), capture.clone());
@@ -3195,7 +3212,8 @@ async fn proxy_config_tool_covers_temp_config_runtime_env_and_validation_paths()
         config_path: dir.path().join("config.toml"),
         ..Config::default()
     };
-    config.autonomy.level = openhuman_core::openhuman::security::AutonomyLevel::Full;
+    config.autonomy.level =
+        alexander_ai_solutions_core::alexander_ai_solutions::security::AutonomyLevel::Full;
     config.save().await.expect("write temp config");
 
     let security = Arc::new(SecurityPolicy::from_config(
@@ -3572,7 +3590,7 @@ async fn node_and_npm_exec_tools_cover_validation_policy_and_disabled_runtime_pa
         &config.workspace_dir,
     ));
     let readonly_security = Arc::new(SecurityPolicy::from_config(
-        &openhuman_core::openhuman::config::AutonomyConfig {
+        &alexander_ai_solutions_core::alexander_ai_solutions::config::AutonomyConfig {
             level: AutonomyLevel::ReadOnly,
             ..config.autonomy.clone()
         },
@@ -3684,13 +3702,15 @@ async fn node_and_npm_exec_tools_cover_validation_policy_and_disabled_runtime_pa
 #[tokio::test]
 async fn doctor_channels_covers_no_channel_and_local_validation_paths() {
     let mut empty = Config::default();
-    empty.channels_config = openhuman_core::openhuman::config::ChannelsConfig::default();
+    empty.channels_config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::ChannelsConfig::default();
     doctor_channels(empty)
         .await
         .expect("empty channel doctor is ok");
 
     let mut config = Config::default();
-    config.channels_config = openhuman_core::openhuman::config::ChannelsConfig::default();
+    config.channels_config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::ChannelsConfig::default();
     config.channels_config.imessage = Some(IMessageConfig {
         allowed_contacts: Vec::new(),
     });

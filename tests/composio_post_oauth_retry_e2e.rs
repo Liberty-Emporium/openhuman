@@ -79,8 +79,8 @@ use axum::{Json, Router};
 use serde_json::{json, Value};
 use tempfile::tempdir;
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 // ── env serialisation ─────────────────────────────────────────────────────────
 //
@@ -315,7 +315,7 @@ async fn post_oauth_gap_retries_and_returns_real_data() {
 
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvGuard::set_to_path("HOME", home);
     let _ws_guard = EnvGuard::unset("OPENHUMAN_WORKSPACE");
@@ -454,7 +454,7 @@ async fn revoked_token_surfaces_without_retry() {
 
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvGuard::set_to_path("HOME", home);
     let _ws_guard = EnvGuard::unset("OPENHUMAN_WORKSPACE");

@@ -2,7 +2,7 @@
 //!
 //! When another OpenHuman instance is already running, it holds an exclusive
 //! lock on the CEF user-data-dir. On macOS this is
-//! `~/Library/Caches/com.openhuman.app/cef`; on Linux it is the path in
+//! `~/Library/Caches/com.alexanderai.app/cef`; on Linux it is the path in
 //! `OPENHUMAN_CEF_CACHE_PATH` (set by `cef_profile::prepare_process_cache_path`
 //! before this module runs), falling back to `$XDG_CACHE_HOME/<id>/cef` or
 //! `$HOME/.cache/<id>/cef` when the env var is absent.
@@ -44,7 +44,7 @@ const BACKOFF_CAP: Duration = Duration::from_millis(500);
 /// the vendored `tauri-runtime-cef` derives the cache directory as
 /// `dirs::cache_dir() / <identifier> / cef`. If `tauri.conf.json` ever changes
 /// the bundle identifier, update this constant too.
-pub const APP_IDENTIFIER: &str = "com.openhuman.app";
+pub const APP_IDENTIFIER: &str = "com.alexanderai.app";
 
 /// Errors returned by the preflight check.
 #[derive(Debug)]
@@ -73,9 +73,9 @@ impl fmt::Display for CefLockError {
                 // compiled for both (`cfg(any(macos, linux))`), so a hardcoded
                 // macOS `pkill` pattern would mislead Linux users.
                 let workaround = if cfg!(target_os = "macos") {
-                    "pkill -f \"OpenHuman.app/Contents\"\n  pkill -f \"openhuman-core\""
+                    "pkill -f \"OpenHuman.app/Contents\"\n  pkill -f \"alexander-ai-solutions-core\""
                 } else {
-                    "pkill -f openhuman\n  pkill -f openhuman-core"
+                    "pkill -f openhuman\n  pkill -f alexander-ai-solutions-core"
                 };
                 write!(
                     f,

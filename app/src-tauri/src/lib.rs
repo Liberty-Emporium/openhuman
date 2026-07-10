@@ -1263,7 +1263,7 @@ fn notch_window_hide(app: AppHandle<AppRuntime>) -> Result<(), String> {
 /// runtime returns a `cef::Window` internal handle that `ShowWindow` rejects,
 /// so we walk the OS window list instead (#1607). Empirically there is one
 /// matching top-level frame; the single-instance lock window uses class
-/// `com.openhuman.app-sic` and is excluded.
+/// `com.alexanderai.app-sic` and is excluded.
 ///
 /// `SW_HIDE` removes the frame from screen AND taskbar — full hide-to-tray as
 /// PR #1548 intended. On restore, the IsWindowVisible filter excludes hidden
@@ -2237,13 +2237,13 @@ pub fn run() {
     // `src/openhuman/config/{schema/load.rs, ops.rs}`) moves the largest
     // contributor off the worker. An initial 8 MiB bump shipped here was
     // enough for that single tower, but sub-agent delegation (issue #3159
-    // / PR #3155) re-tipped the scale: the standalone `openhuman-core`
+    // / PR #3155) re-tipped the scale: the standalone `alexander-ai-solutions-core`
     // CLI server still aborted with `Abort trap: 6 / fatal runtime error:
     // stack overflow` once an orchestrator delegated. PR #3155 raised the
     // standalone server to 16 MiB; the desktop Tauri host is the *same*
     // tower running on a *different* runtime and needs the same headroom.
     // Share the constant with the rest of `src/core/*` via
-    // [`openhuman_core::core::runtime::AGENT_WORKER_STACK_BYTES`] so all
+    // [`alexander_ai_solutions_core::core::runtime::AGENT_WORKER_STACK_BYTES`] so all
     // multi-thread runtimes that may host an agent turn stay in sync.
     //
     // Must happen before any `tauri::async_runtime::*` call, otherwise
@@ -2251,7 +2251,7 @@ pub fn run() {
     {
         let custom_runtime = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
-            .thread_stack_size(openhuman_core::core::runtime::AGENT_WORKER_STACK_BYTES)
+            .thread_stack_size(alexander_ai_solutions_core::core::runtime::AGENT_WORKER_STACK_BYTES)
             .build()
             .expect("build custom tokio runtime for tauri async surface");
         let handle = custom_runtime.handle().clone();
@@ -2302,7 +2302,7 @@ pub fn run() {
                 );
                 return None;
             }
-            if openhuman_core::core::observability::is_budget_event(&event) {
+            if alexander_ai_solutions_core::core::observability::is_budget_event(&event) {
                 // Log only structured tag metadata — `event.message` can carry
                 // upstream provider error text including tokens / pasted-through
                 // secrets, and per `CLAUDE.md` "never log secrets or full PII".
@@ -2317,20 +2317,20 @@ pub fn run() {
             }
             // Defense-in-depth: drop max-tool-iterations cap events that
             // slipped past the call-site filters in the core (see
-            // `openhuman_core::core::observability::is_max_iterations_event`
+            // `alexander_ai_solutions_core::core::observability::is_max_iterations_event`
             // for the rationale). The shell links the core in-process so
             // any captured event for this deterministic agent-state
             // outcome is filtered here too (OPENHUMAN-TAURI-99 / -98).
-            if openhuman_core::core::observability::is_max_iterations_event(&event) {
+            if alexander_ai_solutions_core::core::observability::is_max_iterations_event(&event) {
                 log::debug!(
                     "[sentry-max-iter-filter] dropping max-iteration cap noise event: {:?}",
                     event.message.as_deref().unwrap_or("<no message>")
                 );
                 return None;
             }
-            if openhuman_core::core::observability::is_transient_backend_api_failure(&event)
-                || openhuman_core::core::observability::is_transient_integrations_failure(&event)
-                || openhuman_core::core::observability::is_updater_transient_event(&event)
+            if alexander_ai_solutions_core::core::observability::is_transient_backend_api_failure(&event)
+                || alexander_ai_solutions_core::core::observability::is_transient_integrations_failure(&event)
+                || alexander_ai_solutions_core::core::observability::is_updater_transient_event(&event)
             {
                 return None;
             }
@@ -2340,7 +2340,8 @@ pub fn run() {
             // identically to the core binary's main.rs chain. The malformed
             // `BAD_REQUEST` carve-out (F8) is excluded by the underlying
             // decision, so a client-built bad payload still pages.
-            if openhuman_core::core::observability::is_backend_error_code_event(&event) {
+            if alexander_ai_solutions_core::core::observability::is_backend_error_code_event(&event)
+            {
                 log::debug!(
                     "[sentry-error-code-filter] dropping backend-owned errorCode event_id={:?}",
                     event.event_id
@@ -2351,7 +2352,7 @@ pub fn run() {
             // (domain=llm_provider, failure=transport) — flaky-network
             // timeouts/resets recovered by retry/fallback (F7). Mirrors the
             // core binary's main.rs filter.
-            if openhuman_core::core::observability::is_transient_provider_transport_failure(&event)
+            if alexander_ai_solutions_core::core::observability::is_transient_provider_transport_failure(&event)
             {
                 log::debug!(
                     "[sentry-transport-filter] dropping transient provider transport event_id={:?}",
@@ -2366,7 +2367,7 @@ pub fn run() {
             // captured by either surface lands in the same Sentry client
             // here and must be filtered identically. Keeps
             // OPENHUMAN-TAURI-25 / -1Q / -27 / -1G off Sentry.
-            if openhuman_core::core::observability::is_session_expired_event(&event) {
+            if alexander_ai_solutions_core::core::observability::is_session_expired_event(&event) {
                 // Metadata-only log shape — `event.message` carries the raw
                 // backend response body which CLAUDE.md forbids from local
                 // logs. Mirror the core binary's main.rs filter.
@@ -2386,7 +2387,9 @@ pub fn run() {
             // must be filtered identically. Closes the #3617 drift that wired
             // the filter only into the standalone-CLI chain (TAURI-RUST-514 /
             // -C62).
-            if openhuman_core::core::observability::is_insufficient_credits_event(&event) {
+            if alexander_ai_solutions_core::core::observability::is_insufficient_credits_event(
+                &event,
+            ) {
                 // Metadata-only log shape — `event.message` carries the raw
                 // provider 402 body which CLAUDE.md forbids from local logs.
                 log::debug!(
@@ -2401,7 +2404,7 @@ pub fn run() {
             // the 402-gated credits filter above misses it). No local lever;
             // mirrors the core binary's main.rs before_send chain
             // (TAURI-RUST-C9A: 9k events from a single quota-capped user).
-            if openhuman_core::core::observability::is_quota_exhausted_event(&event) {
+            if alexander_ai_solutions_core::core::observability::is_quota_exhausted_event(&event) {
                 // Metadata-only log shape — `event.message` carries the raw
                 // provider body which CLAUDE.md forbids from local logs.
                 log::debug!(
@@ -2428,7 +2431,7 @@ pub fn run() {
             // (the original userCount=0 root cause).
             if event.user.is_none() {
                 event.user =
-                    openhuman_core::openhuman::app_state::peek_cached_current_user_identity()
+                    alexander_ai_solutions_core::alexander_ai_solutions::app_state::peek_cached_current_user_identity()
                         .and_then(|identity| identity.id)
                         .map(|id| sentry::User {
                             id: Some(id),
@@ -2542,7 +2545,7 @@ pub fn run() {
 
         // Must match the bundle identifier in tauri.conf.json.
         // Changing the app identifier requires updating this string too.
-        let mutex_name: Vec<u16> = "com.openhuman.app-cef-init\0".encode_utf16().collect();
+        let mutex_name: Vec<u16> = "com.alexanderai.app-cef-init\0".encode_utf16().collect();
 
         // SAFETY: mutex_name is null-terminated UTF-16; handle is checked below.
         let handle = unsafe { CreateMutexW(std::ptr::null(), 0, mutex_name.as_ptr()) };
@@ -3057,7 +3060,7 @@ pub fn run() {
                             // ProgramArguments[0] is the first <string>...</string>
                             // after the <key>ProgramArguments</key> marker. The
                             // service installer always writes it as an absolute
-                            // path to the openhuman-core binary (see
+                            // path to the alexander-ai-solutions-core binary (see
                             // src/openhuman/service/macos.rs).
                             let after_key = contents.split("<key>ProgramArguments</key>").nth(1)?;
                             let start = after_key.find("<string>")? + "<string>".len();
@@ -3289,8 +3292,8 @@ pub fn run() {
             // enigo ops here via the native registry; we run each on the real
             // main thread through `run_on_main_thread`.
             {
-                use openhuman_core::core::event_bus::register_native_global;
-                use openhuman_core::openhuman::tools::{
+                use alexander_ai_solutions_core::core::event_bus::register_native_global;
+                use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
                     MainThreadInputOp, INPUT_ON_MAIN_THREAD_METHOD,
                 };
                 let input_app = app.handle().clone();
@@ -3565,7 +3568,7 @@ pub fn run() {
             // auto-spawns a meet-call window at startup so the camera +
             // audio bridges + frame-bus + producer pipeline can be
             // exercised end-to-end without manual UI clicks. Pair with
-            // `tail -F ~/.openhuman/logs/openhuman.<date>.log` to see
+            // `tail -F ~/.alexanderai/logs/openhuman.<date>.log` to see
             // the periodic [meet-camera] bridge stats logged by the
             // diagnostics poller in meet_video::inject.
             if let Ok(meet_url) = std::env::var("OPENHUMAN_DEV_AUTO_MEET_CALL") {
@@ -3836,7 +3839,7 @@ pub fn run_core_from_args(args: &[String]) -> Result<(), String> {
     // library instead of shelling out to a separate binary. The Tauri main()
     // routes `OpenHuman core <args>` here so users can still drive the core CLI
     // from the bundled app.
-    openhuman_core::run_core_from_args(args).map_err(|e| format!("{e:#}"))
+    alexander_ai_solutions_core::run_core_from_args(args).map_err(|e| format!("{e:#}"))
 }
 
 // ---------------------------------------------------------------------------

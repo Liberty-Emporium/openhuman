@@ -133,9 +133,10 @@ pub async fn rpc_handler(State(state): State<AppState>, Json(req): Json<RpcReque
                 // query params, or pasted-through provider error text that
                 // includes tokens. `sanitize_api_error` runs the same scrub
                 // used in the SessionExpired publish path below.
-                let redacted = crate::openhuman::inference::provider::ops::sanitize_api_error(
-                    &display_message,
-                );
+                let redacted =
+                    crate::alexander_ai_solutions::inference::provider::ops::sanitize_api_error(
+                        &display_message,
+                    );
                 tracing::warn!(
                     method = %method,
                     elapsed_ms = ms as u64,
@@ -214,7 +215,8 @@ pub async fn invoke_method(state: AppState, method: &str, params: Value) -> Resu
     // the UI. Generic downstream/provider 401s must stay recoverable errors;
     // otherwise a scoped integration failure can log the user out.
     if let Err(ref msg) = result {
-        let sanitized_reason = crate::openhuman::inference::provider::ops::sanitize_api_error(msg);
+        let sanitized_reason =
+            crate::alexander_ai_solutions::inference::provider::ops::sanitize_api_error(msg);
         if is_session_expired_error(msg) {
             log::warn!(
                 "[jsonrpc] confirmed session expiry for method='{}' — publishing SessionExpired: {}",
@@ -362,7 +364,7 @@ fn is_param_validation_error(msg: &str) -> bool {
 /// Several `tinyplace_*` RPCs derive a signer seed from the wallet before they
 /// can run (the feed, signal/messaging, etc. — backend `GraphQLAuth::Agent`
 /// requires a signer). For a user who has not set up a wallet, the wallet layer
-/// returns [`crate::openhuman::wallet::WALLET_NOT_CONFIGURED_MESSAGE`]. That is
+/// returns [`crate::alexander_ai_solutions::wallet::WALLET_NOT_CONFIGURED_MESSAGE`]. That is
 /// an expected user-state, not an internal failure: the UI already renders a
 /// "set up wallet" prompt, and there is no local lever to make the call succeed
 /// until the user creates a wallet. Classifying it here — at the single Sentry
@@ -375,7 +377,7 @@ fn is_param_validation_error(msg: &str) -> bool {
 /// change in the wallet layer fails the coupling test in `jsonrpc_tests.rs`
 /// rather than silently letting the noise back into Sentry.
 fn is_wallet_not_configured_error(msg: &str) -> bool {
-    msg == crate::openhuman::wallet::WALLET_NOT_CONFIGURED_MESSAGE
+    msg == crate::alexander_ai_solutions::wallet::WALLET_NOT_CONFIGURED_MESSAGE
 }
 
 /// Internal method invocation logic.
@@ -589,7 +591,7 @@ async fn oauth_mcp_callback_handler(
 
     log::info!("[oauth:mcp] callback received (state present); completing exchange");
 
-    let config = match crate::openhuman::config::Config::load_or_init().await {
+    let config = match crate::alexander_ai_solutions::config::Config::load_or_init().await {
         Ok(c) => c,
         Err(e) => {
             log::error!("[oauth:mcp] config load failed: {e}");
@@ -600,7 +602,8 @@ async fn oauth_mcp_callback_handler(
         }
     };
 
-    match crate::openhuman::mcp_registry::oauth::complete(&config, &state, &code).await {
+    match crate::alexander_ai_solutions::mcp_registry::oauth::complete(&config, &state, &code).await
+    {
         Ok(server_id) => {
             log::info!("[oauth:mcp] completed sign-in for server_id={server_id}");
             html(
@@ -775,7 +778,7 @@ async fn telegram_auth_handler(
 
     log::info!("[auth:telegram] Received registration callback with token");
 
-    let config = match crate::openhuman::config::Config::load_or_init().await {
+    let config = match crate::alexander_ai_solutions::config::Config::load_or_init().await {
         Ok(c) => c,
         Err(e) => {
             log::error!("[auth:telegram] Failed to load config: {e}");
@@ -832,7 +835,7 @@ async fn telegram_auth_handler(
     };
 
     // Store the resulting session token in the local configuration.
-    match crate::openhuman::credentials::ops::store_session_with_deferred_validation(
+    match crate::alexander_ai_solutions::credentials::ops::store_session_with_deferred_validation(
         &config, &jwt_token, None, None,
     )
     .await
@@ -919,7 +922,7 @@ async fn desktop_auth_handler(
 
     log::info!("[auth:desktop] Received desktop auth callback");
 
-    let config = match crate::openhuman::config::Config::load_or_init().await {
+    let config = match crate::alexander_ai_solutions::config::Config::load_or_init().await {
         Ok(c) => c,
         Err(e) => {
             log::error!("[auth:desktop] Failed to load config: {e}");
@@ -953,7 +956,7 @@ async fn desktop_auth_handler(
         }
     };
 
-    match crate::openhuman::credentials::ops::store_session_with_deferred_validation(
+    match crate::alexander_ai_solutions::credentials::ops::store_session_with_deferred_validation(
         &config, &jwt_token, None, None,
     )
     .await
@@ -1060,14 +1063,15 @@ async fn dictation_ws_handler(
     }
 
     ws.on_upgrade(|socket| async move {
-        let config = match crate::openhuman::config::rpc::load_config_with_timeout().await {
-            Ok(c) => Arc::new(c),
-            Err(e) => {
-                log::error!("[ws] failed to load config for dictation: {e}");
-                return;
-            }
-        };
-        crate::openhuman::voice::streaming::handle_dictation_ws(socket, config).await;
+        let config =
+            match crate::alexander_ai_solutions::config::rpc::load_config_with_timeout().await {
+                Ok(c) => Arc::new(c),
+                Err(e) => {
+                    log::error!("[ws] failed to load config for dictation: {e}");
+                    return;
+                }
+            };
+        crate::alexander_ai_solutions::voice::streaming::handle_dictation_ws(socket, config).await;
     })
 }
 
@@ -1115,7 +1119,10 @@ pub fn build_core_http_router(socketio_enabled: bool) -> Router {
         .route("/auth/telegram", get(telegram_auth_handler))
         .route("/oauth/mcp/callback", get(oauth_mcp_callback_handler))
         // OpenAI-compatible inference endpoint (/v1/chat/completions, /v1/models)
-        .nest("/v1", crate::openhuman::inference::http::router())
+        .nest(
+            "/v1",
+            crate::alexander_ai_solutions::inference::http::router(),
+        )
         // Apply `AppState` here (before any state-less sub-routers such as
         // AgentBox are merged below) so the outer router becomes
         // `Router<()>` and matches them.
@@ -1129,10 +1136,13 @@ pub fn build_core_http_router(socketio_enabled: bool) -> Router {
     // bypass for `/run` and `/jobs/{id}` is unconditional in
     // [`crate::core::auth`]; the router-side gate is what actually exposes
     // the handlers. The spawned sweep loop lives until process exit.
-    if crate::openhuman::agentbox::agentbox_mode_enabled() {
-        let store = crate::openhuman::agentbox::JobStore::new(std::time::Duration::from_secs(3600));
-        let invoker: std::sync::Arc<dyn crate::openhuman::agentbox::invoker::AgentInvoker> =
-            std::sync::Arc::new(crate::openhuman::agentbox::invoker::CoreAgentInvoker);
+    if crate::alexander_ai_solutions::agentbox::agentbox_mode_enabled() {
+        let store = crate::alexander_ai_solutions::agentbox::JobStore::new(
+            std::time::Duration::from_secs(3600),
+        );
+        let invoker: std::sync::Arc<
+            dyn crate::alexander_ai_solutions::agentbox::invoker::AgentInvoker,
+        > = std::sync::Arc::new(crate::alexander_ai_solutions::agentbox::invoker::CoreAgentInvoker);
         let job_timeout = std::env::var("OPENHUMAN_AGENTBOX_JOB_TIMEOUT_SECS")
             .ok()
             .and_then(|v| v.parse::<u64>().ok())
@@ -1153,7 +1163,7 @@ pub fn build_core_http_router(socketio_enabled: bool) -> Router {
         });
 
         log::info!("[agentbox] enabled; public routes: POST /run, GET /jobs/{{id}}, GET /health");
-        router = router.merge(crate::openhuman::agentbox::agentbox_router(
+        router = router.merge(crate::alexander_ai_solutions::agentbox::agentbox_router(
             store,
             invoker,
             job_timeout,
@@ -1332,8 +1342,8 @@ pub(super) fn with_cors_headers(mut response: Response, origin: Option<&str>) ->
 /// flag and per-component buckets in the body so readiness probes and operators
 /// can still see partial failures.
 async fn health_handler() -> impl IntoResponse {
-    let snapshot = crate::openhuman::health::snapshot();
-    let verdict = crate::openhuman::health::verdict(&snapshot);
+    let snapshot = crate::alexander_ai_solutions::health::snapshot();
+    let verdict = crate::alexander_ai_solutions::health::verdict(&snapshot);
 
     let status = if verdict.healthy {
         StatusCode::OK
@@ -1456,7 +1466,8 @@ async fn events_handler(
     }
 
     let client_id = query.client_id;
-    let rx = crate::openhuman::channels::providers::web::subscribe_web_channel_events();
+    let rx =
+        crate::alexander_ai_solutions::channels::providers::web::subscribe_web_channel_events();
     let stream = tokio_stream::wrappers::BroadcastStream::new(rx).filter_map(
         move |item| -> Option<Result<Event, std::convert::Infallible>> {
             let event = match item {
@@ -1520,7 +1531,7 @@ async fn domain_events_handler(headers: axum::http::HeaderMap) -> Response {
     }
 
     // Read dashboard config for event stream settings.
-    let es_cfg = crate::openhuman::config::rpc::load_config_with_timeout()
+    let es_cfg = crate::alexander_ai_solutions::config::rpc::load_config_with_timeout()
         .await
         .map(|c| c.dashboard.event_stream)
         .unwrap_or_default();
@@ -1588,7 +1599,7 @@ async fn domain_events_handler(headers: axum::http::HeaderMap) -> Response {
 
 /// Handler for the root endpoint, returning server information and available endpoints.
 async fn root_handler() -> impl IntoResponse {
-    let api_server = match crate::openhuman::config::Config::load_or_init().await {
+    let api_server = match crate::alexander_ai_solutions::config::Config::load_or_init().await {
         Ok(cfg) => crate::api::config::effective_backend_api_url(&cfg.api_url),
         Err(_) => crate::api::config::effective_backend_api_url(&None),
     };
@@ -1727,14 +1738,14 @@ async fn run_server_inner(
     // Ensure the master encryption key is loaded from keychain before any
     // config or credential operation that needs to decrypt secrets. This is
     // a no-op if already called (e.g. from run_core_from_args for CLI).
-    crate::openhuman::keyring::init_master_key();
+    crate::alexander_ai_solutions::keyring::init_master_key();
 
     // AgentBox GMI MaaS provider bridge — no-op when env vars absent.
     // Must run BEFORE `build_core_http_router` mounts the AgentBox routes so
     // that by the time `/run` accepts traffic the inference catalog already
     // knows about `"gmi-maas"`. Never panics; missing/blank env vars log a
     // warning and leave the core booting in degraded mode.
-    crate::openhuman::agentbox::register_gmi_provider_if_present();
+    crate::alexander_ai_solutions::agentbox::register_gmi_provider_if_present();
 
     // Initialize the per-process RPC bearer token.
     //
@@ -1753,11 +1764,11 @@ async fn run_server_inner(
     if let Some(token) = rpc_token.as_deref() {
         crate::core::auth::init_rpc_token_with_value(token)?;
     } else {
-        let token_dir =
-            crate::openhuman::config::default_root_openhuman_dir().unwrap_or_else(|_| {
+        let token_dir = crate::alexander_ai_solutions::config::default_root_openhuman_dir()
+            .unwrap_or_else(|_| {
                 dirs::home_dir()
                     .unwrap_or_else(|| std::path::PathBuf::from("."))
-                    .join(".openhuman")
+                    .join(".alexanderai")
             });
         crate::core::auth::init_rpc_token(&token_dir)?;
     }
@@ -1781,18 +1792,19 @@ async fn run_server_inner(
         // than reading/writing the wrong workspace. The server still comes
         // up; the operator sees the loud error and fixes their config or
         // sets OPENHUMAN_WORKSPACE to a writable path, then restarts.
-        match crate::openhuman::config::Config::load_or_init().await {
+        match crate::alexander_ai_solutions::config::Config::load_or_init().await {
             Ok(cfg) => {
                 let keyring_dir =
-                    crate::openhuman::keyring::store::workspace_dir_for_file_backend();
+                    crate::alexander_ai_solutions::keyring::store::workspace_dir_for_file_backend();
                 log::info!(
                     "[boot] paths: config={} workspace={} keyring_dir={} keyring_backend={}",
                     cfg.config_path.display(),
                     cfg.workspace_dir.display(),
                     keyring_dir.display(),
-                    crate::openhuman::keyring::backend_name(),
+                    crate::alexander_ai_solutions::keyring::backend_name(),
                 );
-                match crate::openhuman::memory::global::init(cfg.workspace_dir.clone()) {
+                match crate::alexander_ai_solutions::memory::global::init(cfg.workspace_dir.clone())
+                {
                     Ok(_) => log::info!(
                         "[boot] memory::global initialized (workspace={})",
                         cfg.workspace_dir.display()
@@ -1803,7 +1815,7 @@ async fn run_server_inner(
                 // image markers persist under <workspace>/attachments/ instead
                 // of an in-memory FIFO (survives restarts + delegation hops).
                 // Also fires a best-effort stale-file sweep.
-                crate::openhuman::agent::multimodal::init_attachments_dir(
+                crate::alexander_ai_solutions::agent::multimodal::init_attachments_dir(
                     cfg.workspace_dir.join("attachments"),
                 );
                 log::info!(
@@ -1812,7 +1824,9 @@ async fn run_server_inner(
                 );
                 // Initialize the WhatsApp data store so scanner ingest calls
                 // can write data without requiring a lazy-init fallback.
-                match crate::openhuman::whatsapp_data::global::init(cfg.workspace_dir.clone()) {
+                match crate::alexander_ai_solutions::whatsapp_data::global::init(
+                    cfg.workspace_dir.clone(),
+                ) {
                     Ok(_) => log::info!(
                         "[boot] whatsapp_data::global initialized (workspace={})",
                         cfg.workspace_dir.display()
@@ -1823,7 +1837,7 @@ async fn run_server_inner(
                 // / pr-review-shepherd) that older builds seeded into
                 // <workspace>/skills/. OpenHuman no longer ships bundled defaults;
                 // this removes the stale dirs on upgrade. Idempotent.
-                crate::openhuman::workflows::registry::prune_legacy_default_workflows(
+                crate::alexander_ai_solutions::workflows::registry::prune_legacy_default_workflows(
                     &cfg.workspace_dir,
                 );
                 // Boot-time Sentry user binding — issue #3135. If the user is
@@ -1832,10 +1846,10 @@ async fn run_server_inner(
                 // (Composio sync tick, heartbeat, etc.) fires its first event.
                 // Reading from the store here means subsequent events carry
                 // `user.id` even when no `app_state_snapshot` RPC has run yet.
-                match crate::openhuman::credentials::session_support::build_session_state(&cfg) {
+                match crate::alexander_ai_solutions::credentials::session_support::build_session_state(&cfg) {
                     Ok(state) => {
                         if let Some(uid) = state.user_id.as_deref() {
-                            crate::openhuman::credentials::sentry_scope::bind(uid);
+                            crate::alexander_ai_solutions::credentials::sentry_scope::bind(uid);
                         }
                     }
                     Err(e) => log::debug!(
@@ -1903,7 +1917,7 @@ async fn run_server_inner(
     // Checking only the env var would emit a false security warning whenever
     // an embedded caller binds on a non-loopback host with an in-memory
     // bearer — the server is already protected in that case.
-    if crate::openhuman::security::pairing::is_public_bind(&resolved_host) {
+    if crate::alexander_ai_solutions::security::pairing::is_public_bind(&resolved_host) {
         let has_in_memory_token = rpc_token
             .as_deref()
             .map(|s| !s.trim().is_empty())
@@ -1949,7 +1963,7 @@ async fn run_server_inner(
 
     let preferred_port = resolved_port;
     let host = resolved_host;
-    let pick = crate::openhuman::connectivity::rpc::pick_listen_port_for_host(
+    let pick = crate::alexander_ai_solutions::connectivity::rpc::pick_listen_port_for_host(
         host.as_str(),
         preferred_port,
     )
@@ -2012,7 +2026,7 @@ async fn run_server_inner(
     // on disk, startup is deferred until the login handler in
     // `credentials::ops::store_session()` triggers it.
     tokio::spawn(async move {
-        match crate::openhuman::config::Config::load_or_init().await {
+        match crate::alexander_ai_solutions::config::Config::load_or_init().await {
             Ok(config) => {
                 if embedded_core {
                     log::debug!("[core] embedded core startup");
@@ -2025,7 +2039,7 @@ async fn run_server_inner(
                 // This is unconditional — the hook should fire regardless of
                 // whether the user is currently logged in.
                 crate::core::shutdown::register(|| async {
-                    let engine = crate::openhuman::autocomplete::global_engine();
+                    let engine = crate::alexander_ai_solutions::autocomplete::global_engine();
                     let status = engine.status().await;
                     if status.running {
                         log::info!(
@@ -2038,21 +2052,27 @@ async fn run_server_inner(
                 });
 
                 // Check if a user is already logged in from a previous session.
-                let already_logged_in = crate::openhuman::config::default_root_openhuman_dir()
-                    .ok()
-                    .and_then(|root| crate::openhuman::config::read_active_user_id(&root))
-                    .is_some();
+                let already_logged_in =
+                    crate::alexander_ai_solutions::config::default_root_openhuman_dir()
+                        .ok()
+                        .and_then(|root| {
+                            crate::alexander_ai_solutions::config::read_active_user_id(&root)
+                        })
+                        .is_some();
 
                 if already_logged_in {
                     // User has an active session — start all services now.
                     log::info!("[services] existing session found, starting services");
-                    crate::openhuman::credentials::ops::start_login_gated_services(&config).await;
+                    crate::alexander_ai_solutions::credentials::ops::start_login_gated_services(
+                        &config,
+                    )
+                    .await;
 
                     // Subconscious engine + heartbeat.
                     if !config.heartbeat.enabled {
                         log::info!("[subconscious] disabled by config (heartbeat.enabled = false)");
                     } else {
-                        match crate::openhuman::subconscious::global::bootstrap_after_login().await
+                        match crate::alexander_ai_solutions::subconscious::global::bootstrap_after_login().await
                         {
                             Ok(()) => log::info!(
                                 "[subconscious] bootstrapped on startup (existing session)"
@@ -2074,9 +2094,9 @@ async fn run_server_inner(
 
     // Periodic self-update checker (default: every 1 hour).
     tokio::spawn(async {
-        match crate::openhuman::config::Config::load_or_init().await {
+        match crate::alexander_ai_solutions::config::Config::load_or_init().await {
             Ok(config) => {
-                crate::openhuman::update::scheduler::run(config.update).await;
+                crate::alexander_ai_solutions::update::scheduler::run(config.update).await;
             }
             Err(err) => {
                 log::warn!("[core] config load failed, skipping update scheduler: {err}");
@@ -2086,7 +2106,7 @@ async fn run_server_inner(
 
     // Cron scheduler — polls due_jobs() every ~5s and executes them automatically.
     tokio::spawn(async {
-        match crate::openhuman::config::Config::load_or_init().await {
+        match crate::alexander_ai_solutions::config::Config::load_or_init().await {
             Ok(config) => {
                 if !config.cron.enabled {
                     log::info!("[cron] scheduler disabled via config; skipping");
@@ -2097,11 +2117,14 @@ async fn run_server_inner(
                 // exist for already-onboarded users upgrading from a build that
                 // predates them — otherwise their Settings toggle stays hidden.
                 // Idempotent; no-op until onboarding is complete.
-                if let Err(e) = crate::openhuman::cron::seed::seed_proactive_agents_on_boot(&config)
+                if let Err(e) =
+                    crate::alexander_ai_solutions::cron::seed::seed_proactive_agents_on_boot(
+                        &config,
+                    )
                 {
                     log::warn!("[cron] boot seed of proactive agent jobs failed: {e}");
                 }
-                if let Err(e) = crate::openhuman::cron::scheduler::run(config).await {
+                if let Err(e) = crate::alexander_ai_solutions::cron::scheduler::run(config).await {
                     log::error!("[cron] scheduler loop ended with error: {e}");
                 }
             }
@@ -2120,7 +2143,7 @@ async fn run_server_inner(
         .is_none()
     {
         tokio::spawn(async move {
-            let config = match crate::openhuman::config::Config::load_or_init().await {
+            let config = match crate::alexander_ai_solutions::config::Config::load_or_init().await {
                 Ok(c) => c,
                 Err(e) => {
                     log::warn!("[channels] could not load config for listeners: {e}");
@@ -2134,7 +2157,7 @@ async fn run_server_inner(
                 return;
             }
             log::info!("[channels] spawning in-process realtime listeners (Telegram, Discord, …)");
-            if let Err(e) = crate::openhuman::channels::start_channels(config).await {
+            if let Err(e) = crate::alexander_ai_solutions::channels::start_channels(config).await {
                 log::error!("[channels] start_channels ended with error: {e}");
             }
         });
@@ -2160,8 +2183,8 @@ async fn run_server_inner(
     // daemon was externally managed) and clear the spawn marker so the
     // next launch doesn't try to reclaim a daemon that's already dead.
     // Bounded so a wedged Ollama can't hold up app shutdown.
-    if let Some(svc) = crate::openhuman::inference::local::try_global() {
-        let cfg = crate::openhuman::config::Config::load_or_init()
+    if let Some(svc) = crate::alexander_ai_solutions::inference::local::try_global() {
+        let cfg = crate::alexander_ai_solutions::config::Config::load_or_init()
             .await
             .unwrap_or_default();
         log::info!("[core] shutdown: cleaning up openhuman-owned ollama if any");
@@ -2183,7 +2206,7 @@ async fn run_server_inner(
 /// are safe and idempotent.
 fn register_domain_subscribers(
     workspace_dir: std::path::PathBuf,
-    config: crate::openhuman::config::Config,
+    config: crate::alexander_ai_solutions::config::Config,
     embedded_core: bool,
 ) {
     use std::sync::{Arc, Once};
@@ -2193,7 +2216,7 @@ fn register_domain_subscribers(
         // Leak the SubscriptionHandle so the background tasks live for the
         // entire process — SubscriptionHandle::drop aborts the task.
         if let Some(handle) = crate::core::event_bus::subscribe_global(Arc::new(
-            crate::openhuman::webhooks::bus::WebhookRequestSubscriber::new(),
+            crate::alexander_ai_solutions::webhooks::bus::WebhookRequestSubscriber::new(),
         )) {
             std::mem::forget(handle);
         } else {
@@ -2201,56 +2224,56 @@ fn register_domain_subscribers(
         }
 
         if let Some(handle) = crate::core::event_bus::subscribe_global(Arc::new(
-            crate::openhuman::channels::bus::ChannelInboundSubscriber::new(),
+            crate::alexander_ai_solutions::channels::bus::ChannelInboundSubscriber::new(),
         )) {
             std::mem::forget(handle);
         } else {
             log::warn!("[event_bus] failed to register channel subscriber — bus not initialized");
         }
 
-        crate::openhuman::health::bus::register_health_subscriber();
-        crate::openhuman::notifications::register_notification_bridge_subscriber(config.clone());
-        crate::openhuman::memory_conversations::register_conversation_persistence_subscriber(
+        crate::alexander_ai_solutions::health::bus::register_health_subscriber();
+        crate::alexander_ai_solutions::notifications::register_notification_bridge_subscriber(config.clone());
+        crate::alexander_ai_solutions::memory_conversations::register_conversation_persistence_subscriber(
             workspace_dir.clone(),
         );
-        crate::openhuman::memory::sync::register_sync_stage_bridge(&config);
-        if let Err(error) = crate::openhuman::composio::init_composio_trigger_history(
+        crate::alexander_ai_solutions::memory::sync::register_sync_stage_bridge(&config);
+        if let Err(error) = crate::alexander_ai_solutions::composio::init_composio_trigger_history(
             workspace_dir.clone(),
         ) {
             log::warn!("[composio][history] failed to initialize trigger archive: {error}");
         }
-        crate::openhuman::composio::register_composio_trigger_subscriber();
-        crate::openhuman::agent_meetings::calendar::register_meet_calendar_subscriber();
-        crate::openhuman::agent_meetings::bus::register_meeting_event_subscriber();
-        crate::openhuman::composio::start_periodic_sync();
+        crate::alexander_ai_solutions::composio::register_composio_trigger_subscriber();
+        crate::alexander_ai_solutions::agent_meetings::calendar::register_meet_calendar_subscriber();
+        crate::alexander_ai_solutions::agent_meetings::bus::register_meeting_event_subscriber();
+        crate::alexander_ai_solutions::composio::start_periodic_sync();
         // Workspace-kind memory sources (GitHub repos, folders, RSS, web
         // pages) get their own cadence loop — the Composio scheduler above
         // only walks Composio connections, so without this they only sync
         // on manual "Sync now" and silently go stale.
-        crate::openhuman::memory_sync::workspace::start_workspace_periodic_sync();
+        crate::alexander_ai_solutions::memory_sync::workspace::start_workspace_periodic_sync();
         // Task-sources proactive ingestion: connection-created hook + poll.
-        crate::openhuman::task_sources::bus::register_task_sources_subscriber();
-        crate::openhuman::task_sources::start_periodic_poll();
+        crate::alexander_ai_solutions::task_sources::bus::register_task_sources_subscriber();
+        crate::alexander_ai_solutions::task_sources::start_periodic_poll();
         // Board poller: dispatch the highest-urgency `todo` card on the
         // task-sources board (catch-all for cards without a proactive trigger).
-        crate::openhuman::agent::task_dispatcher::start_board_poller();
+        crate::alexander_ai_solutions::agent::task_dispatcher::start_board_poller();
         // Seed memory_sources with active Composio connections so the
         // user sees their connected integrations as memory sources by
         // default. Best-effort: failure is logged but does not block startup.
         tokio::spawn(async {
-            crate::openhuman::memory_sources::reconcile::ensure_composio_sources().await;
+            crate::alexander_ai_solutions::memory_sources::reconcile::ensure_composio_sources().await;
         });
         // Initialise the scheduler gate before any background AI workers
         // start so they observe a real policy on their first iteration
         // (otherwise they fall back to `Policy::Normal` and miss the
         // initial throttle decision on battery-powered hosts).
-        crate::openhuman::scheduler_gate::init_global(&config);
+        crate::alexander_ai_solutions::scheduler_gate::init_global(&config);
 
         // Install the TokenJuice content-router runtime config (compressor
         // toggles + CCR cache limits + optional on-disk tier). Compaction runs
         // on every agent's tool output, so this must be set before any agent
         // loop executes a tool.
-        crate::openhuman::tokenjuice::install_from_config(&config);
+        crate::alexander_ai_solutions::tokenjuice::install_from_config(&config);
 
         // Seed the scheduler-gate signed-out override from the on-disk
         // session. Without this, a sidecar that boots with no stored JWT
@@ -2258,25 +2281,25 @@ fn register_domain_subscribers(
         // that all 401 immediately.
         match crate::api::jwt::get_session_token(&config) {
             Ok(Some(_)) => {
-                crate::openhuman::scheduler_gate::set_signed_out(false);
+                crate::alexander_ai_solutions::scheduler_gate::set_signed_out(false);
             }
             Ok(None) => {
                 log::info!(
                     "[auth] no session token at startup — scheduler gate set to signed_out \
                      (config_path={}, keyring_backend={})",
                     config.config_path.display(),
-                    crate::openhuman::keyring::backend_name(),
+                    crate::alexander_ai_solutions::keyring::backend_name(),
                 );
-                crate::openhuman::scheduler_gate::set_signed_out(true);
+                crate::alexander_ai_solutions::scheduler_gate::set_signed_out(true);
             }
             Err(err) => {
                 log::warn!(
                     "[auth] failed to read session token at startup ({err}) — assuming signed_out \
                      (config_path={}, keyring_backend={})",
                     config.config_path.display(),
-                    crate::openhuman::keyring::backend_name(),
+                    crate::alexander_ai_solutions::keyring::backend_name(),
                 );
-                crate::openhuman::scheduler_gate::set_signed_out(true);
+                crate::alexander_ai_solutions::scheduler_gate::set_signed_out(true);
             }
         }
 
@@ -2284,7 +2307,7 @@ fn register_domain_subscribers(
         // might publish 401-derived events, so the very first 401 is
         // routed through `clear_session` + the scheduler-gate override.
         if let Some(handle) = crate::core::event_bus::subscribe_global(Arc::new(
-            crate::openhuman::credentials::bus::SessionExpiredSubscriber::new(),
+            crate::alexander_ai_solutions::credentials::bus::SessionExpiredSubscriber::new(),
         )) {
             std::mem::forget(handle);
         } else {
@@ -2293,11 +2316,11 @@ fn register_domain_subscribers(
             );
         }
 
-        crate::openhuman::memory_queue::start(config.clone());
+        crate::alexander_ai_solutions::memory_queue::start(config.clone());
 
         // Restart requests go through a subscriber so every trigger path shares
         // the same respawn logic.
-        crate::openhuman::service::bus::register_restart_subscriber();
+        crate::alexander_ai_solutions::service::bus::register_restart_subscriber();
         if embedded_core {
             log::info!(
                 "[event_bus] embedded core: service shutdown subscriber not registered; Tauri cancellation token owns shutdown"
@@ -2305,28 +2328,28 @@ fn register_domain_subscribers(
         } else {
             // Shutdown requests use the same pattern; the standalone CLI
             // subscriber exits the current process after a short grace period.
-            crate::openhuman::service::bus::register_shutdown_subscriber();
+            crate::alexander_ai_solutions::service::bus::register_shutdown_subscriber();
         }
 
         // Proactive message subscriber (web-only in the desktop runtime —
         // no external channel instances are registered here). Uses a
         // Once-guarded registrar so domain-level startup can't duplicate it.
-        crate::openhuman::channels::proactive::register_web_only_proactive_subscriber();
+        crate::alexander_ai_solutions::channels::proactive::register_web_only_proactive_subscriber();
 
         // Device tunnel subscriber: handles tunnel:frame handshakes, peer-status
         // events, and register acks. Must be registered before any tunnel:frame
         // events can arrive.
-        crate::openhuman::devices::bus::register_device_tunnel_subscriber();
+        crate::alexander_ai_solutions::devices::bus::register_device_tunnel_subscriber();
 
         // Native request handlers — typed in-process request/response.
         // The agent `agent.run_turn` handler is what channel dispatch
         // calls instead of importing `run_tool_call_loop` directly.
-        crate::openhuman::agent::bus::register_agent_handlers();
+        crate::alexander_ai_solutions::agent::bus::register_agent_handlers();
 
         // Background-completion delivery: when a detached sub-agent
         // (spawn_async_subagent) finishes, surface its result back into the
         // originating chat as an idle-gated, batched, system-injected turn.
-        crate::openhuman::agent_orchestration::background_delivery::register_background_delivery();
+        crate::alexander_ai_solutions::agent_orchestration::background_delivery::register_background_delivery();
 
         // Run-ledger finalizer: detached `spawn_async_subagent` runs outlive
         // their parent turn, so their terminal `AgentProgress` never reaches the
@@ -2334,14 +2357,14 @@ fn register_domain_subscribers(
         // subscriber settles `agent_runs` from `DomainEvent::Subagent{Completed,
         // Failed}` (always fired from the detached task), preventing rows from
         // leaking as perpetual `running` timeline entries on thread reopen.
-        crate::openhuman::agent_orchestration::run_ledger_finalize::register_run_ledger_finalize_subscriber(&config);
+        crate::alexander_ai_solutions::agent_orchestration::run_ledger_finalize::register_run_ledger_finalize_subscriber(&config);
 
         // MCP clients lifecycle subscriber: logs McpServer{Installed,Connected,
         // Disconnected} + McpClientToolExecuted for observability. The boot-time
         // spawn of installed servers (boot::spawn_installed_servers) runs later
         // in bootstrap_core_runtime; this subscriber must be live before then so
         // those connect events are observed (issue #3039 gap A1).
-        crate::openhuman::mcp_registry::bus::init();
+        crate::alexander_ai_solutions::mcp_registry::bus::init();
 
         log::info!(
             "[event_bus] domain subscribers registered (webhook, channel, health, conversation, composio, restart, proactive, agent, session_expired, mcp_client)"
@@ -2358,12 +2381,12 @@ fn register_domain_subscribers(
 /// surface a banner; under CLI / Docker the override is honored (with a
 /// noisy log + a domain event so any connected dashboard can flag it).
 pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
-    use crate::openhuman::socket::{set_global_socket_manager, SocketManager};
+    use crate::alexander_ai_solutions::socket::{set_global_socket_manager, SocketManager};
     use std::sync::Arc;
     // `embedded_core` derived from host_kind so the rest of the function (which
     // already keys behavior off the boolean) stays unchanged.
     let embedded_core = host_kind.is_desktop_shell();
-    let mut cfg = match crate::openhuman::config::Config::load_or_init().await {
+    let mut cfg = match crate::alexander_ai_solutions::config::Config::load_or_init().await {
         Ok(cfg) => cfg,
         Err(e) => {
             log::error!("[runtime] Failed to load config for socket manager: {e}");
@@ -2375,7 +2398,7 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // --- Event bus bootstrap ---
     // Ensure the global event bus is initialized (no-op if already done by start_channels).
     crate::core::event_bus::init_global(crate::core::event_bus::DEFAULT_CAPACITY);
-    crate::openhuman::file_state::init_global();
+    crate::alexander_ai_solutions::file_state::init_global();
     // Register domain subscribers for cross-module event handling.
     // Uses a Once guard so repeated calls to bootstrap_core_runtime()
     // cannot double-subscribe.
@@ -2386,18 +2409,18 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // block the ready signal — the core becomes RPC-ready immediately and the
     // frontend watches per-step progress via `openhuman.harness_init_status`.
     // On a warm host every step's `is_done` probe passes and this settles
-    // instantly. See `crate::openhuman::harness_init`.
+    // instantly. See `crate::alexander_ai_solutions::harness_init`.
     {
         let cfg_for_init = cfg.clone();
         tokio::spawn(async move {
-            crate::openhuman::harness_init::run_harness_init(cfg_for_init).await;
+            crate::alexander_ai_solutions::harness_init::run_harness_init(cfg_for_init).await;
         });
     }
 
     // Warm the remote skills catalog on every core load. This updates the
     // cached registry used by skill discovery/search, but runs best-effort in
     // the background so Hermes/network latency cannot block core readiness.
-    crate::openhuman::skill_registry::ops::start_boot_catalog_refresh();
+    crate::alexander_ai_solutions::skill_registry::ops::start_boot_catalog_refresh();
 
     // --- Turn-state recovery -------------------------------------------
     // Any per-thread turn snapshots left on disk from a previous process
@@ -2406,7 +2429,7 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // confusing a stale `Streaming` lifecycle for an in-flight turn.
     {
         let now = chrono::Utc::now().to_rfc3339();
-        match crate::openhuman::threads::turn_state::store::mark_all_interrupted(
+        match crate::alexander_ai_solutions::threads::turn_state::store::mark_all_interrupted(
             workspace_dir.clone(),
             &now,
         ) {
@@ -2426,7 +2449,8 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // at boot is orphaned — its driver died without firing a terminal event, so
     // the finalizer never settled it. Stamp such rows `interrupted` so they stop
     // rendering as perpetual "running" timeline entries on thread reopen.
-    match crate::openhuman::session_db::run_ledger::interrupt_orphaned_agent_runs(&cfg) {
+    match crate::alexander_ai_solutions::session_db::run_ledger::interrupt_orphaned_agent_runs(&cfg)
+    {
         Ok(0) => {}
         Ok(count) => log::info!("[runtime] settled {count} orphaned agent run(s) on startup"),
         Err(err) => log::warn!("[runtime] failed to settle orphaned agent runs: {err}"),
@@ -2436,7 +2460,7 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // Activates the previously-dormant CostTracker so the dashboard RPC
     // surface (`openhuman.cost_get_dashboard`) and `record_provider_usage`
     // share one JSONL-backed store. Idempotent.
-    crate::openhuman::cost::init_global(cfg.cost.clone(), &workspace_dir);
+    crate::alexander_ai_solutions::cost::init_global(cfg.cost.clone(), &workspace_dir);
 
     // --- x402 payment ledger ---
     // Initializes the JSONL-backed spending ledger for machine-payable API
@@ -2444,7 +2468,7 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // the `openhuman.x402_update_budget` RPC.
     {
         let x402_session = format!("x402-{}", uuid::Uuid::new_v4());
-        crate::openhuman::x402::init_ledger(&workspace_dir, &x402_session);
+        crate::alexander_ai_solutions::x402::init_ledger(&workspace_dir, &x402_session);
     }
 
     // --- Sub-agent definition registry bootstrap ---
@@ -2452,7 +2476,9 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // under `<workspace>/agents/*.toml`. Idempotent — safe to call
     // multiple times. Uses the per-user scoped workspace_dir.
     if let Err(err) =
-        crate::openhuman::agent::harness::AgentDefinitionRegistry::init_global(&workspace_dir)
+        crate::alexander_ai_solutions::agent::harness::AgentDefinitionRegistry::init_global(
+            &workspace_dir,
+        )
     {
         log::warn!(
             "[runtime] AgentDefinitionRegistry::init_global failed: {err} — \
@@ -2469,7 +2495,7 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // uncreated and every shell-tool `current_dir` fails with ERROR_DIRECTORY
     // (os error 267) on Windows / ENOENT on Unix (#3353, RC-A). Idempotent — a
     // later `start_channels` calls the same helper.
-    crate::openhuman::config::ensure_agent_dirs(&mut cfg).await;
+    crate::alexander_ai_solutions::config::ensure_agent_dirs(&mut cfg).await;
 
     // --- Live SecurityPolicy ---
     // Install the process-global live policy on the always-run serve boot, not
@@ -2482,12 +2508,14 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // installs; idempotent — a later `start_channels` re-installs an equivalent
     // policy.
     let action_dir = cfg.action_dir.clone();
-    crate::openhuman::security::live_policy::install(
-        std::sync::Arc::new(crate::openhuman::security::SecurityPolicy::from_config(
-            &cfg.autonomy,
-            &workspace_dir,
-            &action_dir,
-        )),
+    crate::alexander_ai_solutions::security::live_policy::install(
+        std::sync::Arc::new(
+            crate::alexander_ai_solutions::security::SecurityPolicy::from_config(
+                &cfg.autonomy,
+                &workspace_dir,
+                &action_dir,
+            ),
+        ),
         workspace_dir.clone(),
         action_dir,
     );
@@ -2500,7 +2528,9 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // installs. Idempotent — shares a process-global OnceLock with the
     // `start_channels` site so it registers exactly once regardless of which
     // path runs first. (Matching only for now; activation handoff still pending.)
-    crate::openhuman::workflows::bus::ensure_triggered_workflow_subscriber(&workspace_dir);
+    crate::alexander_ai_solutions::workflows::bus::ensure_triggered_workflow_subscriber(
+        &workspace_dir,
+    );
 
     // --- Approval gate (#1339) ---
     // ON by default; opt out with `OPENHUMAN_APPROVAL_GATE=0` (or `false`).
@@ -2531,8 +2561,8 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // Record the boot decision before publishing the warning event so the
     // first poll of `approval_get_gate_state` after boot reflects the same
     // host-aware verdict the event itself describes — no race.
-    crate::openhuman::approval::gate::record_boot_state(
-        crate::openhuman::approval::gate::ApprovalGateBootState {
+    crate::alexander_ai_solutions::approval::gate::record_boot_state(
+        crate::alexander_ai_solutions::approval::gate::ApprovalGateBootState {
             installed: decision.install_gate,
             disabled_by_env: decision.gate_disabled_by_override,
             override_ignored: decision.override_ignored,
@@ -2563,7 +2593,7 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // `start_channels` is skipped for web-chat-only cores. Without this an
     // unguarded standalone/CLI/Docker core would park a plan review that never
     // reaches the UI and dies at the gate TTL. Idempotent (Once-guarded).
-    crate::openhuman::channels::providers::web::register_approval_surface_subscriber();
+    crate::alexander_ai_solutions::channels::providers::web::register_approval_surface_subscriber();
 
     if decision.install_gate {
         // Per-launch correlation token for the approval gate. This is
@@ -2575,15 +2605,17 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
         // from prior launches remain visible after restart; only the
         // per-session audit grouping changes across launches.
         let session_id = format!("session-{}", uuid::Uuid::new_v4());
-        let _ =
-            crate::openhuman::approval::ApprovalGate::init_global(cfg.clone(), session_id.clone());
+        let _ = crate::alexander_ai_solutions::approval::ApprovalGate::init_global(
+            cfg.clone(),
+            session_id.clone(),
+        );
         log::info!(
             "[runtime] approval gate installed (on by default; set OPENHUMAN_APPROVAL_GATE=0 to disable, session_id={session_id}) — \
              Prompt-class external-effect tool calls park for approval in interactive chat turns"
         );
         // (The approval/plan-review surface bridge is registered unconditionally
         // above — it must run even when this gate-install branch is skipped.)
-        crate::openhuman::channels::providers::web::register_artifact_surface_subscriber();
+        crate::alexander_ai_solutions::channels::providers::web::register_artifact_surface_subscriber();
     } else {
         log::error!(
             "[runtime] approval gate DISABLED (OPENHUMAN_APPROVAL_GATE=0 honored on host={}) — \
@@ -2603,10 +2635,10 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // `if approval_gate` block so artifact events still publish when the user
     // sets OPENHUMAN_APPROVAL_GATE=0 (CR #3328947323 on PR #3026). Idempotent
     // (OnceLock-guarded inside register_artifact_surface_subscriber).
-    crate::openhuman::channels::providers::web::register_artifact_surface_subscriber();
+    crate::alexander_ai_solutions::channels::providers::web::register_artifact_surface_subscriber();
 
     // --- Workspace migrations --------------------------------------------
-    crate::openhuman::startup::run_workspace_migrations(&workspace_dir);
+    crate::alexander_ai_solutions::startup::run_workspace_migrations(&workspace_dir);
 
     // --- MCP registry boot-spawn -----------------------------------------
     // Bring up every locally-installed MCP server's stdio subprocess so its
@@ -2616,7 +2648,7 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     {
         let cfg = cfg.clone();
         tokio::spawn(async move {
-            crate::openhuman::mcp_registry::boot::spawn_installed_servers(&cfg).await;
+            crate::alexander_ai_solutions::mcp_registry::boot::spawn_installed_servers(&cfg).await;
         });
     }
 
@@ -2638,7 +2670,7 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
         SUPERVISOR_SPAWNED.call_once(|| {
             let cfg = cfg.clone();
             tokio::spawn(async move {
-                crate::openhuman::mcp_registry::supervisor::run(cfg).await;
+                crate::alexander_ai_solutions::mcp_registry::supervisor::run(cfg).await;
             });
         });
     }
@@ -2652,7 +2684,7 @@ pub async fn bootstrap_core_runtime(host_kind: crate::core::types::HostKind) {
     // This runs in the background so it doesn't block server startup.
     tokio::spawn(async move {
         log::info!("[socket] Checking for stored session to auto-connect...");
-        let config = match crate::openhuman::config::Config::load_or_init().await {
+        let config = match crate::alexander_ai_solutions::config::Config::load_or_init().await {
             Ok(c) => c,
             Err(e) => {
                 log::debug!("[socket] Config not available for auto-connect: {e}");

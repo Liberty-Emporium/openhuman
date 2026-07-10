@@ -416,7 +416,7 @@ mod imp {
     }
 }
 
-/// Linux implementation: use /proc/<pid>/cmdline to enumerate openhuman-core processes.
+/// Linux implementation: use /proc/<pid>/cmdline to enumerate alexander-ai-solutions-core processes.
 #[cfg(target_os = "linux")]
 mod linux_imp {
     use crate::core_process;
@@ -582,7 +582,7 @@ mod linux_imp {
             .and_then(|n| n.to_str())
             .unwrap_or(argv0);
         let lower = filename.to_ascii_lowercase();
-        lower == "openhuman-core" || lower == "openhuman"
+        lower == "alexander-ai-solutions-core" || lower == "openhuman"
     }
 
     #[cfg(test)]
@@ -591,9 +591,13 @@ mod linux_imp {
 
         #[test]
         fn is_openhuman_executable_matches_core_binary() {
-            assert!(is_openhuman_executable("/usr/local/bin/openhuman-core"));
-            assert!(is_openhuman_executable("openhuman-core"));
-            assert!(is_openhuman_executable("/opt/OpenHuman/openhuman-core"));
+            assert!(is_openhuman_executable(
+                "/usr/local/bin/alexander-ai-solutions-core"
+            ));
+            assert!(is_openhuman_executable("alexander-ai-solutions-core"));
+            assert!(is_openhuman_executable(
+                "/opt/OpenHuman/alexander-ai-solutions-core"
+            ));
         }
 
         #[test]
@@ -825,9 +829,9 @@ mod windows_imp {
             .and_then(|n| n.to_str())
             .unwrap_or(exe_path)
             .to_ascii_lowercase();
-        caption_lower == "openhuman-core.exe"
+        caption_lower == "alexander-ai-solutions-core.exe"
             || caption_lower == "openhuman.exe"
-            || exe_filename == "openhuman-core.exe"
+            || exe_filename == "alexander-ai-solutions-core.exe"
             || exe_filename == "openhuman.exe"
     }
 
@@ -840,14 +844,14 @@ mod windows_imp {
             let csv = "\
 Node,Caption,ExecutablePath,ParentProcessId,ProcessId\r\n\
 \r\n\
-DESKTOP-ABC,openhuman-core.exe,C:\\Program Files\\OpenHuman\\openhuman-core.exe,1234,5678\r\n\
+DESKTOP-ABC,alexander-ai-solutions-core.exe,C:\\Program Files\\OpenHuman\\alexander-ai-solutions-core.exe,1234,5678\r\n\
 DESKTOP-ABC,chrome.exe,C:\\Program Files\\Google\\Chrome\\chrome.exe,1,9000\r\n\
 ";
             let results = parse_wmic_output(csv, 9999);
             assert_eq!(results.len(), 1);
             assert_eq!(results[0].pid, 5678);
             assert_eq!(results[0].ppid, 1234);
-            assert!(results[0].argv0.contains("openhuman-core"));
+            assert!(results[0].argv0.contains("alexander-ai-solutions-core"));
         }
 
         #[test]
@@ -855,7 +859,7 @@ DESKTOP-ABC,chrome.exe,C:\\Program Files\\Google\\Chrome\\chrome.exe,1,9000\r\n\
             let csv = "\
 Node,Caption,ExecutablePath,ParentProcessId,ProcessId\r\n\
 \r\n\
-DESKTOP-ABC,openhuman-core.exe,C:\\Program Files\\OpenHuman\\openhuman-core.exe,1,1234\r\n\
+DESKTOP-ABC,alexander-ai-solutions-core.exe,C:\\Program Files\\OpenHuman\\alexander-ai-solutions-core.exe,1,1234\r\n\
 ";
             let results = parse_wmic_output(csv, 1234);
             assert!(results.is_empty(), "self pid should be excluded");
@@ -864,8 +868,8 @@ DESKTOP-ABC,openhuman-core.exe,C:\\Program Files\\OpenHuman\\openhuman-core.exe,
         #[test]
         fn is_openhuman_executable_matches_core() {
             assert!(is_openhuman_executable(
-                "openhuman-core.exe",
-                "C:\\path\\openhuman-core.exe"
+                "alexander-ai-solutions-core.exe",
+                "C:\\path\\alexander-ai-solutions-core.exe"
             ));
             assert!(is_openhuman_executable(
                 "OpenHuman.exe",

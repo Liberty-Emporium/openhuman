@@ -101,20 +101,22 @@
 //! Assertion is implicit: cargo reports the test as failed when the
 //! tokio runtime aborts with stack overflow.
 
-use anyhow::Result;
-use async_trait::async_trait;
-use openhuman_core::openhuman::agent::harness::definition::{AgentDefinitionRegistry, ModelSpec};
-use openhuman_core::openhuman::agent::harness::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::definition::{
+    AgentDefinitionRegistry, ModelSpec,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::{
     run_subagent, with_parent_context, ParentExecutionContext, SubagentRunOptions,
 };
-use openhuman_core::openhuman::config::AgentConfig;
-use openhuman_core::openhuman::context::prompt::ToolCallFormat;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::AgentConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::ToolCallFormat;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatRequest, ChatResponse, Provider, ToolCall,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts,
 };
+use anyhow::Result;
+use async_trait::async_trait;
 use parking_lot::Mutex;
 use serde_json::json;
 use std::sync::Arc;

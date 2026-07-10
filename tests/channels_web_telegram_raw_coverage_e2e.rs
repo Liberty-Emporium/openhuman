@@ -6,6 +6,18 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::providers::telegram::TelegramChannel;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::providers::web::{
+    cancel_chat, register_approval_surface_subscriber, start_chat, subscribe_web_channel_events,
+    test_support as web_test_support, ChatRequestMetadata,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::providers::yuanbao::{
+    YuanbaoChannel, YuanbaoConfig,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::LarkChannel;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::{Channel, SendMessage};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{schema::LarkConfig, StreamMode};
+use alexander_ai_solutions_core::core::event_bus::{init_global, publish_global, DomainEvent};
 use axum::{
     body::Bytes,
     extract::{Path, State},
@@ -14,16 +26,6 @@ use axum::{
     routing::post,
     Router,
 };
-use openhuman_core::core::event_bus::{init_global, publish_global, DomainEvent};
-use openhuman_core::openhuman::channels::providers::telegram::TelegramChannel;
-use openhuman_core::openhuman::channels::providers::web::{
-    cancel_chat, register_approval_surface_subscriber, start_chat, subscribe_web_channel_events,
-    test_support as web_test_support, ChatRequestMetadata,
-};
-use openhuman_core::openhuman::channels::providers::yuanbao::{YuanbaoChannel, YuanbaoConfig};
-use openhuman_core::openhuman::channels::LarkChannel;
-use openhuman_core::openhuman::channels::{Channel, SendMessage};
-use openhuman_core::openhuman::config::{schema::LarkConfig, StreamMode};
 use serde_json::{json, Value};
 use tokio::time::timeout;
 

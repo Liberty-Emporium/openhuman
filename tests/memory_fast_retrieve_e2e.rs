@@ -21,10 +21,14 @@
 use chrono::{TimeZone, Utc};
 use tempfile::TempDir;
 
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::memory::ingest_pipeline::ingest_chat;
-use openhuman_core::openhuman::memory_sync::canonicalize::chat::{ChatBatch, ChatMessage};
-use openhuman_core::openhuman::memory_tree::retrieval::{fast_retrieve, FastRetrieveOptions};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::ingest_pipeline::ingest_chat;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::canonicalize::chat::{
+    ChatBatch, ChatMessage,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::{
+    fast_retrieve, FastRetrieveOptions,
+};
 
 fn test_config() -> (TempDir, Config) {
     let tmp = TempDir::new().unwrap();

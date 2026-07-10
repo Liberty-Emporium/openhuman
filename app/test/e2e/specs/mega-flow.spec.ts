@@ -13,7 +13,7 @@
  *     the CEF WebView accessibility tree (which exposes zero DOM to XCUITest).
  *   - Between scenarios, reset state in-app via `openhuman.config_reset_local_data`
  *     (mirrors the production "Clear app data + log out" flow) + mock admin reset.
- *     Then re-write `~/.openhuman/config.toml` so the mock URL persists across
+ *     Then re-write `~/.alexanderai/config.toml` so the mock URL persists across
  *     the reset and the next scenario starts pointing at the mock.
  *
  * What this covers (the "major user flows" set):
@@ -85,7 +85,7 @@ async function resetEverything(label: string): Promise<void> {
   // `openhuman.config_reset_local_data` call this used to make was
   // killing the CEF/WDIO session on Linux mid-spec — `reset_local_data`
   // does `remove_dir_all($OPENHUMAN_WORKSPACE)` plus
-  // `remove_dir_all(~/.openhuman)` while CEF is still mid-flight,
+  // `remove_dir_all(~/.alexanderai)` while CEF is still mid-flight,
   // and the renderer doesn't survive that on Linux/CEF (every
   // sub-test after the first then fails with `invalid session id`).
   //

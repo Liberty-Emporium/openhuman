@@ -380,7 +380,7 @@ encrypt = false
     write_config_file(openhuman_dir, &cfg);
     if openhuman_dir
         .file_name()
-        .is_some_and(|name| name == std::ffi::OsStr::new(".openhuman"))
+        .is_some_and(|name| name == std::ffi::OsStr::new(".alexanderai"))
     {
         write_config_file(&openhuman_dir.join("users").join("local"), &cfg);
     }
@@ -497,7 +497,7 @@ impl Stack {
 async fn boot_stack() -> Stack {
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path().to_path_buf();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let home_guard = EnvVarGuard::set_to_path("HOME", &home);
     let workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");

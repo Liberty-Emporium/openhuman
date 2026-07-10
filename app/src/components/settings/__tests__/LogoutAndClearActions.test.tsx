@@ -58,7 +58,7 @@ describe('LogoutAndClearActions', () => {
     const user = userEvent.setup();
     mockClearAllAppData.mockRejectedValueOnce(
       new Error(
-        'Failed to remove C:\\Users\\me\\.openhuman because it is locked by another OpenHuman window or process. Close all OpenHuman windows and try again.'
+        'Failed to remove C:\\Users\\me\\.alexanderai because it is locked by another OpenHuman window or process. Close all OpenHuman windows and try again.'
       )
     );
     renderActions();

@@ -8,18 +8,18 @@ use tempfile::tempdir;
 
 use chrono::{TimeZone, Utc};
 
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::memory::tree_source::registry::get_or_create_source_tree;
-use openhuman_core::openhuman::memory_queue::drain_until_idle;
-use openhuman_core::openhuman::memory_store::content::atomic::stage_summary;
-use openhuman_core::openhuman::memory_store::content::obsidian::ensure_obsidian_defaults;
-use openhuman_core::openhuman::memory_store::content::wiki_git::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::tree_source::registry::get_or_create_source_tree;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_queue::drain_until_idle;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::content::atomic::stage_summary;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::content::obsidian::ensure_obsidian_defaults;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::content::wiki_git::{
     get_read_pointer_tag, set_read_pointer_tag,
 };
-use openhuman_core::openhuman::memory_store::content::{SummaryComposeInput, SummaryTreeKind};
-use openhuman_core::openhuman::memory_sync::composio::providers::slack::ingest::ingest_page_into_memory_tree;
-use openhuman_core::openhuman::memory_sync::composio::providers::slack::SlackMessage;
-use openhuman_core::openhuman::memory_tree::ingest::{ingest_summary, SummaryIngestInput};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::content::{SummaryComposeInput, SummaryTreeKind};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::slack::ingest::ingest_page_into_memory_tree;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::slack::SlackMessage;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::ingest::{ingest_summary, SummaryIngestInput};
 
 fn make_config(workspace_dir: &std::path::Path) -> Config {
     let mut config = Config::default();

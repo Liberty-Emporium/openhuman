@@ -12,18 +12,22 @@ use filetime::FileTime;
 use serde_json::Value;
 use tempfile::{Builder, TempDir};
 
-use openhuman_core::openhuman::app_state::{snapshot, update_local_state, StoredAppStatePatch};
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::credentials::profiles::{AuthProfile, AuthProfilesStore, TokenSet};
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::app_state::{
+    snapshot, update_local_state, StoredAppStatePatch,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::profiles::{
+    AuthProfile, AuthProfilesStore, TokenSet,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     AppendConversationMessageRequest, ConversationMessageRecord, CreateConversationThreadRequest,
     GenerateConversationThreadTitleRequest, UpsertConversationThreadRequest,
 };
-use openhuman_core::openhuman::memory_sources::reconcile::ensure_composio_sources;
-use openhuman_core::openhuman::threads::ops::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::reconcile::ensure_composio_sources;
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::ops::{
     message_append, thread_create_new, thread_generate_title, thread_upsert,
 };
-use openhuman_core::openhuman::threads::welcome_migration::migrate_welcome_agent_artifacts;
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::welcome_migration::migrate_welcome_agent_artifacts;
 
 static ENV_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
 

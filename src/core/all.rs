@@ -89,7 +89,7 @@ fn cli_adapters() -> &'static [RegisteredCliAdapter] {
     CLI_ADAPTERS.get_or_init(|| {
         vec![RegisteredCliAdapter {
             namespace: "voice",
-            handler: crate::openhuman::voice::cli::run_standalone_subcommand,
+            handler: crate::alexander_ai_solutions::voice::cli::run_standalone_subcommand,
         }]
     })
 }
@@ -105,228 +105,318 @@ fn cli_adapters() -> &'static [RegisteredCliAdapter] {
 fn build_registered_controllers() -> Vec<RegisteredController> {
     let mut controllers = Vec::new();
     // Application information and capabilities
-    controllers.extend(crate::openhuman::about_app::all_about_app_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::about_app::all_about_app_registered_controllers());
     // AgentBox marketplace adapter status
-    controllers.extend(crate::openhuman::agentbox::all_agentbox_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::agentbox::all_agentbox_registered_controllers());
     // Core application shell state
-    controllers.extend(crate::openhuman::app_state::all_app_state_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::app_state::all_app_state_registered_controllers());
     // Audio generation + podcast-style email delivery
-    controllers.extend(crate::openhuman::audio_toolkit::all_audio_toolkit_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::audio_toolkit::all_audio_toolkit_registered_controllers(),
+    );
     // Composio integration controllers
-    controllers.extend(crate::openhuman::composio::all_composio_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::composio::all_composio_registered_controllers());
     // Scheduled job management
-    controllers.extend(crate::openhuman::cron::all_cron_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::cron::all_cron_registered_controllers());
     // Proactive task ingestion from external tools (github/notion/linear/clickup)
-    controllers.extend(crate::openhuman::task_sources::all_task_sources_registered_controllers());
-    controllers.extend(crate::openhuman::dashboard::all_dashboard_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::task_sources::all_task_sources_registered_controllers(),
+    );
+    controllers
+        .extend(crate::alexander_ai_solutions::dashboard::all_dashboard_registered_controllers());
     // MCP client subsystem: Smithery registry browser, local server install/connect, tool dispatch
-    controllers.extend(crate::openhuman::mcp_registry::all_mcp_registry_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::mcp_registry::all_mcp_registry_registered_controllers(),
+    );
     // Webview APIs bridge — proxies connector calls (Gmail, …) through
     // a WebSocket to the Tauri shell so curl reaches the live webview.
-    controllers.extend(crate::openhuman::webview_apis::all_webview_apis_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::webview_apis::all_webview_apis_registered_controllers(),
+    );
     // Agent definition and prompt inspection
-    controllers.extend(crate::openhuman::agent::all_agent_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::agent::all_agent_registered_controllers());
     // Persistent agent profiles (flavours): name, soul, memory sources, skills, MCP, connectors.
-    controllers.extend(crate::openhuman::profiles::all_profiles_registered_controllers());
-    // User-facing agent registry: defaults, enablement, custom agents, tool policy.
     controllers
-        .extend(crate::openhuman::agent_registry::all_agent_registry_registered_controllers());
+        .extend(crate::alexander_ai_solutions::profiles::all_profiles_registered_controllers());
+    // User-facing agent registry: defaults, enablement, custom agents, tool policy.
+    controllers.extend(
+        crate::alexander_ai_solutions::agent_registry::all_agent_registry_registered_controllers(),
+    );
     // Local procedural operating experience for agent self-learning
     controllers
-        .extend(crate::openhuman::agent_experience::all_agent_experience_registered_controllers());
+        .extend(crate::alexander_ai_solutions::agent_experience::all_agent_experience_registered_controllers());
     // System and process health monitoring
-    controllers.extend(crate::openhuman::health::all_health_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::health::all_health_registered_controllers());
     // One-time first-run initialization (Python/spaCy/Node provisioning)
-    controllers.extend(crate::openhuman::harness_init::all_harness_init_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::harness_init::all_harness_init_registered_controllers(),
+    );
     // Diagnostic tools
-    controllers.extend(crate::openhuman::doctor::all_doctor_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::doctor::all_doctor_registered_controllers());
     // Secret storage and encryption
-    controllers.extend(crate::openhuman::encryption::all_encryption_registered_controllers());
-    // Keyring consent — user approval before local secret storage fallback
     controllers
-        .extend(crate::openhuman::keyring_consent::all_keyring_consent_registered_controllers());
+        .extend(crate::alexander_ai_solutions::encryption::all_encryption_registered_controllers());
+    // Keyring consent — user approval before local secret storage fallback
+    controllers.extend(
+        crate::alexander_ai_solutions::keyring_consent::all_keyring_consent_registered_controllers(
+        ),
+    );
     // Security policy metadata
-    controllers.extend(crate::openhuman::security::all_security_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::security::all_security_registered_controllers());
     // Interactive approval workflow (#1339 — gate external-effect tool calls)
-    controllers.extend(crate::openhuman::approval::all_approval_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::approval::all_approval_registered_controllers());
     // Interactive plan-review gate — parks a live turn on a thread-scoped plan
-    controllers.extend(crate::openhuman::plan_review::all_plan_review_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::plan_review::all_plan_review_registered_controllers(),
+    );
     // Agent-generated artifact storage, retrieval, and lifecycle management
-    controllers.extend(crate::openhuman::artifacts::all_artifacts_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::artifacts::all_artifacts_registered_controllers());
     // Background heartbeat loop controls
-    controllers.extend(crate::openhuman::heartbeat::all_heartbeat_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::heartbeat::all_heartbeat_registered_controllers());
     // Ad-hoc static directory HTTP hosting for local file sharing / previews
-    controllers.extend(crate::openhuman::http_host::all_http_host_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::http_host::all_http_host_registered_controllers());
     // Token usage and billing cost tracking
-    controllers.extend(crate::openhuman::cost::all_cost_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::cost::all_cost_registered_controllers());
     // x402 machine-payable API payment protocol
-    controllers.extend(crate::openhuman::x402::all_x402_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::x402::all_x402_registered_controllers());
     // Inline autocomplete settings
-    controllers.extend(crate::openhuman::autocomplete::all_autocomplete_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::autocomplete::all_autocomplete_registered_controllers(),
+    );
     // External messaging channels (Web, Telegram, etc.)
     controllers.extend(
-        crate::openhuman::channels::providers::web::all_web_channel_registered_controllers(),
+        crate::alexander_ai_solutions::channels::providers::web::all_web_channel_registered_controllers(),
     );
-    controllers
-        .extend(crate::openhuman::channels::controllers::all_channels_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::channels::controllers::all_channels_registered_controllers(),
+    );
     // Persistent configuration management
-    controllers.extend(crate::openhuman::config::all_config_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::config::all_config_registered_controllers());
     // Local sidecar reachability + backend Socket.IO state diagnostics (#1527)
-    controllers.extend(crate::openhuman::connectivity::all_connectivity_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::connectivity::all_connectivity_registered_controllers(),
+    );
     // User credentials and session management
-    controllers.extend(crate::openhuman::credentials::all_credentials_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::credentials::all_credentials_registered_controllers(),
+    );
     // Desktop service management
-    controllers.extend(crate::openhuman::service::all_service_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::service::all_service_registered_controllers());
     // Data migration utilities
-    controllers.extend(crate::openhuman::migration::all_migration_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::migration::all_migration_registered_controllers());
     // Saved council definitions for the desktop Model Council surface.
     controllers
-        .extend(crate::openhuman::council_registry::all_council_registry_registered_controllers());
+        .extend(crate::alexander_ai_solutions::council_registry::all_council_registry_registered_controllers());
     // Model Council: multi-model deliberation (parallel members + chair synthesis)
-    controllers.extend(crate::openhuman::model_council::all_model_council_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::model_council::all_model_council_registered_controllers(),
+    );
     // Background command monitors for agent-scoped event sources
-    controllers.extend(crate::openhuman::monitor::all_monitor_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::monitor::all_monitor_registered_controllers());
     // Unified inference domain: text / vision / local runtime / cloud providers.
     // (Formerly split across inference, local AI, and providers modules.)
-    controllers.extend(crate::openhuman::inference::all_inference_registered_controllers());
-    controllers.extend(crate::openhuman::inference::all_local_inference_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::inference::all_inference_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::inference::all_local_inference_registered_controllers(),
+    );
     // Embedding provider configuration and embed RPC.
-    controllers.extend(crate::openhuman::embeddings::all_embeddings_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::embeddings::all_embeddings_registered_controllers());
     // People resolution and interaction scoring
-    controllers.extend(crate::openhuman::people::all_people_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::people::all_people_registered_controllers());
     // Screen capture and UI analysis
     controllers.extend(
-        crate::openhuman::screen_intelligence::all_screen_intelligence_registered_controllers(),
+        crate::alexander_ai_solutions::screen_intelligence::all_screen_intelligence_registered_controllers(),
     );
     // Sandbox execution backends (Docker, local jail, policy, cleanup)
-    controllers.extend(crate::openhuman::sandbox::all_sandbox_registered_controllers());
-    // Backend Socket.IO bridge + related runtime plumbing
-    controllers.extend(crate::openhuman::socket::all_socket_registered_controllers());
-    // Managed Node.js runtime bridge (tool listing + dispatch)
-    controllers.extend(crate::openhuman::javascript::all_javascript_registered_controllers());
-    // Discovered SKILL.md skills and their bundled resources
-    controllers.extend(crate::openhuman::workflows::all_workflows_registered_controllers());
-    // Skill runtime: run/cancel/log skill executions and resolve Node/Python toolchains
-    controllers.extend(crate::openhuman::skill_runtime::all_skill_runtime_registered_controllers());
-    // Skill registry: browse, search, install from remote registries
     controllers
-        .extend(crate::openhuman::skill_registry::all_skill_registry_registered_controllers());
+        .extend(crate::alexander_ai_solutions::sandbox::all_sandbox_registered_controllers());
+    // Backend Socket.IO bridge + related runtime plumbing
+    controllers.extend(crate::alexander_ai_solutions::socket::all_socket_registered_controllers());
+    // Managed Node.js runtime bridge (tool listing + dispatch)
+    controllers
+        .extend(crate::alexander_ai_solutions::javascript::all_javascript_registered_controllers());
+    // Discovered SKILL.md skills and their bundled resources
+    controllers
+        .extend(crate::alexander_ai_solutions::workflows::all_workflows_registered_controllers());
+    // Skill runtime: run/cancel/log skill executions and resolve Node/Python toolchains
+    controllers.extend(
+        crate::alexander_ai_solutions::skill_runtime::all_skill_runtime_registered_controllers(),
+    );
+    // Skill registry: browse, search, install from remote registries
+    controllers.extend(
+        crate::alexander_ai_solutions::skill_registry::all_skill_registry_registered_controllers(),
+    );
     // User workspace and file management
-    controllers.extend(crate::openhuman::workspace::all_workspace_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::workspace::all_workspace_registered_controllers());
     // Workflow tool registry
-    controllers.extend(crate::openhuman::tools::all_tools_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::tools::all_tools_registered_controllers());
     // Unified read-only registry across MCP stdio tools and controller-backed tools
-    controllers.extend(crate::openhuman::tool_registry::all_tool_registry_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::tool_registry::all_tool_registry_registered_controllers(),
+    );
     // Document and knowledge graph storage
-    controllers.extend(crate::openhuman::memory::all_memory_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::memory::all_memory_registered_controllers());
     // Long-term goals list (editable list + turn-based enrichment agent)
-    controllers.extend(crate::openhuman::memory_goals::all_memory_goals_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::memory_goals::all_memory_goals_registered_controllers(),
+    );
     // Thread-level goal (Codex-style per-thread completion contract)
-    controllers.extend(crate::openhuman::thread_goals::all_thread_goals_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::thread_goals::all_thread_goals_registered_controllers(),
+    );
     // Memory tree ingestion layer (#707 — canonicalised chunks with provenance)
-    controllers.extend(crate::openhuman::memory_tree::all_memory_tree_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::memory_tree::all_memory_tree_registered_controllers(),
+    );
     // Memory tree retrieval layer (#710 — LLM-callable read tools over the tree)
-    controllers.extend(crate::openhuman::memory_tree::all_retrieval_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::memory_tree::all_retrieval_registered_controllers());
     // Slack → memory-tree ingestion engine (per-message ingest, no bucketing)
     controllers.extend(
-        crate::openhuman::composio::providers::slack::all_slack_memory_registered_controllers(),
+        crate::alexander_ai_solutions::composio::providers::slack::all_slack_memory_registered_controllers(),
     );
     // Per-connection memory sync status, controls, and progress (#1136)
     controllers.extend(
-        crate::openhuman::memory_sync::sync_status::all_memory_sync_status_registered_controllers(),
+        crate::alexander_ai_solutions::memory_sync::sync_status::all_memory_sync_status_registered_controllers(),
     );
     // Memory sources — user-configured data connectors registry
-    controllers
-        .extend(crate::openhuman::memory_sources::all_memory_sources_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::memory_sources::all_memory_sources_registered_controllers(),
+    );
     // Memory diff — snapshot-based change tracking for memory sources
-    controllers.extend(crate::openhuman::memory_diff::all_memory_diff_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::memory_diff::all_memory_diff_registered_controllers(),
+    );
     // Link shortener for long tracking URLs — saves LLM tokens
-    controllers
-        .extend(crate::openhuman::redirect_links::all_redirect_links_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::redirect_links::all_redirect_links_registered_controllers(),
+    );
     // Referral and growth tracking
-    controllers.extend(crate::openhuman::referral::all_referral_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::referral::all_referral_registered_controllers());
     // Billing and subscription management
-    controllers.extend(crate::openhuman::billing::all_billing_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::billing::all_billing_registered_controllers());
     // Announcements surfaced on harness init
-    controllers.extend(crate::openhuman::announcements::all_announcements_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::announcements::all_announcements_registered_controllers(),
+    );
     // Team and role management
-    controllers.extend(crate::openhuman::team::all_team_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::team::all_team_registered_controllers());
     // E2E test support — `openhuman.test_reset` wipes sidecar state in-place.
     // Gated behind the `e2e-test-support` cargo feature so shipped binaries
     // never even register the destructive wipe RPC. Flipped on by the E2E
     // build script (app/scripts/e2e-build.sh).
     #[cfg(feature = "e2e-test-support")]
-    controllers.extend(crate::openhuman::test_support::all_test_support_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::test_support::all_test_support_registered_controllers(),
+    );
     // Local wallet metadata and onboarding status
-    controllers.extend(crate::openhuman::wallet::all_wallet_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::wallet::all_wallet_registered_controllers());
     // High-level web3 surface (swaps / bridges / dapp calls) over the wallet
-    controllers.extend(crate::openhuman::web3::all_web3_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::web3::all_web3_registered_controllers());
     // Local assistive surfaces over third-party provider apps
     controllers.extend(
-        crate::openhuman::provider_surfaces::all_provider_surfaces_registered_controllers(),
+        crate::alexander_ai_solutions::provider_surfaces::all_provider_surfaces_registered_controllers(),
     );
     // OS-level text input interactions
-    controllers.extend(crate::openhuman::text_input::all_text_input_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::text_input::all_text_input_registered_controllers());
     // Voice transcription and synthesis
-    controllers.extend(crate::openhuman::voice::all_voice_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::voice::all_voice_registered_controllers());
     // Background awareness and autonomous tasks
-    controllers.extend(crate::openhuman::subconscious::all_subconscious_registered_controllers());
     controllers.extend(
-        crate::openhuman::subconscious_triggers::all_subconscious_triggers_registered_controllers(),
+        crate::alexander_ai_solutions::subconscious::all_subconscious_registered_controllers(),
+    );
+    controllers.extend(
+        crate::alexander_ai_solutions::subconscious_triggers::all_subconscious_triggers_registered_controllers(),
     );
     // Webhook tunnel management
-    controllers.extend(crate::openhuman::webhooks::all_webhooks_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::webhooks::all_webhooks_registered_controllers());
     // Core binary update management
-    controllers.extend(crate::openhuman::update::all_update_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::update::all_update_registered_controllers());
     // Hierarchical knowledge summarization
-    controllers.extend(crate::openhuman::memory_tree::all_tree_summarizer_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::memory_tree::all_tree_summarizer_registered_controllers(),
+    );
     // Self-learning and user context enrichment
-    controllers.extend(crate::openhuman::learning::all_learning_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::learning::all_learning_registered_controllers());
     // Conversation thread and message management
-    controllers.extend(crate::openhuman::threads::all_threads_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::threads::all_threads_registered_controllers());
     // TokenJuice content-router debug controllers (detect / compress / cache_stats / retrieve)
-    controllers.extend(crate::openhuman::tokenjuice::all_tokenjuice_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::tokenjuice::all_tokenjuice_registered_controllers());
     // Per-thread todo list (agent task board CRUD over RPC)
-    controllers.extend(crate::openhuman::todos::all_todos_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::todos::all_todos_registered_controllers());
     // Embedded webview native notifications
     controllers.extend(
-        crate::openhuman::webview_notifications::all_webview_notifications_registered_controllers(),
+        crate::alexander_ai_solutions::webview_notifications::all_webview_notifications_registered_controllers(),
     );
     // Integration notification ingest, triage, and per-provider settings
-    controllers.extend(crate::openhuman::notifications::all_notifications_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::notifications::all_notifications_registered_controllers(),
+    );
     // Google Meet call-join request validation (shell handles the webview)
-    controllers.extend(crate::openhuman::meet::all_meet_registered_controllers());
+    controllers.extend(crate::alexander_ai_solutions::meet::all_meet_registered_controllers());
     // Agent meetings — backend-delegated Meet bot via Socket.IO
-    controllers
-        .extend(crate::openhuman::agent_meetings::all_agent_meetings_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::agent_meetings::all_agent_meetings_registered_controllers(),
+    );
     // Live meet-agent loop: STT/LLM/TTS over the open call's audio.
-    controllers.extend(crate::openhuman::meet_agent::all_meet_agent_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::meet_agent::all_meet_agent_registered_controllers());
     // Desktop companion — Clicky-style interaction loop.
     controllers.extend(
-        crate::openhuman::desktop_companion::all_desktop_companion_registered_controllers(),
+        crate::alexander_ai_solutions::desktop_companion::all_desktop_companion_registered_controllers(),
     );
     // Structured WhatsApp Web data — agent-facing read-only controllers (list/search).
     // The write-path ingest controller is registered separately in build_internal_only_controllers.
-    controllers.extend(crate::openhuman::whatsapp_data::all_whatsapp_data_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::whatsapp_data::all_whatsapp_data_registered_controllers(),
+    );
     // Mobile device pairing and management
-    controllers.extend(crate::openhuman::devices::all_devices_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::devices::all_devices_registered_controllers());
     // Durable agent session database — queryable index over transcripts, lineage, tool calls
-    controllers.extend(crate::openhuman::session_db::all_session_db_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::session_db::all_session_db_registered_controllers());
     // Background agent command center — read-only grouped view over the run ledger
     controllers
-        .extend(crate::openhuman::agent_orchestration::all_command_center_registered_controllers());
+        .extend(crate::alexander_ai_solutions::agent_orchestration::all_command_center_registered_controllers());
     // Durable dynamic workflow runs — definitions + read surface over the run ledger
-    controllers
-        .extend(crate::openhuman::agent_orchestration::all_workflow_run_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::agent_orchestration::all_workflow_run_registered_controllers(
+        ),
+    );
     // Durable agent-team coordination — teams, members, dependency-aware task claiming, messaging
-    controllers
-        .extend(crate::openhuman::agent_orchestration::all_agent_team_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::agent_orchestration::all_agent_team_registered_controllers(),
+    );
     // Git-worktree isolation manager — list / status / diff / remove worker worktrees (#3376)
-    controllers
-        .extend(crate::openhuman::agent_orchestration::all_worktree_registered_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::agent_orchestration::all_worktree_registered_controllers(),
+    );
     // User-driven cancel of detached background sub-agents (#3711)
     controllers.extend(
-        crate::openhuman::agent_orchestration::all_subagent_control_registered_controllers(),
+        crate::alexander_ai_solutions::agent_orchestration::all_subagent_control_registered_controllers(),
     );
     controllers
 }
@@ -339,13 +429,17 @@ fn build_internal_only_controllers() -> Vec<RegisteredController> {
     let mut controllers = Vec::new();
     // whatsapp_data ingest: scanner-side write path.  Callable over RPC by the
     // Tauri scanner but excluded from agent-facing schema discovery.
-    controllers.extend(crate::openhuman::whatsapp_data::all_whatsapp_data_internal_controllers());
+    controllers.extend(
+        crate::alexander_ai_solutions::whatsapp_data::all_whatsapp_data_internal_controllers(),
+    );
     // MCP write audit list: internal-only so the desktop UI/CLI can inspect
     // local write history without exposing cross-client history as an MCP tool.
-    controllers.extend(crate::openhuman::mcp_audit::all_mcp_audit_internal_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::mcp_audit::all_mcp_audit_internal_controllers());
     // tiny.place A2A social-network integration: renderer-callable via core_rpc_relay
     // but NOT advertised to agents in tool listings or schema discovery.
-    controllers.extend(crate::openhuman::tinyplace::all_tinyplace_registered_controllers());
+    controllers
+        .extend(crate::alexander_ai_solutions::tinyplace::all_tinyplace_registered_controllers());
     controllers
 }
 
@@ -355,131 +449,198 @@ fn build_internal_only_controllers() -> Vec<RegisteredController> {
 /// (schema) for each controller. This is used for discovery and validation.
 fn build_declared_controller_schemas() -> Vec<ControllerSchema> {
     let mut schemas = Vec::new();
-    schemas.extend(crate::openhuman::about_app::all_about_app_controller_schemas());
-    schemas.extend(crate::openhuman::agentbox::all_agentbox_controller_schemas());
-    schemas.extend(crate::openhuman::app_state::all_app_state_controller_schemas());
-    schemas.extend(crate::openhuman::audio_toolkit::all_audio_toolkit_controller_schemas());
-    schemas.extend(crate::openhuman::composio::all_composio_controller_schemas());
-    schemas.extend(crate::openhuman::cron::all_cron_controller_schemas());
-    schemas.extend(crate::openhuman::task_sources::all_task_sources_controller_schemas());
-    schemas.extend(crate::openhuman::dashboard::all_dashboard_controller_schemas());
-    schemas.extend(crate::openhuman::mcp_registry::all_mcp_registry_controller_schemas());
-    schemas.extend(crate::openhuman::webview_apis::all_webview_apis_controller_schemas());
-    schemas.extend(crate::openhuman::agent::all_agent_controller_schemas());
-    schemas.extend(crate::openhuman::profiles::all_profiles_controller_schemas());
-    schemas.extend(crate::openhuman::agent_registry::all_agent_registry_controller_schemas());
-    schemas.extend(crate::openhuman::agent_experience::all_agent_experience_controller_schemas());
-    schemas.extend(crate::openhuman::health::all_health_controller_schemas());
-    schemas.extend(crate::openhuman::harness_init::all_harness_init_controller_schemas());
-    schemas.extend(crate::openhuman::doctor::all_doctor_controller_schemas());
-    schemas.extend(crate::openhuman::encryption::all_encryption_controller_schemas());
-    schemas.extend(crate::openhuman::keyring_consent::all_keyring_consent_controller_schemas());
-    schemas.extend(crate::openhuman::security::all_security_controller_schemas());
-    schemas.extend(crate::openhuman::approval::all_approval_controller_schemas());
-    schemas.extend(crate::openhuman::plan_review::all_plan_review_controller_schemas());
-    schemas.extend(crate::openhuman::artifacts::all_artifacts_controller_schemas());
-    schemas.extend(crate::openhuman::heartbeat::all_heartbeat_controller_schemas());
-    schemas.extend(crate::openhuman::http_host::all_http_host_controller_schemas());
-    schemas.extend(crate::openhuman::cost::all_cost_controller_schemas());
-    schemas.extend(crate::openhuman::x402::all_x402_controller_schemas());
-    schemas.extend(crate::openhuman::autocomplete::all_autocomplete_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::about_app::all_about_app_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::agentbox::all_agentbox_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::app_state::all_app_state_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::audio_toolkit::all_audio_toolkit_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::composio::all_composio_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::cron::all_cron_controller_schemas());
     schemas
-        .extend(crate::openhuman::channels::providers::web::all_web_channel_controller_schemas());
-    schemas.extend(crate::openhuman::channels::controllers::all_channels_controller_schemas());
-    schemas.extend(crate::openhuman::config::all_config_controller_schemas());
-    schemas.extend(crate::openhuman::connectivity::all_connectivity_controller_schemas());
-    schemas.extend(crate::openhuman::credentials::all_credentials_controller_schemas());
-    schemas.extend(crate::openhuman::service::all_service_controller_schemas());
-    schemas.extend(crate::openhuman::migration::all_migration_controller_schemas());
-    schemas.extend(crate::openhuman::council_registry::all_council_registry_controller_schemas());
-    schemas.extend(crate::openhuman::model_council::all_model_council_controller_schemas());
-    schemas.extend(crate::openhuman::monitor::all_monitor_controller_schemas());
-    schemas.extend(crate::openhuman::inference::all_inference_controller_schemas());
-    schemas.extend(crate::openhuman::inference::all_local_inference_controller_schemas());
-    schemas.extend(crate::openhuman::embeddings::all_embeddings_controller_schemas());
-    schemas.extend(crate::openhuman::people::all_people_controller_schemas());
+        .extend(crate::alexander_ai_solutions::task_sources::all_task_sources_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::dashboard::all_dashboard_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::mcp_registry::all_mcp_registry_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::webview_apis::all_webview_apis_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::agent::all_agent_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::profiles::all_profiles_controller_schemas());
     schemas.extend(
-        crate::openhuman::screen_intelligence::all_screen_intelligence_controller_schemas(),
-    );
-    schemas.extend(crate::openhuman::sandbox::all_sandbox_controller_schemas());
-    schemas.extend(crate::openhuman::socket::all_socket_controller_schemas());
-    schemas.extend(crate::openhuman::javascript::all_javascript_controller_schemas());
-    schemas.extend(crate::openhuman::workflows::all_workflows_controller_schemas());
-    schemas.extend(crate::openhuman::skill_runtime::all_skill_runtime_controller_schemas());
-    schemas.extend(crate::openhuman::skill_registry::all_skill_registry_controller_schemas());
-    schemas.extend(crate::openhuman::workspace::all_workspace_controller_schemas());
-    schemas.extend(crate::openhuman::tools::all_tools_controller_schemas());
-    schemas.extend(crate::openhuman::tool_registry::all_tool_registry_controller_schemas());
-    schemas.extend(crate::openhuman::memory::all_memory_controller_schemas());
-    schemas.extend(crate::openhuman::memory_goals::all_memory_goals_controller_schemas());
-    schemas.extend(crate::openhuman::thread_goals::all_thread_goals_controller_schemas());
-    schemas.extend(crate::openhuman::memory_tree::all_memory_tree_controller_schemas());
-    schemas.extend(crate::openhuman::memory_tree::all_retrieval_controller_schemas());
-    schemas.extend(
-        crate::openhuman::composio::providers::slack::all_slack_memory_controller_schemas(),
+        crate::alexander_ai_solutions::agent_registry::all_agent_registry_controller_schemas(),
     );
     schemas.extend(
-        crate::openhuman::memory_sync::sync_status::all_memory_sync_status_controller_schemas(),
+        crate::alexander_ai_solutions::agent_experience::all_agent_experience_controller_schemas(),
     );
-    schemas.extend(crate::openhuman::memory_sources::all_memory_sources_controller_schemas());
-    schemas.extend(crate::openhuman::memory_diff::all_memory_diff_controller_schemas());
-    schemas.extend(crate::openhuman::redirect_links::all_redirect_links_controller_schemas());
-    schemas.extend(crate::openhuman::referral::all_referral_controller_schemas());
-    schemas.extend(crate::openhuman::billing::all_billing_controller_schemas());
-    schemas.extend(crate::openhuman::announcements::all_announcements_controller_schemas());
-    schemas.extend(crate::openhuman::team::all_team_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::health::all_health_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::harness_init::all_harness_init_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::doctor::all_doctor_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::encryption::all_encryption_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::keyring_consent::all_keyring_consent_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::security::all_security_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::approval::all_approval_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::plan_review::all_plan_review_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::artifacts::all_artifacts_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::heartbeat::all_heartbeat_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::http_host::all_http_host_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::cost::all_cost_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::x402::all_x402_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::autocomplete::all_autocomplete_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::channels::providers::web::all_web_channel_controller_schemas(
+        ),
+    );
+    schemas.extend(
+        crate::alexander_ai_solutions::channels::controllers::all_channels_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::config::all_config_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::connectivity::all_connectivity_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::credentials::all_credentials_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::service::all_service_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::migration::all_migration_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::council_registry::all_council_registry_controller_schemas(),
+    );
+    schemas.extend(
+        crate::alexander_ai_solutions::model_council::all_model_council_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::monitor::all_monitor_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::inference::all_inference_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::inference::all_local_inference_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::embeddings::all_embeddings_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::people::all_people_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::screen_intelligence::all_screen_intelligence_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::sandbox::all_sandbox_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::socket::all_socket_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::javascript::all_javascript_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::workflows::all_workflows_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::skill_runtime::all_skill_runtime_controller_schemas(),
+    );
+    schemas.extend(
+        crate::alexander_ai_solutions::skill_registry::all_skill_registry_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::workspace::all_workspace_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::tools::all_tools_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::tool_registry::all_tool_registry_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::memory::all_memory_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::memory_goals::all_memory_goals_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::thread_goals::all_thread_goals_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::memory_tree::all_memory_tree_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::memory_tree::all_retrieval_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::composio::providers::slack::all_slack_memory_controller_schemas(),
+    );
+    schemas.extend(
+        crate::alexander_ai_solutions::memory_sync::sync_status::all_memory_sync_status_controller_schemas(),
+    );
+    schemas.extend(
+        crate::alexander_ai_solutions::memory_sources::all_memory_sources_controller_schemas(),
+    );
+    schemas
+        .extend(crate::alexander_ai_solutions::memory_diff::all_memory_diff_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::redirect_links::all_redirect_links_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::referral::all_referral_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::billing::all_billing_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::announcements::all_announcements_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::team::all_team_controller_schemas());
     #[cfg(feature = "e2e-test-support")]
-    schemas.extend(crate::openhuman::test_support::all_test_support_controller_schemas());
-    schemas.extend(crate::openhuman::wallet::all_wallet_controller_schemas());
-    schemas.extend(crate::openhuman::web3::all_web3_controller_schemas());
-    schemas.extend(crate::openhuman::provider_surfaces::all_provider_surfaces_controller_schemas());
-    schemas.extend(crate::openhuman::text_input::all_text_input_controller_schemas());
-    schemas.extend(crate::openhuman::voice::all_voice_controller_schemas());
-    schemas.extend(crate::openhuman::subconscious::all_subconscious_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::test_support::all_test_support_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::wallet::all_wallet_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::web3::all_web3_controller_schemas());
     schemas.extend(
-        crate::openhuman::subconscious_triggers::all_subconscious_triggers_controller_schemas(),
+        crate::alexander_ai_solutions::provider_surfaces::all_provider_surfaces_controller_schemas(
+        ),
     );
-    schemas.extend(crate::openhuman::webhooks::all_webhooks_controller_schemas());
-    schemas.extend(crate::openhuman::update::all_update_controller_schemas());
-    schemas.extend(crate::openhuman::memory_tree::all_tree_summarizer_controller_schemas());
-    schemas.extend(crate::openhuman::learning::all_learning_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::text_input::all_text_input_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::voice::all_voice_controller_schemas());
+    schemas
+        .extend(crate::alexander_ai_solutions::subconscious::all_subconscious_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::subconscious_triggers::all_subconscious_triggers_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::webhooks::all_webhooks_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::update::all_update_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::memory_tree::all_tree_summarizer_controller_schemas(),
+    );
+    schemas.extend(crate::alexander_ai_solutions::learning::all_learning_controller_schemas());
     // Conversation thread and message management
-    schemas.extend(crate::openhuman::threads::all_threads_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::threads::all_threads_controller_schemas());
     // TokenJuice content-router debug controllers
-    schemas.extend(crate::openhuman::tokenjuice::all_tokenjuice_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::tokenjuice::all_tokenjuice_controller_schemas());
     // Per-thread todo list (agent task board CRUD over RPC)
-    schemas.extend(crate::openhuman::todos::all_todos_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::todos::all_todos_controller_schemas());
     // Embedded webview native notifications
     schemas.extend(
-        crate::openhuman::webview_notifications::all_webview_notifications_controller_schemas(),
+        crate::alexander_ai_solutions::webview_notifications::all_webview_notifications_controller_schemas(),
     );
     // Integration notification ingest, triage, and per-provider settings
-    schemas.extend(crate::openhuman::notifications::all_notifications_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::notifications::all_notifications_controller_schemas(),
+    );
     // Google Meet call-join request validation
-    schemas.extend(crate::openhuman::meet::all_meet_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::meet::all_meet_controller_schemas());
     // Agent meetings — backend-delegated Meet bot via Socket.IO
-    schemas.extend(crate::openhuman::agent_meetings::all_agent_meetings_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::agent_meetings::all_agent_meetings_controller_schemas(),
+    );
     // Live meet-agent listening + speaking loop
-    schemas.extend(crate::openhuman::meet_agent::all_meet_agent_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::meet_agent::all_meet_agent_controller_schemas());
     // Desktop companion — Clicky-style interaction loop.
-    schemas.extend(crate::openhuman::desktop_companion::all_desktop_companion_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::desktop_companion::all_desktop_companion_controller_schemas(
+        ),
+    );
     // Structured WhatsApp Web data — local SQLite store, agent-queryable
-    schemas.extend(crate::openhuman::whatsapp_data::all_whatsapp_data_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::whatsapp_data::all_whatsapp_data_controller_schemas(),
+    );
     // Mobile device pairing and management
-    schemas.extend(crate::openhuman::devices::all_devices_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::devices::all_devices_controller_schemas());
     // Durable agent session database
-    schemas.extend(crate::openhuman::session_db::all_session_db_controller_schemas());
+    schemas.extend(crate::alexander_ai_solutions::session_db::all_session_db_controller_schemas());
     // Background agent command center
-    schemas.extend(crate::openhuman::agent_orchestration::all_command_center_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::agent_orchestration::all_command_center_controller_schemas(),
+    );
     // Durable dynamic workflow runs
-    schemas.extend(crate::openhuman::agent_orchestration::all_workflow_run_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::agent_orchestration::all_workflow_run_controller_schemas(),
+    );
     // Durable agent-team coordination
-    schemas.extend(crate::openhuman::agent_orchestration::all_agent_team_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::agent_orchestration::all_agent_team_controller_schemas(),
+    );
     // Git-worktree isolation manager (#3376)
-    schemas.extend(crate::openhuman::agent_orchestration::all_worktree_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::agent_orchestration::all_worktree_controller_schemas(),
+    );
     // User-driven cancel of detached background sub-agents (#3711)
-    schemas
-        .extend(crate::openhuman::agent_orchestration::all_subagent_control_controller_schemas());
+    schemas.extend(
+        crate::alexander_ai_solutions::agent_orchestration::all_subagent_control_controller_schemas(
+        ),
+    );
     schemas
 }
 

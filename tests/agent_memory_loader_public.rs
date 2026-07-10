@@ -1,7 +1,11 @@
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::memory_loader::{
+    DefaultMemoryLoader, MemoryLoader,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
+    Memory, MemoryCategory, MemoryEntry,
+};
 use anyhow::Result;
 use async_trait::async_trait;
-use openhuman_core::openhuman::agent::memory_loader::{DefaultMemoryLoader, MemoryLoader};
-use openhuman_core::openhuman::memory::{Memory, MemoryCategory, MemoryEntry};
 use std::sync::Arc;
 
 struct ScriptedMemory {
@@ -26,7 +30,7 @@ impl Memory for ScriptedMemory {
         &self,
         query: &str,
         _limit: usize,
-        _opts: openhuman_core::openhuman::memory::RecallOpts<'_>,
+        _opts: alexander_ai_solutions_core::alexander_ai_solutions::memory::RecallOpts<'_>,
     ) -> Result<Vec<MemoryEntry>> {
         if query.contains("working.user") {
             Ok(self.working.clone())
@@ -54,7 +58,8 @@ impl Memory for ScriptedMemory {
 
     async fn namespace_summaries(
         &self,
-    ) -> Result<Vec<openhuman_core::openhuman::memory::NamespaceSummary>> {
+    ) -> Result<Vec<alexander_ai_solutions_core::alexander_ai_solutions::memory::NamespaceSummary>>
+    {
         Ok(Vec::new())
     }
 

@@ -16,24 +16,26 @@ use axum::{Json, Router};
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
-use openhuman_core::openhuman::config::schema::cloud_providers::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::schema::cloud_providers::{
     AuthStyle as CloudAuthStyle, CloudProviderCreds,
 };
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::credentials::{AuthService, DEFAULT_AUTH_PROFILE_NAME};
-use openhuman_core::openhuman::inference::local::ops::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
+    AuthService, DEFAULT_AUTH_PROFILE_NAME,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::ops::{
     local_ai_chat, local_ai_download_asset, local_ai_downloads_progress, local_ai_should_react,
     LocalAiChatMessage,
 };
-use openhuman_core::openhuman::inference::local::LocalAiService;
-use openhuman_core::openhuman::inference::provider::compatible::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::LocalAiService;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::compatible::{
     AuthStyle as CompatibleAuthStyle, OpenAiCompatibleProvider,
 };
-use openhuman_core::openhuman::inference::provider::factory::auth_key_for_slug;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::factory::auth_key_for_slug;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     list_configured_models, ChatMessage, ChatRequest, Provider, ProviderDelta,
 };
-use openhuman_core::openhuman::tools::ToolSpec;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::ToolSpec;
 
 #[derive(Clone, Default)]
 struct MockState {
@@ -790,7 +792,7 @@ fn auth_header(headers: &HeaderMap) -> Option<String> {
 }
 
 fn temp_config(tmp: &TempDir) -> Config {
-    let root = tmp.path().join(".openhuman");
+    let root = tmp.path().join(".alexanderai");
     std::fs::create_dir_all(root.join("workspace")).expect("workspace dir");
     let mut config = Config::default();
     config.config_path = root.join("config.toml");

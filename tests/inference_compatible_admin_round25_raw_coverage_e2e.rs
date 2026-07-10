@@ -7,6 +7,26 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, OnceLock};
 
+use alexander_ai_solutions_core::alexander_ai_solutions::config::schema::cloud_providers::{
+    AuthStyle as CloudAuthStyle, CloudProviderCreds,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
+    AuthService, DEFAULT_AUTH_PROFILE_NAME,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::all_local_inference_registered_controllers;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::ops::inference_test_provider_model;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::compatible::{
+    AuthStyle as CompatibleAuthStyle, OpenAiCompatibleProvider,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::factory::auth_key_for_slug;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::{
+    StreamError, StreamOptions,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
+    list_configured_models, ChatMessage, Provider,
+};
+use alexander_ai_solutions_core::core::all::RegisteredController;
 use axum::body::Body;
 use axum::extract::State;
 use axum::http::{header, HeaderMap, Response, StatusCode};
@@ -14,22 +34,6 @@ use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use futures_util::StreamExt;
-use openhuman_core::core::all::RegisteredController;
-use openhuman_core::openhuman::config::schema::cloud_providers::{
-    AuthStyle as CloudAuthStyle, CloudProviderCreds,
-};
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::credentials::{AuthService, DEFAULT_AUTH_PROFILE_NAME};
-use openhuman_core::openhuman::inference::local::all_local_inference_registered_controllers;
-use openhuman_core::openhuman::inference::ops::inference_test_provider_model;
-use openhuman_core::openhuman::inference::provider::compatible::{
-    AuthStyle as CompatibleAuthStyle, OpenAiCompatibleProvider,
-};
-use openhuman_core::openhuman::inference::provider::factory::auth_key_for_slug;
-use openhuman_core::openhuman::inference::provider::traits::{StreamError, StreamOptions};
-use openhuman_core::openhuman::inference::provider::{
-    list_configured_models, ChatMessage, Provider,
-};
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
@@ -372,7 +376,7 @@ async fn call(controller: &RegisteredController, params: Value) -> Result<Value,
 }
 
 fn temp_config(tmp: &TempDir) -> Config {
-    let root = tmp.path().join(".openhuman");
+    let root = tmp.path().join(".alexanderai");
     std::fs::create_dir_all(root.join("workspace")).expect("workspace dir");
     let mut config = Config::default();
     config.config_path = root.join("config.toml");

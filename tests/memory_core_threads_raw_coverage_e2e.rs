@@ -11,39 +11,45 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use tempfile::TempDir;
 
-use openhuman_core::openhuman::agent::progress::AgentProgress;
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::memory::read_rpc::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::progress::AgentProgress;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::read_rpc::{
     self, ChunkFilter, GraphMode, ResetTreeResponse,
 };
-use openhuman_core::openhuman::memory::tree_source::get_or_create_source_tree;
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::tree_source::get_or_create_source_tree;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     AppendConversationMessageRequest, ConversationMessageRecord, ConversationMessagesRequest,
     CreateConversationThreadRequest, DeleteConversationThreadRequest, EmptyRequest,
     GenerateConversationThreadTitleRequest, UpdateConversationMessageRequest,
     UpdateConversationThreadLabelsRequest, UpdateConversationThreadTitleRequest,
 };
-use openhuman_core::openhuman::memory_conversations::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_conversations::{
     ensure_thread, list_threads, CreateConversationThread,
 };
-use openhuman_core::openhuman::memory_store::chunks::store::{upsert_chunks, with_connection};
-use openhuman_core::openhuman::memory_store::chunks::types::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::store::{
+    upsert_chunks, with_connection,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::types::{
     approx_token_count, chunk_id, Chunk, Metadata, SourceKind, SourceRef,
 };
-use openhuman_core::openhuman::memory_store::content;
-use openhuman_core::openhuman::memory_store::trees::store as tree_store;
-use openhuman_core::openhuman::memory_store::trees::types::{SummaryNode, TreeKind};
-use openhuman_core::openhuman::memory_tree::score::embed::pack_embedding;
-use openhuman_core::openhuman::memory_tree::score::extract::EntityKind;
-use openhuman_core::openhuman::memory_tree::score::resolver::CanonicalEntity;
-use openhuman_core::openhuman::memory_tree::score::signals::ScoreSignals;
-use openhuman_core::openhuman::memory_tree::score::store::{index_entity, upsert_score, ScoreRow};
-use openhuman_core::openhuman::threads::ops as thread_ops;
-use openhuman_core::openhuman::threads::turn_state::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::content;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::trees::store as tree_store;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::trees::types::{
+    SummaryNode, TreeKind,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::embed::pack_embedding;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::extract::EntityKind;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::resolver::CanonicalEntity;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::signals::ScoreSignals;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::store::{
+    index_entity, upsert_score, ScoreRow,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::ops as thread_ops;
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::turn_state::{
     self, ClearTurnStateRequest, GetTurnStateRequest, TurnLifecycle, TurnStateMirror,
     TurnStateStore,
 };
-use openhuman_core::openhuman::threads::welcome_migration::migrate_welcome_agent_artifacts;
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::welcome_migration::migrate_welcome_agent_artifacts;
 
 struct EnvGuard {
     key: &'static str,

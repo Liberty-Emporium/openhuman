@@ -71,7 +71,7 @@ fn run_tick(args: &[String]) -> Result<()> {
 
     let rt = tokio::runtime::Runtime::new()?;
     rt.block_on(async {
-        let mut config = crate::openhuman::config::Config::load_or_init()
+        let mut config = crate::alexander_ai_solutions::config::Config::load_or_init()
             .await
             .map_err(|e| anyhow!("config load failed: {e}"))?;
 
@@ -81,8 +81,8 @@ fn run_tick(args: &[String]) -> Result<()> {
 
         if let Some(mode_str) = &flags.mode {
             config.heartbeat.subconscious_mode = match mode_str.as_str() {
-                "simple" => crate::openhuman::config::schema::SubconsciousMode::Simple,
-                "aggressive" => crate::openhuman::config::schema::SubconsciousMode::Aggressive,
+                "simple" => crate::alexander_ai_solutions::config::schema::SubconsciousMode::Simple,
+                "aggressive" => crate::alexander_ai_solutions::config::schema::SubconsciousMode::Aggressive,
                 other => {
                     return Err(anyhow!(
                         "unknown mode '{other}', expected simple|aggressive"
@@ -99,7 +99,7 @@ fn run_tick(args: &[String]) -> Result<()> {
             config.heartbeat.inference_enabled = true;
             if !config.heartbeat.subconscious_mode.is_enabled() {
                 config.heartbeat.subconscious_mode =
-                    crate::openhuman::config::schema::SubconsciousMode::Simple;
+                    crate::alexander_ai_solutions::config::schema::SubconsciousMode::Simple;
             }
         }
 
@@ -111,15 +111,15 @@ fn run_tick(args: &[String]) -> Result<()> {
         );
 
         // Init memory client
-        let _ = crate::openhuman::memory::global::init(config.workspace_dir.clone());
+        let _ = crate::alexander_ai_solutions::memory::global::init(config.workspace_dir.clone());
 
         // Init scheduler gate so is_signed_out() works
-        crate::openhuman::scheduler_gate::init_global(&config);
+        crate::alexander_ai_solutions::scheduler_gate::init_global(&config);
 
         // Seed signed_out from session token
         match crate::api::jwt::get_session_token(&config) {
             Ok(Some(_)) => {
-                crate::openhuman::scheduler_gate::set_signed_out(false);
+                crate::alexander_ai_solutions::scheduler_gate::set_signed_out(false);
                 eprintln!("[subconscious] session token found — provider available");
             }
             Ok(None) => {
@@ -133,7 +133,7 @@ fn run_tick(args: &[String]) -> Result<()> {
 
         // Check provider availability
         if let Some(reason) =
-            crate::openhuman::subconscious::engine::subconscious_provider_unavailable_reason(
+            crate::alexander_ai_solutions::subconscious::engine::subconscious_provider_unavailable_reason(
                 &config,
             )
         {
@@ -143,7 +143,7 @@ fn run_tick(args: &[String]) -> Result<()> {
 
         // Create engine and run tick. The engine pulls its own memory_diff /
         // context state from the workspace — no memory client to pass in.
-        let engine = crate::openhuman::subconscious::SubconsciousEngine::new(&config);
+        let engine = crate::alexander_ai_solutions::subconscious::SubconsciousEngine::new(&config);
 
         eprintln!("[subconscious] running tick...");
         let result = engine
@@ -158,9 +158,9 @@ fn run_tick(args: &[String]) -> Result<()> {
 
         if flags.verbose {
             // Print the world baseline the next tick will diff against.
-            let baseline = crate::openhuman::subconscious::store::with_connection(
+            let baseline = crate::alexander_ai_solutions::subconscious::store::with_connection(
                 &config.workspace_dir,
-                crate::openhuman::subconscious::store::get_baseline_checkpoint_id,
+                crate::alexander_ai_solutions::subconscious::store::get_baseline_checkpoint_id,
             )
             .unwrap_or(None);
             match baseline {
@@ -180,7 +180,7 @@ fn run_status(args: &[String]) -> Result<()> {
 
     let rt = tokio::runtime::Runtime::new()?;
     rt.block_on(async {
-        let mut config = crate::openhuman::config::Config::load_or_init()
+        let mut config = crate::alexander_ai_solutions::config::Config::load_or_init()
             .await
             .map_err(|e| anyhow!("config load failed: {e}"))?;
         if let Some(ws) = workspace {
@@ -189,16 +189,16 @@ fn run_status(args: &[String]) -> Result<()> {
 
         let mode = config.heartbeat.effective_subconscious_mode();
         let provider_reason = if mode.is_enabled() {
-            crate::openhuman::subconscious::engine::subconscious_provider_unavailable_reason(
+            crate::alexander_ai_solutions::subconscious::engine::subconscious_provider_unavailable_reason(
                 &config,
             )
         } else {
             None
         };
 
-        let last_tick = crate::openhuman::subconscious::store::with_connection(
+        let last_tick = crate::alexander_ai_solutions::subconscious::store::with_connection(
             &config.workspace_dir,
-            crate::openhuman::subconscious::store::get_last_tick_at,
+            crate::alexander_ai_solutions::subconscious::store::get_last_tick_at,
         )
         .ok();
 

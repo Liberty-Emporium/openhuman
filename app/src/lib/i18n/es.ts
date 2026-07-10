@@ -579,7 +579,7 @@ const messages: TranslationMap = {
   'skills.channels': 'Mensajería',
   'skills.explorer.emptyCta': 'Instalar desde URL',
   'skills.explorer.emptyDescription':
-    'Instala un paquete SKILL.md o coloca carpetas estilo Hermes en ~/.openhuman/skills.',
+    'Instala un paquete SKILL.md o coloca carpetas estilo Hermes en ~/.alexanderai/skills.',
   'skills.explorer.emptyTitle': 'No se encontraron skills',
   'skills.explorer.installFromUrl': 'Instalar desde URL',
   'skills.explorer.newSkill': 'Nueva skill',
@@ -3800,7 +3800,7 @@ const messages: TranslationMap = {
   'settings.ai.claudeCode.fullAccessOff':
     'Aceptar solo ediciones — aplica los cambios de archivos automáticamente y restringe comandos y red.',
   'settings.ai.claudeCode.sandboxNoteMac':
-    'En macOS, ~/.openhuman permanece protegido por el sandbox en ambos modos.',
+    'En macOS, ~/.alexanderai permanece protegido por el sandbox en ambos modos.',
   'settings.ai.claudeCode.sandboxNoteOther':
     'El acceso completo no tiene restricciones en esta plataforma — actívalo solo si confías en el espacio de trabajo.',
   'settings.ai.claudeCode.enableToCheck': 'Activa Claude Code para comprobar el inicio de sesión.',
@@ -5144,9 +5144,9 @@ const messages: TranslationMap = {
   'skills.create.name': 'Nombre',
   'skills.create.namePlaceholder': 'p. ej. Trade Journal',
   'skills.create.scope': 'Alcance',
-  'skills.create.scopeProjectHint': '/.openhuman/habilidades/',
+  'skills.create.scopeProjectHint': '/.alexanderai/habilidades/',
   'skills.create.scopeUserHint':
-    'Se escribe en ~/.openhuman/skills/<slug>/SKILL.md — disponible en todos los espacios de trabajo.',
+    'Se escribe en ~/.alexanderai/skills/<slug>/SKILL.md — disponible en todos los espacios de trabajo.',
   'skills.create.slugLabel': 'Etiqueta de slug',
   'skills.create.subtitle': 'HABILIDAD.md',
   'skills.create.tags': 'Etiquetas',
@@ -5193,7 +5193,7 @@ const messages: TranslationMap = {
     'Sólo funcionan los enlaces directos `.md`. Para GitHub, enlace a un archivo (github.com/owner/repo/blob/.../SKILL.md): las raíces del árbol y del repositorio no están instaladas.',
   'skills.install.errors.unsupportedUrlTitle': 'Formulario URL no compatible',
   'skills.install.errors.writeFailedHint':
-    'No se podía escribir en el directorio de habilidades del espacio de trabajo. Verifique los permisos del sistema de archivos para `<workspace>/.openhuman/skills/`.',
+    'No se podía escribir en el directorio de habilidades del espacio de trabajo. Verifique los permisos del sistema de archivos para `<workspace>/.alexanderai/skills/`.',
   'skills.install.errors.writeFailedTitle': 'No se pudo escribir SKILL.md',
   'skills.install.fetchLog': 'Obtener registro',
   'skills.install.fetchingPrefix': 'buscando',

@@ -1,28 +1,30 @@
-use anyhow::Result;
-use async_trait::async_trait;
-use openhuman_core::openhuman::agent::dispatcher::NativeToolDispatcher;
-use openhuman_core::openhuman::agent::harness::definition::AgentTier;
-use openhuman_core::openhuman::agent::harness::session::Agent;
-use openhuman_core::openhuman::agent::harness::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::NativeToolDispatcher;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::definition::AgentTier;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::session::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::{
     run_subagent, with_parent_context, AgentDefinition, DefinitionSource, ModelSpec,
     ParentExecutionContext, PromptSource, SandboxMode, SubagentRunOptions, ToolScope,
 };
-use openhuman_core::openhuman::config::AgentConfig;
-use openhuman_core::openhuman::context::prompt::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::AgentConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::{
     render_ambient_environment, render_subagent_system_prompt, render_tools, render_user_files,
     ConnectedIntegration, CuratedMemoryPromptSnapshot, LearnedContextData, NamespaceSummary,
     PersonalityRosterEntry, PromptContext, PromptTool, SubagentRenderOptions, SystemPromptBuilder,
     ToolCallFormat, UserIdentity,
 };
-use openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, ChatResponse, Provider, ToolCall, UsageInfo,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary as MemoryNamespaceSummary, RecallOpts,
 };
-use openhuman_core::openhuman::tokenjuice::AgentTokenjuiceCompression;
-use openhuman_core::openhuman::tools::{PermissionLevel, Tool, ToolContent, ToolResult};
+use alexander_ai_solutions_core::alexander_ai_solutions::tokenjuice::AgentTokenjuiceCompression;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
+    PermissionLevel, Tool, ToolContent, ToolResult,
+};
+use anyhow::Result;
+use async_trait::async_trait;
 use parking_lot::Mutex;
 use serde_json::json;
 use std::collections::{HashSet, VecDeque};
@@ -419,7 +421,7 @@ async fn turn_rejects_empty_final_response_and_keeps_history_nonfinal() -> Resul
     assert!(agent
         .history()
         .iter()
-        .any(|message| matches!(message, openhuman_core::openhuman::inference::provider::ConversationMessage::Chat(chat) if chat.role == "user")));
+        .any(|message| matches!(message, alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::ConversationMessage::Chat(chat) if chat.role == "user")));
     Ok(())
 }
 

@@ -18,11 +18,13 @@ use axum::{Json, Router};
 use serde_json::{json, Value};
 use tempfile::{Builder, TempDir};
 
-use openhuman_core::openhuman::config::{Config, DelegateAgentConfig};
-use openhuman_core::openhuman::cron::DeliveryConfig;
-use openhuman_core::openhuman::memory::{Memory, MemoryCategory, MemoryEntry, NamespaceSummary};
-use openhuman_core::openhuman::security::{AuditLogger, SecurityPolicy};
-use openhuman_core::openhuman::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{Config, DelegateAgentConfig};
+use alexander_ai_solutions_core::alexander_ai_solutions::cron::DeliveryConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
+    Memory, MemoryCategory, MemoryEntry, NamespaceSummary,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::security::{AuditLogger, SecurityPolicy};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
     all_tools, ComposioTool, CronAddTool, TodoTool, Tool, ToolCallOptions,
 };
 
@@ -95,7 +97,7 @@ impl Memory for StubMemory {
         &self,
         _query: &str,
         _limit: usize,
-        _opts: openhuman_core::openhuman::memory::RecallOpts<'_>,
+        _opts: alexander_ai_solutions_core::alexander_ai_solutions::memory::RecallOpts<'_>,
     ) -> Result<Vec<MemoryEntry>> {
         Ok(Vec::new())
     }

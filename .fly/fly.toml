@@ -19,12 +19,12 @@ primary_region = '<your-region>'
 [env]
   OPENHUMAN_CORE_HOST = "0.0.0.0"
   OPENHUMAN_CORE_PORT = "7788"
-  OPENHUMAN_WORKSPACE = "/home/openhuman/.openhuman"
+  OPENHUMAN_WORKSPACE = "/home/openhuman/.alexanderai"
   RUST_LOG = "info"
 
 [[mounts]]
   source = "openhuman_workspace"
-  destination = "/home/openhuman/.openhuman"
+  destination = "/home/openhuman/.alexanderai"
 
 [http_service]
   internal_port = 7788

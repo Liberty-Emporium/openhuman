@@ -27,7 +27,7 @@ const autonomy = (overrides: Partial<AutonomySettings> = {}): AutonomySettings =
 
 const agentPaths = (overrides: Partial<AgentPaths> = {}): AgentPaths => ({
   action_dir: '/home/test/OpenHuman/projects',
-  workspace_dir: '/home/test/.openhuman/users/u1/workspace',
+  workspace_dir: '/home/test/.alexanderai/users/u1/workspace',
   projects_dir: '/home/test/OpenHuman/projects',
   action_dir_source: 'default',
   ...overrides,

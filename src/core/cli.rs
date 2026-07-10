@@ -64,15 +64,15 @@ pub fn run_from_cli_args(args: &[String]) -> Result<()> {
     // Match on the first argument to determine the subcommand.
     match args[0].as_str() {
         "run" | "serve" => run_server_command(&args[1..]),
-        "mcp" | "mcp-server" => crate::openhuman::mcp_server::run_stdio_from_cli(&args[1..]),
+        "mcp" | "mcp-server" => crate::alexander_ai_solutions::mcp_server::run_stdio_from_cli(&args[1..]),
         "call" => run_call_command(&args[1..]),
         // Domain-specific CLI adapters that don't follow the generic namespace pattern.
         "screen-intelligence" => {
-            crate::openhuman::screen_intelligence::cli::run_screen_intelligence_command(&args[1..])
+            crate::alexander_ai_solutions::screen_intelligence::cli::run_screen_intelligence_command(&args[1..])
         }
-        "text-input" => crate::openhuman::text_input::cli::run_text_input_command(&args[1..]),
+        "text-input" => crate::alexander_ai_solutions::text_input::cli::run_text_input_command(&args[1..]),
         "tree-summarizer" => {
-            crate::openhuman::memory_tree::tree_runtime::cli::run_tree_summarizer_command(
+            crate::alexander_ai_solutions::memory_tree::tree_runtime::cli::run_tree_summarizer_command(
                 &args[1..],
             )
         }

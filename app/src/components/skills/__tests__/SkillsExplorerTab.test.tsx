@@ -35,7 +35,7 @@ const MOCK_SKILL: WorkflowSummary = {
   sourceFormat: 'hermes',
   tools: [],
   prompts: [],
-  location: '/Users/test/.openhuman/skills/test-skill/SKILL.md',
+  location: '/Users/test/.alexanderai/skills/test-skill/SKILL.md',
   resources: [],
   scope: 'user',
   legacy: false,
@@ -307,7 +307,7 @@ describe('SkillsExplorerTab', () => {
       ...MOCK_SKILL,
       id: 'apple-notes',
       name: 'Apple Notes',
-      location: '/Users/test/.openhuman/skills/apple-notes/SKILL.md',
+      location: '/Users/test/.alexanderai/skills/apple-notes/SKILL.md',
     };
     vi.mocked(workflowsApi.listWorkflows).mockResolvedValue([installedSkill]);
     vi.mocked(skillRegistryApi.browse).mockResolvedValue([catalogEntry]);
@@ -346,7 +346,7 @@ describe('SkillsExplorerTab', () => {
       ...MOCK_SKILL,
       id: 'apple-notes-copy',
       name: 'Apple Notes',
-      location: '/Users/test/.openhuman/skills/apple-notes-copy/SKILL.md',
+      location: '/Users/test/.alexanderai/skills/apple-notes-copy/SKILL.md',
     };
     vi.mocked(workflowsApi.listWorkflows).mockResolvedValue([unrelatedInstalledSkill]);
     vi.mocked(skillRegistryApi.browse).mockResolvedValue([catalogEntry]);

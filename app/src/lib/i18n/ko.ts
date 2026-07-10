@@ -564,7 +564,7 @@ const messages: TranslationMap = {
   'skills.channels': '메시징',
   'skills.explorer.emptyCta': 'URL에서 설치',
   'skills.explorer.emptyDescription':
-    'SKILL.md 패키지를 설치하거나 Hermes 스타일 폴더를 ~/.openhuman/skills에 넣으세요.',
+    'SKILL.md 패키지를 설치하거나 Hermes 스타일 폴더를 ~/.alexanderai/skills에 넣으세요.',
   'skills.explorer.emptyTitle': '스킬을 찾을 수 없음',
   'skills.explorer.installFromUrl': 'URL에서 설치',
   'skills.explorer.newSkill': '새 스킬',
@@ -5001,9 +5001,9 @@ const messages: TranslationMap = {
   'skills.create.name': '이름',
   'skills.create.namePlaceholder': '예: Trade Journal',
   'skills.create.scope': '범위',
-  'skills.create.scopeProjectHint': '/.openhuman/skills/',
+  'skills.create.scopeProjectHint': '/.alexanderai/skills/',
   'skills.create.scopeUserHint':
-    '~/.openhuman/skills/<slug>/SKILL.md에 작성됨 — 모든 워크스페이스에서 사용 가능.',
+    '~/.alexanderai/skills/<slug>/SKILL.md에 작성됨 — 모든 워크스페이스에서 사용 가능.',
   'skills.create.slugLabel': '슬러그 라벨',
   'skills.create.subtitle': 'SKILL.md',
   'skills.create.tags': '태그',
@@ -5050,7 +5050,7 @@ const messages: TranslationMap = {
     '직접 `.md` 링크만 작동합니다. GitHub의 경우 파일 링크(github.com/owner/repo/blob/.../SKILL.md) - 트리 및 repo 루트는 설치되지 않습니다.',
   'skills.install.errors.unsupportedUrlTitle': 'URL 형식이 지원되지 않습니다.',
   'skills.install.errors.writeFailedHint':
-    '작업공간 기술 디렉터리에 쓸 수 없습니다. `<workspace>/.openhuman/skills/`에 대한 파일 시스템 권한을 확인하세요.',
+    '작업공간 기술 디렉터리에 쓸 수 없습니다. `<workspace>/.alexanderai/skills/`에 대한 파일 시스템 권한을 확인하세요.',
   'skills.install.errors.writeFailedTitle': 'SKILL.md를 쓸 수 없습니다.',
   'skills.install.fetchLog': '로그 가져오기',
   'skills.install.fetchingPrefix': '가져오는 중',

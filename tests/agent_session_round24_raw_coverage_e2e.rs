@@ -1,24 +1,26 @@
-use anyhow::Result;
-use async_trait::async_trait;
-use openhuman_core::openhuman::agent::dispatcher::XmlToolDispatcher;
-use openhuman_core::openhuman::agent::hooks::{PostTurnHook, TurnContext};
-use openhuman_core::openhuman::agent::memory_loader::MemoryLoader;
-use openhuman_core::openhuman::agent::Agent;
-use openhuman_core::openhuman::config::{AgentConfig, ContextConfig};
-use openhuman_core::openhuman::context::prompt::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::XmlToolDispatcher;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::hooks::{
+    PostTurnHook, TurnContext,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::memory_loader::MemoryLoader;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{AgentConfig, ContextConfig};
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::{
     ConnectedIntegration, LearnedContextData, PersonalityRosterEntry, PersonalityRosterSection,
     PromptContext, PromptSection, PromptTool, SubagentRenderOptions, SystemPromptBuilder,
     ToolCallFormat, UserIdentity, UserIdentitySection,
 };
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, ChatResponse, Provider, ProviderDelta, UsageInfo,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts,
 };
-use openhuman_core::openhuman::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
     PermissionLevel, Tool, ToolContent, ToolResult, ToolScope as RuntimeToolScope,
 };
+use anyhow::Result;
+use async_trait::async_trait;
 use parking_lot::Mutex;
 use serde_json::json;
 use std::collections::{HashSet, VecDeque};
@@ -98,8 +100,8 @@ impl ScriptedProvider {
 impl Provider for ScriptedProvider {
     fn capabilities(
         &self,
-    ) -> openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities {
-        openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities {
+    ) -> alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities{
+        alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities {
             native_tool_calling: false,
             vision: false,
         }
@@ -481,7 +483,7 @@ async fn max_iteration_checkpoint_uses_deterministic_fallback_and_hooks() {
     }
     assert!(streamed.iter().any(|event| matches!(
         event,
-        openhuman_core::openhuman::agent::progress::AgentProgress::TextDelta {
+        alexander_ai_solutions_core::alexander_ai_solutions::agent::progress::AgentProgress::TextDelta {
             delta,
             iteration: 2
         } if delta == "checkpoint delta"
@@ -607,7 +609,7 @@ fn prompt_sections_cover_dynamic_roster_identity_and_subagent_edges() {
     let parent_tools: Vec<Box<dyn Tool>> = vec![Box::new(Round24Tool {
         calls: Arc::new(AtomicUsize::new(0)),
     })];
-    let subagent_json = openhuman_core::openhuman::context::prompt::render_subagent_system_prompt(
+    let subagent_json = alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::render_subagent_system_prompt(
         &workspace_path,
         "round24-model",
         &[999, 0],

@@ -596,7 +596,7 @@ const en: TranslationMap = {
   'skills.channels': 'Messaging',
   'skills.explorer.emptyCta': 'Install from URL',
   'skills.explorer.emptyDescription':
-    'Install a SKILL.md package or place Hermes-style folders under ~/.openhuman/skills.',
+    'Install a SKILL.md package or place Hermes-style folders under ~/.alexanderai/skills.',
   'skills.explorer.emptyTitle': 'No skills found',
   'skills.explorer.installFromUrl': 'Install from URL',
   'skills.explorer.newSkill': 'New skill',
@@ -4374,7 +4374,7 @@ const en: TranslationMap = {
   'settings.ai.claudeCode.fullAccessOff':
     'Accept edits only — auto-applies file edits, gates commands & network.',
   'settings.ai.claudeCode.sandboxNoteMac':
-    'On macOS, ~/.openhuman stays protected by the sandbox in either mode.',
+    'On macOS, ~/.alexanderai stays protected by the sandbox in either mode.',
   'settings.ai.claudeCode.sandboxNoteOther':
     'Full access is unconfined on this platform — enable only if you trust the workspace.',
   'settings.ai.claudeCode.enableToCheck': 'Enable Claude Code to check sign-in.',
@@ -5692,9 +5692,9 @@ const en: TranslationMap = {
   'skills.create.name': 'Name',
   'skills.create.namePlaceholder': 'e.g. Trade Journal',
   'skills.create.scope': 'Scope',
-  'skills.create.scopeProjectHint': '/.openhuman/skills/',
+  'skills.create.scopeProjectHint': '/.alexanderai/skills/',
   'skills.create.scopeUserHint':
-    'Written to ~/.openhuman/skills/<slug>/SKILL.md — available across all workspaces.',
+    'Written to ~/.alexanderai/skills/<slug>/SKILL.md — available across all workspaces.',
   'skills.create.slugLabel': 'Slug',
   'skills.create.subtitle': 'SKILL.md',
   'skills.create.tags': 'Tags',
@@ -5744,7 +5744,7 @@ const en: TranslationMap = {
     'Only direct `.md` links work. For GitHub, link to a file (github.com/owner/repo/blob/.../SKILL.md) - tree and repo roots are not installed.',
   'skills.install.errors.unsupportedUrlTitle': 'URL form not supported',
   'skills.install.errors.writeFailedHint':
-    'The workspace skills directory was not writable. Check filesystem permissions for `<workspace>/.openhuman/skills/`.',
+    'The workspace skills directory was not writable. Check filesystem permissions for `<workspace>/.alexanderai/skills/`.',
   'skills.install.errors.writeFailedTitle': 'Could not write SKILL.md',
   'skills.install.fetchLog': 'Fetch log',
   'skills.install.fetchingPrefix': 'Fetching',

@@ -1,27 +1,31 @@
-use anyhow::Result;
-use async_trait::async_trait;
-use chrono::{TimeZone, Utc};
-use openhuman_core::openhuman::agent::debug::{dump_agent_prompt, DumpPromptOptions};
-use openhuman_core::openhuman::agent::dispatcher::NativeToolDispatcher;
-use openhuman_core::openhuman::agent::Agent;
-use openhuman_core::openhuman::config::AgentConfig;
-use openhuman_core::openhuman::context::prompt::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::debug::{
+    dump_agent_prompt, DumpPromptOptions,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::NativeToolDispatcher;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::AgentConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::{
     render_ambient_environment, render_safety, render_subagent_system_prompt_with_format,
     render_tools, ConnectedIntegration, CuratedMemoryPromptSnapshot, LearnedContextData,
     NamespaceSummary as PromptNamespaceSummary, PersonalityRosterEntry, PersonalityRosterSection,
     PromptContext, PromptTool, SubagentRenderOptions, SystemPromptBuilder, ToolCallFormat,
     UserIdentity,
 };
-use openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, ChatResponse, Provider, UsageInfo,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts,
 };
-use openhuman_core::openhuman::subconscious::SourceChunk;
-use openhuman_core::openhuman::tools::{PermissionLevel, Tool, ToolResult};
-use openhuman_core::openhuman::workflows::ops_types::Workflow;
+use alexander_ai_solutions_core::alexander_ai_solutions::subconscious::SourceChunk;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
+    PermissionLevel, Tool, ToolResult,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::workflows::ops_types::Workflow;
+use anyhow::Result;
+use async_trait::async_trait;
+use chrono::{TimeZone, Utc};
 use parking_lot::Mutex;
 use serde_json::json;
 use std::collections::{HashSet, VecDeque};

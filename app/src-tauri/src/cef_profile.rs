@@ -25,8 +25,8 @@ struct PendingCefPurgeState {
 }
 
 /// Resolves the on-disk OpenHuman root dir name (`.openhuman` vs
-/// `.openhuman-staging`) for the Tauri shell. Delegates to
-/// [`openhuman_core::api::config::app_env_from_env`] so the shell and the
+/// `.alexanderai-staging`) for the Tauri shell. Delegates to
+/// [`alexander_ai_solutions_core::api::config::app_env_from_env`] so the shell and the
 /// embedded core agree on the channel selection — including the
 /// `option_env!` compile-time fallback that staging CI bakes into the
 /// build. Without that fallback the packaged staging `.app` launched from
@@ -34,12 +34,12 @@ struct PendingCefPurgeState {
 /// collides with any older production install's CEF profile, producing
 /// the startup crash loop reported in #1490.
 fn default_root_dir_name() -> &'static str {
-    if openhuman_core::api::config::is_staging_app_env(
-        openhuman_core::api::config::app_env_from_env().as_deref(),
+    if alexander_ai_solutions_core::api::config::is_staging_app_env(
+        alexander_ai_solutions_core::api::config::app_env_from_env().as_deref(),
     ) {
-        ".openhuman-staging"
+        ".alexanderai-staging"
     } else {
-        ".openhuman"
+        ".alexanderai"
     }
 }
 
@@ -458,17 +458,17 @@ mod tests {
     }
 
     /// Regression for #1490: with the staging env var set at runtime, the
-    /// Tauri shell must resolve the dedicated `.openhuman-staging` data
+    /// Tauri shell must resolve the dedicated `.alexanderai-staging` data
     /// dir — never the production `.openhuman` dir. Prior to the fix
     /// this function had its own runtime-only lookup and would diverge
-    /// from `openhuman_core::api::config::app_env_from_env`, producing a
+    /// from `alexander_ai_solutions_core::api::config::app_env_from_env`, producing a
     /// split-brain datadir (CEF profile under prod, sidecar state under
     /// staging) that crashed the app on launch.
     #[test]
     fn default_root_dir_name_resolves_staging_when_primary_env_set() {
         with_clean_app_env(|| {
             std::env::set_var("OPENHUMAN_APP_ENV", "staging");
-            assert_eq!(default_root_dir_name(), ".openhuman-staging");
+            assert_eq!(default_root_dir_name(), ".alexanderai-staging");
         });
     }
 
@@ -479,7 +479,7 @@ mod tests {
     fn default_root_dir_name_resolves_staging_when_vite_alias_set() {
         with_clean_app_env(|| {
             std::env::set_var("VITE_OPENHUMAN_APP_ENV", "staging");
-            assert_eq!(default_root_dir_name(), ".openhuman-staging");
+            assert_eq!(default_root_dir_name(), ".alexanderai-staging");
         });
     }
 
@@ -491,18 +491,18 @@ mod tests {
     #[test]
     fn default_root_dir_name_defaults_to_production_when_unset() {
         with_clean_app_env(|| {
-            assert_eq!(default_root_dir_name(), ".openhuman");
+            assert_eq!(default_root_dir_name(), ".alexanderai");
         });
     }
 
     /// Whitespace and casing are folded by
-    /// `openhuman_core::api::config::app_env_from_env` — confirm the shell
+    /// `alexander_ai_solutions_core::api::config::app_env_from_env` — confirm the shell
     /// inherits that behavior rather than re-implementing it.
     #[test]
     fn default_root_dir_name_normalizes_staging_casing_and_whitespace() {
         with_clean_app_env(|| {
             std::env::set_var("OPENHUMAN_APP_ENV", "  STAGING  ");
-            assert_eq!(default_root_dir_name(), ".openhuman-staging");
+            assert_eq!(default_root_dir_name(), ".alexanderai-staging");
         });
     }
 

@@ -246,7 +246,7 @@ export async function triggerDeepLink(url: string): Promise<void> {
     if (process.platform === 'darwin') {
       try {
         await browser.execute('macos: launchApp', {
-          bundleId: 'com.openhuman.app',
+          bundleId: 'com.alexanderai.app',
           arguments: [url],
         } as Record<string, unknown>);
         deepLinkDebug('macos: launchApp OK');
@@ -256,10 +256,10 @@ export async function triggerDeepLink(url: string): Promise<void> {
       }
       for (let attempt = 1; attempt <= 3; attempt += 1) {
         try {
-          await browser.execute('macos: deepLink', { url, bundleId: 'com.openhuman.app' } as Record<
-            string,
-            unknown
-          >);
+          await browser.execute('macos: deepLink', {
+            url,
+            bundleId: 'com.alexanderai.app',
+          } as Record<string, unknown>);
           deepLinkDebug('macos: deepLink OK', { attempt });
           await browser.pause(300);
           return;

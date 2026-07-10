@@ -53,7 +53,7 @@
 //! - `POST /rpc` requires the per-launch core bearer token.
 //! - `GET /v1/models` and `POST /v1/chat/completions` accept either that
 //!   internal bearer or a stable user-managed external API key stored under
-//!   `openhuman::inference::http::EXTERNAL_OPENAI_COMPAT_PROVIDER`.
+//!   `alexander_ai_solutions::inference::http::EXTERNAL_OPENAI_COMPAT_PROVIDER`.
 
 use std::io::Write as _;
 use std::path::Path;
@@ -68,9 +68,9 @@ use axum::response::{IntoResponse, Response};
 use axum::Json;
 use serde_json::json;
 
-use crate::openhuman::config::Config;
-use crate::openhuman::credentials::AuthService;
-use crate::openhuman::inference::http::EXTERNAL_OPENAI_COMPAT_PROVIDER;
+use crate::alexander_ai_solutions::config::Config;
+use crate::alexander_ai_solutions::credentials::AuthService;
+use crate::alexander_ai_solutions::inference::http::EXTERNAL_OPENAI_COMPAT_PROVIDER;
 
 static RPC_TOKEN: OnceLock<String> = OnceLock::new();
 
@@ -96,7 +96,7 @@ const PUBLIC_PATHS: &[&str] = &[
     "/oauth/mcp/callback",
     "/schema",
     "/events",
-    // AgentBox marketplace surface — see `openhuman::agentbox::http`.
+    // AgentBox marketplace surface — see `alexander_ai_solutions::agentbox::http`.
     // Mounted only when `OPENHUMAN_AGENTBOX_MODE=1`; the public-path entry is
     // unconditional so the matcher remains a pure function of the path string.
     "/run",

@@ -13,39 +13,39 @@ use axum::{Json, Router};
 use serde_json::{json, Value};
 use tempfile::TempDir;
 
-use openhuman_core::core::event_bus::{DomainEvent, EventHandler};
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::core::event_bus::{DomainEvent, EventHandler};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::memory::global as memory_global;
-use openhuman_core::openhuman::memory::jobs::drain_until_idle;
-use openhuman_core::openhuman::memory::tree_source::get_or_create_source_tree;
-use openhuman_core::openhuman::memory_store::chunks::store::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::global as memory_global;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::jobs::drain_until_idle;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::tree_source::get_or_create_source_tree;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::store::{
     count_chunks_by_lifecycle_status, get_chunk_raw_refs, list_chunks, ListChunksQuery,
     CHUNK_STATUS_BUFFERED,
 };
-use openhuman_core::openhuman::memory_store::chunks::types::SourceKind;
-use openhuman_core::openhuman::memory_store::content::read::read_chunk_body;
-use openhuman_core::openhuman::memory_store::trees::store as tree_store;
-use openhuman_core::openhuman::memory_sync::composio::bus::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::types::SourceKind;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::content::read::read_chunk_body;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::trees::store as tree_store;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::bus::{
     ComposioConfigChangedSubscriber, ComposioConnectionCreatedSubscriber, ComposioTriggerSubscriber,
 };
-use openhuman_core::openhuman::memory_sync::composio::providers::clickup::ClickUpProvider;
-use openhuman_core::openhuman::memory_sync::composio::providers::github::GitHubProvider;
-use openhuman_core::openhuman::memory_sync::composio::providers::gmail::ingest as gmail_ingest;
-use openhuman_core::openhuman::memory_sync::composio::providers::gmail::GmailProvider;
-use openhuman_core::openhuman::memory_sync::composio::providers::linear::LinearProvider;
-use openhuman_core::openhuman::memory_sync::composio::providers::notion::NotionProvider;
-use openhuman_core::openhuman::memory_sync::composio::providers::slack::ingest as slack_ingest;
-use openhuman_core::openhuman::memory_sync::composio::providers::slack::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::clickup::ClickUpProvider;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::github::GitHubProvider;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::gmail::ingest as gmail_ingest;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::gmail::GmailProvider;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::linear::LinearProvider;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::notion::NotionProvider;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::slack::ingest as slack_ingest;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::slack::{
     SlackMessage, SlackProvider,
 };
-use openhuman_core::openhuman::memory_sync::composio::providers::sync_state::SyncState;
-use openhuman_core::openhuman::memory_sync::composio::providers::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::sync_state::SyncState;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::{
     ComposioProvider, ProviderContext, SyncReason, TaskFetchFilter,
 };
-use openhuman_core::openhuman::memory_tree::tree::bucket_seal::LabelStrategy;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::bucket_seal::LabelStrategy;
 
 static ENV_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
 
@@ -508,7 +508,7 @@ async fn gmail_raw_backed_messages_drain_into_source_tree_summary() {
         "all Gmail chunks should reach the source tree buffer"
     );
 
-    let sealed = openhuman_core::openhuman::memory_tree::tree::flush::flush_stale_buffers(
+    let sealed = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::flush::flush_stale_buffers(
         &config,
         chrono::Duration::zero(),
         &LabelStrategy::Empty,
@@ -523,7 +523,7 @@ async fn gmail_raw_backed_messages_drain_into_source_tree_summary() {
         !l1.is_empty(),
         "Gmail source tree should have a sealed summary after flush"
     );
-    let summary_body = openhuman_core::openhuman::memory_store::content::read::read_summary_body(
+    let summary_body = alexander_ai_solutions_core::alexander_ai_solutions::memory_store::content::read::read_summary_body(
         &config, &l1[0].id,
     )
     .expect("read gmail summary body");

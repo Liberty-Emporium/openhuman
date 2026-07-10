@@ -1,21 +1,29 @@
-use async_trait::async_trait;
-use openhuman_core::core::event_bus::{init_global, request_native_global, DEFAULT_CAPACITY};
-use openhuman_core::openhuman::agent::bus::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::bus::{
     register_agent_handlers, AgentTurnRequest, AgentTurnResponse, AGENT_RUN_TURN_METHOD,
 };
-use openhuman_core::openhuman::agent::debug::{dump_agent_prompt, DumpPromptOptions};
-use openhuman_core::openhuman::agent::dispatcher::XmlToolDispatcher;
-use openhuman_core::openhuman::agent::{Agent, AgentBuilder};
-use openhuman_core::openhuman::config::{AgentConfig, MultimodalConfig, MultimodalFileConfig};
-use openhuman_core::openhuman::context::prompt::LearnedContextData;
-use openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::debug::{
+    dump_agent_prompt, DumpPromptOptions,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::XmlToolDispatcher;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::{Agent, AgentBuilder};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
+    AgentConfig, MultimodalConfig, MultimodalFileConfig,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::LearnedContextData;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, ChatResponse, Provider, ProviderDelta, ToolCall, UsageInfo,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts,
 };
-use openhuman_core::openhuman::tools::{PermissionLevel, Tool, ToolContent, ToolResult, ToolScope};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
+    PermissionLevel, Tool, ToolContent, ToolResult, ToolScope,
+};
+use alexander_ai_solutions_core::core::event_bus::{
+    init_global, request_native_global, DEFAULT_CAPACITY,
+};
+use async_trait::async_trait;
 use serde_json::json;
 use std::collections::{HashSet, VecDeque};
 use std::path::PathBuf;
@@ -381,7 +389,7 @@ async fn run_bus_turn(
             visible_tool_names,
             extra_tools: Vec::new(),
             on_progress: None,
-            origin: openhuman_core::openhuman::agent::turn_origin::AgentTurnOrigin::Cli,
+            origin: alexander_ai_solutions_core::alexander_ai_solutions::agent::turn_origin::AgentTurnOrigin::Cli,
         },
     )
     .await

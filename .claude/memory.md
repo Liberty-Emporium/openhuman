@@ -50,7 +50,7 @@ Quick reference for anyone starting with Claude on this project. Updated by the 
 - **`pnpm core:stage` is a no-op echo** — there is no `target/debug/openhuman-core` binary to copy into `app/src-tauri/binaries/`. Rebuilding via `pnpm dev:app` is enough to pick up new RPC methods in the in-process server.
 - **Token auth**: per-launch hex bearer in `OPENHUMAN_CORE_TOKEN`, exposed to the renderer via `core_rpc_token` Tauri command. Always call RPC through `invoke('core_rpc_relay', { request: { method, params } })` — avoids the CORS preflight `fetch()` would trigger.
 - **Stale-listener policy** (#1130): if the port is already in use, the handle probes `GET /` to decide if it's an OpenHuman core, then term/force-kill with PID revalidation guarding against PID reuse. Set `OPENHUMAN_CORE_REUSE_EXISTING=1` to attach to a manually-started `openhuman-core serve` for debugging.
-- **Default port** `7788`. Stage token (when running standalone): `~/.openhuman-staging/core.token` under `OPENHUMAN_APP_ENV=staging`.
+- **Default port** `7788`. Stage token (when running standalone): `~/.alexanderai-staging/core.token` under `OPENHUMAN_APP_ENV=staging`.
 
 ## Onboarding System
 
@@ -275,7 +275,7 @@ Quick reference for anyone starting with Claude on this project. Updated by the 
 
 ## Windows OAuth Deep Link (Issue #2562)
 
-- **Three-layer fix**: (1) named-pipe IPC in `deep_link_ipc_windows.rs` — secondary process forwards `openhuman://` URL to primary via `\\.\pipe\com.openhuman.app-deeplink`, 40 retries × 50ms; (2) loopback OAuth server in `loopback_oauth.rs` — RFC 8252 one-shot `127.0.0.1:53824`, preferred path that eliminates deep link dispatch entirely; (3) Linux analog in `deep_link_ipc.rs` — Unix domain socket at `$XDG_RUNTIME_DIR/com.openhuman.app-deeplink.sock`.
+- **Three-layer fix**: (1) named-pipe IPC in `deep_link_ipc_windows.rs` — secondary process forwards `openhuman://` URL to primary via `\\.\pipe\com.alexanderai.app-deeplink`, 40 retries × 50ms; (2) loopback OAuth server in `loopback_oauth.rs` — RFC 8252 one-shot `127.0.0.1:53824`, preferred path that eliminates deep link dispatch entirely; (3) Linux analog in `deep_link_ipc.rs` — Unix domain socket at `$XDG_RUNTIME_DIR/com.alexanderai.app-deeplink.sock`.
 - **`OAuthProviderButton.tsx` loopback flow** — tries loopback first, sets `redirectUri` for backend, awaits callback, rewrites `http://127.0.0.1:PORT/auth?...` → `openhuman://auth?...` → `handleDeepLinkUrls`. Falls back to deep link if bind fails.
 - **Pipe binding location** — primary binds the named pipe in `lib.rs` right after the mutex guard (line 2269); `drain_pending_urls()` wired in `setup()` at line 2578.
 - **Issue was already fixed before we picked it up** — PRs #2469, #2511, #2550 had already merged the fix. Our contribution was extracting `classify_request` as a pure function and adding 11 Rust unit tests.

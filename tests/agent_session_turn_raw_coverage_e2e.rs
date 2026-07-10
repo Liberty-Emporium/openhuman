@@ -1,32 +1,38 @@
-use async_trait::async_trait;
-use openhuman_core::openhuman::agent::dispatcher::{NativeToolDispatcher, XmlToolDispatcher};
-use openhuman_core::openhuman::agent::harness::definition::AgentTier;
-use openhuman_core::openhuman::agent::harness::subagent_runner::run_subagent;
-use openhuman_core::openhuman::agent::harness::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::{
+    NativeToolDispatcher, XmlToolDispatcher,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::definition::AgentTier;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::subagent_runner::run_subagent;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::{
     with_parent_context, AgentDefinition, DefinitionSource, ModelSpec, ParentExecutionContext,
     PromptSource, SandboxMode, SubagentRunError, SubagentRunOptions, ToolScope,
 };
-use openhuman_core::openhuman::agent::hooks::{PostTurnHook, TurnContext};
-use openhuman_core::openhuman::agent::memory_loader::MemoryLoader;
-use openhuman_core::openhuman::agent::progress::AgentProgress;
-use openhuman_core::openhuman::agent::tool_policy::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::hooks::{
+    PostTurnHook, TurnContext,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::memory_loader::MemoryLoader;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::progress::AgentProgress;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::tool_policy::{
     ToolPolicy, ToolPolicyDecision, ToolPolicyRequest,
 };
-use openhuman_core::openhuman::agent::Agent;
-use openhuman_core::openhuman::config::{AgentConfig, ContextConfig, MemoryConfig};
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
+    AgentConfig, ContextConfig, MemoryConfig,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, ChatResponse, ConversationMessage, Provider, ProviderDelta, ToolCall,
     UsageInfo,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts,
 };
-use openhuman_core::openhuman::memory_store;
-use openhuman_core::openhuman::tokenjuice::AgentTokenjuiceCompression;
-use openhuman_core::openhuman::tools::traits::ToolCallOptions;
-use openhuman_core::openhuman::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store;
+use alexander_ai_solutions_core::alexander_ai_solutions::tokenjuice::AgentTokenjuiceCompression;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::traits::ToolCallOptions;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
     PermissionLevel, Tool, ToolContent, ToolResult, ToolScope as RuntimeToolScope,
 };
+use async_trait::async_trait;
 use serde_json::json;
 use std::collections::{HashSet, VecDeque};
 use std::path::PathBuf;
@@ -106,8 +112,8 @@ impl ScriptedProvider {
 impl Provider for ScriptedProvider {
     fn capabilities(
         &self,
-    ) -> openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities {
-        openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities {
+    ) -> alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities{
+        alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities {
             native_tool_calling: self.native_tools,
             vision: false,
         }
@@ -528,7 +534,9 @@ fn agent_with(
     provider: Arc<dyn Provider>,
     tools: Vec<Box<dyn Tool>>,
     workspace_path: PathBuf,
-    dispatcher: Box<dyn openhuman_core::openhuman::agent::dispatcher::ToolDispatcher>,
+    dispatcher: Box<
+        dyn alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::ToolDispatcher,
+    >,
     config: AgentConfig,
     context_config: ContextConfig,
 ) -> Agent {
@@ -915,7 +923,7 @@ async fn subagent_runner_parent_context_filters_tools_caps_output_and_reports_er
         session_id: "round17-parent-session".to_string(),
         channel: "round17-parent-channel".to_string(),
         connected_integrations: Vec::new(),
-        tool_call_format: openhuman_core::openhuman::context::prompt::ToolCallFormat::Json,
+        tool_call_format: alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::ToolCallFormat::Json,
         session_key: "123_parent".to_string(),
         session_parent_prefix: Some("root_ancestor".to_string()),
         on_progress: None,

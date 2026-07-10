@@ -87,7 +87,7 @@ This installs:
 #### Development vs Production Paths
 
 - **Development**: Skills in git submodule at `./skills/skills/`
-- **Production**: Skills in `~/.openhuman/skills/`
+- **Production**: Skills in `~/.alexanderai/skills/`
 - **Configuration**: `src/lib/skills/paths.ts` handles path resolution
 
 #### Skill Execution Process

@@ -19,170 +19,188 @@ use base64::{engine::general_purpose::STANDARD as BASE64_STANDARD, Engine as _};
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
-use openhuman_core::core::all::RegisteredController;
-use openhuman_core::core::event_bus::{register_native_global, request_native_global};
-use openhuman_core::openhuman::agent::bus::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::bus::{
     register_agent_handlers, AgentTurnRequest, AgentTurnResponse, AGENT_RUN_TURN_METHOD,
 };
-use openhuman_core::openhuman::agent::debug::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::debug::{
     write_prompt_dumps, DumpPromptOptions, DumpedPrompt,
 };
-use openhuman_core::openhuman::agent::dispatcher::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::{
     NativeToolDispatcher, PFormatToolDispatcher, ToolDispatcher, ToolExecutionResult,
     XmlToolDispatcher,
 };
-use openhuman_core::openhuman::agent::error::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::error::{
     is_context_limit_error, is_max_iterations_error, AgentError, MAX_ITERATIONS_ERROR_PREFIX,
 };
-use openhuman_core::openhuman::agent::harness::definition::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::definition::{
     AgentTier, SkillsWildcard, SubagentEntry,
 };
-use openhuman_core::openhuman::agent::harness::subagent_runner::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::subagent_runner::{
     autonomous_iter_cap, with_autonomous_iter_cap, SubagentMode, SubagentRunError,
     SubagentRunOptions, SubagentRunOutcome, SubagentRunStatus,
 };
-use openhuman_core::openhuman::agent::harness::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::{
     check_interrupt, current_sandbox_mode, with_current_sandbox_mode, InterruptFence,
     InterruptedError, SandboxMode,
 };
-use openhuman_core::openhuman::agent::harness::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::{
     AgentDefinition, AgentDefinitionRegistry, DefinitionSource, ModelSpec, PromptSource, ToolScope,
 };
-use openhuman_core::openhuman::agent::hooks::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::hooks::{
     fire_hooks, sanitize_tool_output, PostTurnHook, ToolCallRecord, TurnContext,
 };
-use openhuman_core::openhuman::agent::host_runtime::create_runtime;
-use openhuman_core::openhuman::agent::memory_loader::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::host_runtime::create_runtime;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::memory_loader::{
     collect_recall_citations, DefaultMemoryLoader, MemoryLoader, CROSS_CHAT_HEADER,
 };
-use openhuman_core::openhuman::agent::multimodal::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::multimodal::{
     contains_image_markers, count_image_markers, extract_ollama_image_payload, parse_image_markers,
     prepare_messages_for_provider, MultimodalError,
 };
-use openhuman_core::openhuman::agent::pformat::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::pformat::{
     build_registry, parse_call as parse_pformat_call, render_signature, render_signature_from_tool,
     PFormatParamType, PFormatRegistry, PFormatToolParams,
 };
-use openhuman_core::openhuman::agent::prompts::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::prompts::{
     render_ambient_environment, render_subagent_system_prompt, render_tools, ConnectedIntegration,
     GatedIntegrationTool, LearnedContextData, NamespaceSummary, PersonalityRosterEntry,
     PromptContext, PromptTool, SubagentRenderOptions, SystemPromptBuilder, ToolCallFormat,
     UserIdentity,
 };
-use openhuman_core::openhuman::agent::stop_hooks::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::stop_hooks::{
     current_stop_hooks, with_stop_hooks, BudgetStopHook, MaxIterationsStopHook, StopDecision,
     StopHook, TurnState,
 };
-use openhuman_core::openhuman::agent::task_board::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::task_board::{
     TaskApprovalMode, TaskBoard, TaskBoardCard, TaskBoardStore, TaskCardStatus,
 };
-use openhuman_core::openhuman::agent::task_dispatcher::build_task_prompt;
-use openhuman_core::openhuman::agent::tool_policy::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::task_dispatcher::build_task_prompt;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::tool_policy::{
     AllowAllToolPolicy, GeneratedToolRuntimeContext, GeneratedToolRuntimePolicy,
     GeneratedToolRuntimePolicyConfig, GeneratedToolRuntimeRisk, RuntimeToolPolicyAction,
     ToolCallContext, ToolPolicy, ToolPolicyDecision, ToolPolicyRequest,
 };
-use openhuman_core::openhuman::agent::tools::remember_preference::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::tools::remember_preference::{
     pinned_content, pinned_key, FacetClass, RememberPreferenceTool, PINNED_PREFERENCES_NAMESPACE,
 };
-use openhuman_core::openhuman::agent::tools::save_preference::{PrefScope, SavePreferenceTool};
-use openhuman_core::openhuman::agent::tools::PlanExitTool;
-use openhuman_core::openhuman::agent::tree_loader::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::tools::save_preference::{
+    PrefScope, SavePreferenceTool,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::tools::PlanExitTool;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::tree_loader::{
     should_prefetch, TreeContextLoader, REFRESH_INTERVAL,
 };
-use openhuman_core::openhuman::agent::triage::envelope::{TriggerEnvelope, TriggerSource};
-use openhuman_core::openhuman::agent::triage::evaluator::{run_triage_with_arms, TriageOutcome};
-use openhuman_core::openhuman::agent::triage::events::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::triage::envelope::{
+    TriggerEnvelope, TriggerSource,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::triage::evaluator::{
+    run_triage_with_arms, TriageOutcome,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::triage::events::{
     publish_escalated, publish_evaluated, publish_failed,
 };
-use openhuman_core::openhuman::agent::triage::routing::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::triage::routing::{
     build_local_provider_with_config, ResolvedProvider,
 };
-use openhuman_core::openhuman::agent::triage::{parse_triage_decision, ParseError, TriageAction};
-use openhuman_core::openhuman::agent::Agent;
-use openhuman_core::openhuman::agent::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::triage::{
+    parse_triage_decision, ParseError, TriageAction,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::{
     all_agent_controller_schemas, all_agent_registered_controllers,
 };
-use openhuman_core::openhuman::agent_registry::agents::BUILTINS;
-use openhuman_core::openhuman::config::schema::cloud_providers::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent_registry::agents::BUILTINS;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::schema::cloud_providers::{
     AuthStyle as CloudAuthStyle, CloudProviderCreds,
 };
-use openhuman_core::openhuman::config::schema::LocalAiConfig;
-use openhuman_core::openhuman::config::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::schema::LocalAiConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
     Config, DelegateAgentConfig, DockerRuntimeConfig, MultimodalConfig, MultimodalFileConfig,
     RuntimeConfig,
 };
-use openhuman_core::openhuman::credentials::profiles::{AuthProfile, TokenSet};
-use openhuman_core::openhuman::credentials::{AuthService, APP_SESSION_PROVIDER};
-use openhuman_core::openhuman::inference::context_window_for_model;
-use openhuman_core::openhuman::inference::local::{
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::profiles::{
+    AuthProfile, TokenSet,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
+    AuthService, APP_SESSION_PROVIDER,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::context_window_for_model;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::{
     global as local_ai_global, model_artifact_path, try_global as local_ai_try_global,
     LocalAiService,
 };
-use openhuman_core::openhuman::inference::openai_oauth::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::openai_oauth::{
     lookup_openai_bearer_token, OPENAI_OAUTH_PROFILE_NAME, OPENAI_PROVIDER_KEY,
 };
-use openhuman_core::openhuman::inference::presets::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::presets::{
     all_presets, apply_preset_to_config, current_tier_from_config, device_supports_local_ai,
     mvp_presets, preset_for_tier, recommend_tier, should_default_to_cloud_fallback,
     supports_screen_summary, vision_mode_for_config, vision_mode_for_tier, ModelTier, VisionMode,
     MIN_RAM_GB_FOR_LOCAL_AI, MVP_MAX_TIER,
 };
-use openhuman_core::openhuman::inference::provider::compatible::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::compatible::{
     AuthStyle as CompatibleAuthStyle, OpenAiCompatibleProvider,
 };
-use openhuman_core::openhuman::inference::provider::factory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::factory::{
     auth_key_for_slug, create_chat_provider_from_string, provider_for_role,
     BYOK_INCOMPLETE_SENTINEL,
 };
-use openhuman_core::openhuman::inference::provider::openhuman_backend::OpenHumanBackendProvider;
-use openhuman_core::openhuman::inference::provider::reliable::ReliableProvider;
-use openhuman_core::openhuman::inference::provider::router::{Route, RouterProvider};
-use openhuman_core::openhuman::inference::provider::temperature::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::openhuman_backend::OpenHumanBackendProvider;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::reliable::ReliableProvider;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::router::{
+    Route, RouterProvider,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::temperature::{
     glob_match, temperature_for_model,
 };
-use openhuman_core::openhuman::inference::provider::thread_context::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::thread_context::{
     current_thread_id, with_thread_id,
 };
-use openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     format_anyhow_chain, is_budget_exhausted_message, is_openai_compatible_unknown_model_message,
     is_provider_config_rejection_message, sanitize_api_error, scrub_secret_patterns,
 };
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, ChatResponse, ConversationMessage, Provider, ProviderDelta,
     ProviderRuntimeOptions, ToolCall, ToolResultMessage, UsageInfo,
 };
-use openhuman_core::openhuman::inference::sentiment::local_ai_analyze_sentiment;
-use openhuman_core::openhuman::inference::voice::cloud_transcribe::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::sentiment::local_ai_analyze_sentiment;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::voice::cloud_transcribe::{
     transcribe_cloud, CloudTranscribeOptions,
 };
-use openhuman_core::openhuman::inference::voice::hallucination::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::voice::hallucination::{
     is_hallucinated_output, HallucinationMode,
 };
-use openhuman_core::openhuman::inference::voice::local_speech::{synthesize_piper, PiperOptions};
-use openhuman_core::openhuman::inference::voice::postprocess::cleanup_transcription;
-use openhuman_core::openhuman::inference::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::voice::local_speech::{
+    synthesize_piper, PiperOptions,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::voice::postprocess::cleanup_transcription;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::{
     all_inference_controller_schemas, all_inference_registered_controllers,
     all_local_inference_controller_schemas, all_local_inference_registered_controllers,
     DeviceProfile,
 };
-use openhuman_core::openhuman::memory::{Memory, MemoryCategory, MemoryEntry, RecallOpts};
-use openhuman_core::openhuman::profiles::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
+    Memory, MemoryCategory, MemoryEntry, RecallOpts,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::profiles::{
     all_profiles_controller_schemas, all_profiles_registered_controllers,
 };
-use openhuman_core::openhuman::profiles::{
+use alexander_ai_solutions_core::alexander_ai_solutions::profiles::{
     filter_integrations, memory_subdir_for_suffix, memory_tree_subdir_for_suffix,
     resolve_personality_memory_md, resolve_personality_soul, session_raw_subdir_for_suffix,
     HasToolkit, PersonalityContext,
 };
-use openhuman_core::openhuman::profiles::{
+use alexander_ai_solutions_core::alexander_ai_solutions::profiles::{
     AgentProfile, AgentProfileStore, AgentProfilesState, DEFAULT_PROFILE_ID,
 };
-use openhuman_core::openhuman::security::SecurityPolicy;
-use openhuman_core::openhuman::todos::ops::BoardLocation;
-use openhuman_core::openhuman::tokenjuice::AgentTokenjuiceCompression;
-use openhuman_core::openhuman::tools::{Tool, ToolResult, ToolSpec};
+use alexander_ai_solutions_core::alexander_ai_solutions::security::SecurityPolicy;
+use alexander_ai_solutions_core::alexander_ai_solutions::todos::ops::BoardLocation;
+use alexander_ai_solutions_core::alexander_ai_solutions::tokenjuice::AgentTokenjuiceCompression;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{Tool, ToolResult, ToolSpec};
+use alexander_ai_solutions_core::core::all::RegisteredController;
+use alexander_ai_solutions_core::core::event_bus::{register_native_global, request_native_global};
 
 static ENV_LOCK: Mutex<()> = Mutex::new(());
 
@@ -416,7 +434,9 @@ impl Memory for ScriptedMemory {
 
     async fn namespace_summaries(
         &self,
-    ) -> anyhow::Result<Vec<openhuman_core::openhuman::memory::NamespaceSummary>> {
+    ) -> anyhow::Result<
+        Vec<alexander_ai_solutions_core::alexander_ai_solutions::memory::NamespaceSummary>,
+    > {
         Ok(Vec::new())
     }
 
@@ -542,7 +562,9 @@ impl Memory for RecordingMemory {
 
     async fn namespace_summaries(
         &self,
-    ) -> anyhow::Result<Vec<openhuman_core::openhuman::memory::NamespaceSummary>> {
+    ) -> anyhow::Result<
+        Vec<alexander_ai_solutions_core::alexander_ai_solutions::memory::NamespaceSummary>,
+    > {
         Ok(Vec::new())
     }
 
@@ -868,7 +890,8 @@ async fn call(controller: &RegisteredController, params: Value) -> Result<Value,
     (controller.handler)(params).await
 }
 
-fn base_agent_builder() -> openhuman_core::openhuman::agent::AgentBuilder {
+fn base_agent_builder() -> alexander_ai_solutions_core::alexander_ai_solutions::agent::AgentBuilder
+{
     Agent::builder()
         .provider(Box::new(EchoProvider))
         .tools(vec![
@@ -1002,9 +1025,9 @@ async fn inference_registry_drives_config_oauth_models_and_provider_chat() {
     );
 
     let provider_schemas =
-        openhuman_core::openhuman::inference::provider::schemas::all_controller_schemas();
+        alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::schemas::all_controller_schemas();
     let provider_registered =
-        openhuman_core::openhuman::inference::provider::schemas::all_registered_controllers();
+        alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::schemas::all_registered_controllers();
     assert_eq!(provider_schemas.len(), provider_registered.len());
     assert_eq!(
         provider_registered[0].rpc_method_name(),
@@ -1309,7 +1332,7 @@ fn agent_builder_public_paths_cover_required_fields_defaults_and_filters() {
     assert_eq!(agent.tool_specs().len(), 2);
     assert_eq!(
         agent.model_name(),
-        openhuman_core::openhuman::config::DEFAULT_MODEL
+        alexander_ai_solutions_core::alexander_ai_solutions::config::DEFAULT_MODEL
     );
     assert_eq!(agent.temperature(), 0.7);
     assert_eq!(agent.workspace_dir(), std::path::Path::new("."));
@@ -2087,8 +2110,8 @@ async fn inference_provider_factory_and_classifiers_cover_user_state_edges() {
 
 #[tokio::test]
 async fn inference_openhuman_backend_provider_covers_authless_and_streaming_edges() {
+    use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::StreamOptions;
     use futures_util::StreamExt;
-    use openhuman_core::openhuman::inference::provider::traits::StreamOptions;
 
     let state_dir = tempdir().expect("openhuman provider state");
     let provider = OpenHumanBackendProvider::new(
@@ -2131,10 +2154,10 @@ async fn inference_openhuman_backend_provider_covers_authless_and_streaming_edge
 
 #[tokio::test]
 async fn inference_provider_trait_defaults_cover_prompt_guided_paths() {
-    use futures_util::StreamExt;
-    use openhuman_core::openhuman::inference::provider::traits::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::{
         build_tool_instructions_text, StreamChunk, StreamOptions, ToolsPayload,
     };
+    use futures_util::StreamExt;
 
     let provider = EchoProvider;
     assert!(!provider.supports_native_tools());
@@ -2409,7 +2432,7 @@ async fn inference_openai_compatible_provider_covers_native_streaming_and_fallba
         "plain stream",
         "stream-native",
         0.3,
-        openhuman_core::openhuman::inference::provider::traits::StreamOptions::new(true)
+        alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::StreamOptions::new(true)
             .with_token_count(),
     );
     let first = chunks
@@ -2472,11 +2495,10 @@ async fn inference_http_models_router_uses_isolated_config_and_dedupes_entries()
     });
     config.save().await.expect("save isolated config");
 
-    let app = openhuman_core::openhuman::inference::http::router().with_state(
-        openhuman_core::core::types::AppState {
+    let app = alexander_ai_solutions_core::alexander_ai_solutions::inference::http::router()
+        .with_state(alexander_ai_solutions_core::core::types::AppState {
             core_version: "coverage".to_string(),
-        },
-    );
+        });
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
         .await
         .expect("bind inference http router");
@@ -2672,7 +2694,7 @@ async fn agent_runtime_policy_cost_and_triage_helpers_cover_public_edges() {
     assert_eq!(allow_all.check(&request).await, ToolPolicyDecision::Allow);
     assert_eq!(
         request.context.source,
-        openhuman_core::openhuman::agent::tool_policy::ToolCallSource::Session
+        alexander_ai_solutions_core::alexander_ai_solutions::agent::tool_policy::ToolCallSource::Session
     );
 
     let generated = request
@@ -2789,25 +2811,38 @@ async fn agent_runtime_policy_cost_and_triage_helpers_cover_public_edges() {
         ..Default::default()
     };
     assert_eq!(
-        openhuman_core::openhuman::agent::cost::lookup_pricing("claude-opus-4.7").model,
+        alexander_ai_solutions_core::alexander_ai_solutions::agent::cost::lookup_pricing(
+            "claude-opus-4.7"
+        )
+        .model,
         "reasoning-v1"
     );
     assert_eq!(
-        openhuman_core::openhuman::agent::cost::lookup_pricing("unknown-model").model,
+        alexander_ai_solutions_core::alexander_ai_solutions::agent::cost::lookup_pricing(
+            "unknown-model"
+        )
+        .model,
         "<fallback>"
     );
     let estimated =
-        openhuman_core::openhuman::agent::cost::estimate_call_cost_usd("agentic-v1", &usage);
+        alexander_ai_solutions_core::alexander_ai_solutions::agent::cost::estimate_call_cost_usd(
+            "agentic-v1",
+            &usage,
+        );
     assert!((estimated - 1.308625).abs() < 1e-6, "got {estimated}");
     let charged = UsageInfo {
         charged_amount_usd: 0.42,
         ..usage.clone()
     };
     assert_eq!(
-        openhuman_core::openhuman::agent::cost::call_cost_usd("reasoning-v1", &charged),
+        alexander_ai_solutions_core::alexander_ai_solutions::agent::cost::call_cost_usd(
+            "reasoning-v1",
+            &charged
+        ),
         0.42
     );
-    let mut turn_cost = openhuman_core::openhuman::agent::cost::TurnCost::new();
+    let mut turn_cost =
+        alexander_ai_solutions_core::alexander_ai_solutions::agent::cost::TurnCost::new();
     turn_cost.add_call("agentic-v1", &usage);
     turn_cost.add_call("reasoning-v1", &charged);
     assert_eq!(turn_cost.input_tokens, 4_000_000);
@@ -2905,7 +2940,7 @@ async fn agent_triage_evaluator_covers_native_dispatch_decision_and_deferred_pat
             visible_tool_names: Some(HashSet::new()),
             extra_tools: Vec::new(),
             on_progress: None,
-            origin: openhuman_core::openhuman::agent::turn_origin::AgentTurnOrigin::Cli,
+            origin: alexander_ai_solutions_core::alexander_ai_solutions::agent::turn_origin::AgentTurnOrigin::Cli,
         },
     )
     .await
@@ -3487,11 +3522,13 @@ fn agent_builtin_prompt_builders_cover_all_registered_archetypes() {
 
 #[tokio::test]
 async fn agent_public_tools_cover_validation_and_metadata_paths() {
-    use openhuman_core::openhuman::agent::tools::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::agent::tools::{
         AskClarificationTool, DelegateToPersonalityTool, DelegateTool, RunWorkflowTool, TodoTool,
         RUN_WORKFLOW_TOOL_NAME,
     };
-    use openhuman_core::openhuman::tools::{ArchetypeDelegationTool, SkillDelegationTool};
+    use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
+        ArchetypeDelegationTool, SkillDelegationTool,
+    };
 
     let ask = AskClarificationTool::new();
     assert_eq!(ask.name(), "ask_user_clarification");
@@ -4123,8 +4160,8 @@ fn inference_openai_oauth_store_covers_persist_lookup_and_empty_profiles() {
     AuthService::from_config(&config)
         .load_profiles()
         .expect("profiles load before upsert");
-    openhuman_core::openhuman::credentials::profiles::AuthProfilesStore::new(
-        &openhuman_core::openhuman::credentials::state_dir_from_config(&config),
+    alexander_ai_solutions_core::alexander_ai_solutions::credentials::profiles::AuthProfilesStore::new(
+        &alexander_ai_solutions_core::alexander_ai_solutions::credentials::state_dir_from_config(&config),
         config.secrets.encrypt,
     )
     .upsert_profile(profile.clone(), true)
@@ -4163,8 +4200,8 @@ fn inference_openai_oauth_store_covers_persist_lookup_and_empty_profiles() {
             scope: None,
         },
     );
-    openhuman_core::openhuman::credentials::profiles::AuthProfilesStore::new(
-        &openhuman_core::openhuman::credentials::state_dir_from_config(&config),
+    alexander_ai_solutions_core::alexander_ai_solutions::credentials::profiles::AuthProfilesStore::new(
+        &alexander_ai_solutions_core::alexander_ai_solutions::credentials::state_dir_from_config(&config),
         config.secrets.encrypt,
     )
     .upsert_profile(blank, true)
@@ -4283,7 +4320,8 @@ async fn agent_error_hooks_interrupt_and_stop_hooks_cover_public_paths() {
     assert_eq!(hook_names, vec!["max_iterations"]);
     assert_eq!(current_stop_hooks().len(), 0);
 
-    let mut turn_cost = openhuman_core::openhuman::agent::cost::TurnCost::new();
+    let mut turn_cost =
+        alexander_ai_solutions_core::alexander_ai_solutions::agent::cost::TurnCost::new();
     turn_cost.add_call(
         "agentic-v1",
         &UsageInfo {
@@ -4668,7 +4706,7 @@ async fn agent_debug_prompt_dump_and_identity_rendering_cover_file_layouts() {
     assert!(summary_text.contains("planner/coverage"));
     assert!(summary_text.contains("integrations_agent@gmail+calendar"));
 
-    let identities = openhuman_core::openhuman::agent::prompts::render_connected_identities();
+    let identities = alexander_ai_solutions_core::alexander_ai_solutions::agent::prompts::render_connected_identities();
     assert_eq!(identities, "");
 }
 

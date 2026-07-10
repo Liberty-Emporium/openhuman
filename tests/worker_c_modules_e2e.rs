@@ -14,8 +14,8 @@ use reqwest::StatusCode;
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 const TEST_RPC_TOKEN: &str = "worker-c-modules-e2e-token";
 
@@ -86,7 +86,7 @@ fn ensure_rpc_auth() {
 }
 
 fn write_config(openhuman_dir: &Path) {
-    std::fs::create_dir_all(openhuman_dir).expect("create .openhuman");
+    std::fs::create_dir_all(openhuman_dir).expect("create .alexanderai");
     let cfg = r#"api_url = "http://127.0.0.1:9"
 default_model = "worker-c-e2e-model"
 default_temperature = 0.2
@@ -107,7 +107,7 @@ embedding_dimensions = 0
 embedding_strict = false
 "#;
     std::fs::write(openhuman_dir.join("config.toml"), cfg).expect("write config.toml");
-    let _: openhuman_core::openhuman::config::Config =
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
         toml::from_str(cfg).expect("test config must match schema");
 }
 
@@ -116,7 +116,7 @@ async fn setup() -> Harness {
 
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    write_config(&home.join(".openhuman"));
+    write_config(&home.join(".alexanderai"));
 
     let guards = vec![
         EnvVarGuard::set_to_path("HOME", home),

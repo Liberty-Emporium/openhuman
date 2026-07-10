@@ -19,8 +19,8 @@ use axum::{Json, Router};
 use serde_json::{json, Value};
 use tempfile::tempdir;
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 // ── Auth / token setup ────────────────────────────────────────────────────────
 
@@ -245,7 +245,7 @@ async fn setup_embeddings_test() -> (
 ) {
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path().to_path_buf();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     write_min_config(&openhuman_home);
     // Also write user-local config so that post-login config loads succeed.

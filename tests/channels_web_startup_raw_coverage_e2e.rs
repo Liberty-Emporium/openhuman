@@ -6,16 +6,16 @@
 
 use std::time::Duration;
 
-use openhuman_core::openhuman::channels::start_channels;
-use openhuman_core::openhuman::channels::test_support::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::start_channels;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::test_support::{
     lock_agent_handler, run_dispatch_harness, DispatchHarnessOptions, TestMemoryEntry,
 };
-use openhuman_core::openhuman::channels::web::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::web::{
     all_web_channel_controller_schemas, all_web_channel_registered_controllers, channel_web_cancel,
     channel_web_chat, schemas, start_chat, subscribe_web_channel_events,
     test_support as web_test_support, ChatRequestMetadata,
 };
-use openhuman_core::openhuman::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
 use tempfile::tempdir;
 use tokio::time::timeout;
 

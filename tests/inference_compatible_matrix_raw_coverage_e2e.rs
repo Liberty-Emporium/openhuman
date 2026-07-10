@@ -16,16 +16,16 @@ use futures_util::StreamExt;
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::inference::local::LocalAiService;
-use openhuman_core::openhuman::inference::provider::compatible::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::LocalAiService;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::compatible::{
     AuthStyle as CompatibleAuthStyle, OpenAiCompatibleProvider,
 };
-use openhuman_core::openhuman::inference::provider::traits::StreamOptions;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::StreamOptions;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, Provider, ProviderDelta,
 };
-use openhuman_core::openhuman::tools::ToolSpec;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::ToolSpec;
 
 #[derive(Clone, Default)]
 struct MockState {
@@ -828,7 +828,7 @@ fn auth_header(headers: &HeaderMap) -> Option<String> {
 }
 
 fn temp_config(tmp: &TempDir) -> Config {
-    let root = tmp.path().join(".openhuman");
+    let root = tmp.path().join(".alexanderai");
     std::fs::create_dir_all(root.join("workspace")).expect("workspace dir");
     let mut config = Config::default();
     config.config_path = root.join("config.toml");

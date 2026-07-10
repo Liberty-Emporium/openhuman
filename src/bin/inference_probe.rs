@@ -21,20 +21,22 @@
 //! # integrations client can fetch the user's Connected Integrations.
 //! BACKEND_URL=https://staging-api.tinyhumans.ai \
 //!   OPENHUMAN_APP_ENV=staging \
-//!   RUST_LOG=info,openhuman_core::openhuman::agent=debug,openhuman_core::openhuman::inference=debug \
+//!   RUST_LOG=info,alexander_ai_solutions_core::alexander_ai_solutions::agent=debug,alexander_ai_solutions_core::alexander_ai_solutions::inference=debug \
 //!   cargo run --bin inference-probe -- \
 //!     --mode harness --prompt "hey list my top 5 emails"
 //!
 //! # Raw provider call (no harness):
 //! cargo run --bin inference-probe -- --mode raw --raw-mode pformat
 //! ```
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::create_chat_provider;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::{
+    ChatMessage, ChatRequest,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::traits::ToolSpec;
 use anyhow::{Context, Result};
 use clap::Parser;
-use openhuman_core::openhuman::agent::Agent;
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::inference::provider::create_chat_provider;
-use openhuman_core::openhuman::inference::provider::traits::{ChatMessage, ChatRequest};
-use openhuman_core::openhuman::tools::traits::ToolSpec;
 use serde_json::json;
 
 #[derive(Parser, Debug)]

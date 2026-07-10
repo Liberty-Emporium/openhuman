@@ -21,25 +21,25 @@ use futures_util::{stream, StreamExt};
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
-use openhuman_core::openhuman::config::schema::cloud_providers::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::schema::cloud_providers::{
     AuthStyle as CloudAuthStyle, CloudProviderCreds,
 };
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::inference::local::LocalAiService;
-use openhuman_core::openhuman::inference::provider::compatible::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::LocalAiService;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::compatible::{
     AuthStyle as CompatibleAuthStyle, OpenAiCompatibleProvider,
 };
-use openhuman_core::openhuman::inference::provider::factory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::factory::{
     auth_key_for_slug, create_chat_provider_from_string,
 };
-use openhuman_core::openhuman::inference::provider::reliable::ReliableProvider;
-use openhuman_core::openhuman::inference::provider::traits::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::reliable::ReliableProvider;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::{
     StreamChunk, StreamError, StreamOptions, StreamResult,
 };
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     list_configured_models, ChatMessage, ChatRequest, ChatResponse, Provider, ToolCall,
 };
 
@@ -880,7 +880,7 @@ fn provider_entry(
 }
 
 fn temp_config(tmp: &TempDir) -> Config {
-    let root = tmp.path().join(".openhuman");
+    let root = tmp.path().join(".alexanderai");
     std::fs::create_dir_all(root.join("workspace")).expect("workspace dir");
     let mut config = Config::default();
     config.config_path = root.join("config.toml");

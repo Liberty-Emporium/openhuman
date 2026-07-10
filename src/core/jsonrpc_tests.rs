@@ -18,7 +18,7 @@ struct EnvVarGuard {
 
 impl EnvVarGuard {
     fn set_many(vars: Vec<(&'static str, OsString)>) -> Self {
-        let lock = crate::openhuman::config::TEST_ENV_LOCK
+        let lock = crate::alexander_ai_solutions::config::TEST_ENV_LOCK
             .lock()
             .expect("test env lock poisoned");
         let mut old_values = Vec::with_capacity(vars.len());
@@ -103,7 +103,8 @@ async fn wait_until_port_released(port: u16) {
 #[tokio::test]
 #[ignore = "calls full server bootstrap; leaks process-global state into sibling tests (#1552). Re-cover via integration test."]
 async fn shutdown_token_stops_axum_listener_within_timeout() {
-    let _signed_out_restore = crate::openhuman::scheduler_gate::SignedOutTestGuard::set(false);
+    let _signed_out_restore =
+        crate::alexander_ai_solutions::scheduler_gate::SignedOutTestGuard::set(false);
 
     let workspace = tempfile::tempdir().expect("workspace tempdir");
 
@@ -1413,7 +1414,7 @@ fn is_wallet_not_configured_error_matches_wallet_constant() {
     // The classifier keys off the wallet layer's exact "not configured"
     // message so a wallet-less user's tinyplace RPC stays out of Sentry.
     assert!(is_wallet_not_configured_error(
-        crate::openhuman::wallet::WALLET_NOT_CONFIGURED_MESSAGE
+        crate::alexander_ai_solutions::wallet::WALLET_NOT_CONFIGURED_MESSAGE
     ));
 }
 
@@ -1423,7 +1424,7 @@ fn is_wallet_not_configured_error_is_coupled_to_the_wallet_constant() {
     // constant the classifier matches, this fails — preventing the noise from
     // silently returning to Sentry. Mirrors the param-validation prefix locks.
     assert_eq!(
-        crate::openhuman::wallet::WALLET_NOT_CONFIGURED_MESSAGE,
+        crate::alexander_ai_solutions::wallet::WALLET_NOT_CONFIGURED_MESSAGE,
         "wallet is not configured; run wallet setup first"
     );
 }

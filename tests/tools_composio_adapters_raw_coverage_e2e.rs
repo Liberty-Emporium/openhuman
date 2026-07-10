@@ -20,15 +20,17 @@ use axum::{Json, Router};
 use serde_json::{json, Map, Value};
 use tempfile::{Builder, TempDir};
 
-use openhuman_core::openhuman::config::{Config, PolymarketClobCredentials};
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
+    Config, PolymarketClobCredentials,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts,
 };
-use openhuman_core::openhuman::security::{AuditLogger, SecurityPolicy};
-use openhuman_core::openhuman::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::security::{AuditLogger, SecurityPolicy};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
     all_tools, all_tools_registered_controllers, ComposioExecuteTool, PolymarketTool, Tool,
 };
 

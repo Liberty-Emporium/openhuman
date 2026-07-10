@@ -169,7 +169,7 @@ Each archetype lives under `agents/<name>/` with an `agent.toml` (metadata, tool
 | `morning_briefing`  | Curated daily digest run by cron.                                                       |
 | `welcome` / `help`  | Onboarding flows.                                                                       |
 
-Custom archetypes ship as TOML files under `$OPENHUMAN_WORKSPACE/agents/*.toml` (or `~/.openhuman/agents/*.toml` for user-global specialists). Custom definitions override built-ins on id collision.
+Custom archetypes ship as TOML files under `$OPENHUMAN_WORKSPACE/agents/*.toml` (or `~/.alexanderai/agents/*.toml` for user-global specialists). Custom definitions override built-ins on id collision.
 
 ### Running a reusable sub-agent
 

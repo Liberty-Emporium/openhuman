@@ -73,11 +73,11 @@ pub async fn reset_local_data(
     // The daily-rotating log appender at `<data_dir>/logs/openhuman-*.log`
     // is owned by *this* Tauri host process, not by the embedded core
     // tokio task — so `shutdown()` above does not release it. On Windows
-    // that lingering OS file handle causes `remove_dir_all(.openhuman)`
+    // that lingering OS file handle causes `remove_dir_all(.alexanderai)`
     // below to fail with `ERROR_SHARING_VIOLATION` (os error 32). Drop
     // the writer guard now so the background flushing thread exits and
     // the file handle is closed before the removal walks the tree.
-    let log_guard_dropped = openhuman_core::core::logging::shutdown_file_guard();
+    let log_guard_dropped = alexander_ai_solutions_core::core::logging::shutdown_file_guard();
     log::info!("[core] reset_local_data: shutdown_file_guard dropped guard = {log_guard_dropped}");
 
     // ── 4. Remove the paths ─────────────────────────────────────────────
@@ -91,7 +91,7 @@ pub async fn reset_local_data(
     // surfaced after the restart attempt.
     //
     // Scoping (issue: "Clear App Data" wiped every user, not just the active
-    // one): all user data lives under `~/.openhuman/users/<id>` and the shared
+    // one): all user data lives under `~/.alexanderai/users/<id>` and the shared
     // root `~/.openhuman` holds every user's subtree. So we remove ONLY:
     //   * the two shared root-level marker files — `active_workspace.toml`
     //     (workspace pointer) and `active_user.toml` (sign-out), and
@@ -144,7 +144,7 @@ struct ResolvedDataPaths {
     /// `users/<id>` subtree (deleting it wiped sibling accounts' data).
     default_openhuman_dir: std::path::PathBuf,
     active_workspace_marker_path: std::path::PathBuf,
-    /// `~/.openhuman/active_user.toml` — the shared active-user marker. Removed
+    /// `~/.alexanderai/active_user.toml` — the shared active-user marker. Removed
     /// to sign the current user out so the next launch boots pre-login.
     active_user_marker_path: std::path::PathBuf,
 }

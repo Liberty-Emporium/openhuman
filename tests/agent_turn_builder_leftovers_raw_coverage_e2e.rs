@@ -1,17 +1,23 @@
-use anyhow::Result;
-use async_trait::async_trait;
-use openhuman_core::openhuman::agent::dispatcher::{NativeToolDispatcher, XmlToolDispatcher};
-use openhuman_core::openhuman::agent::hooks::{PostTurnHook, TurnContext};
-use openhuman_core::openhuman::agent::Agent;
-use openhuman_core::openhuman::config::{AgentConfig, ContextConfig};
-use openhuman_core::openhuman::context::session_memory::SessionMemoryConfig;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::{
+    NativeToolDispatcher, XmlToolDispatcher,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::hooks::{
+    PostTurnHook, TurnContext,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{AgentConfig, ContextConfig};
+use alexander_ai_solutions_core::alexander_ai_solutions::context::session_memory::SessionMemoryConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, ChatResponse, Provider, ToolCall, UsageInfo,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts,
 };
-use openhuman_core::openhuman::tools::{PermissionLevel, Tool, ToolContent, ToolResult};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
+    PermissionLevel, Tool, ToolContent, ToolResult,
+};
+use anyhow::Result;
+use async_trait::async_trait;
 use parking_lot::Mutex;
 use serde_json::json;
 use std::collections::VecDeque;
@@ -80,8 +86,8 @@ impl ScriptedProvider {
 impl Provider for ScriptedProvider {
     fn capabilities(
         &self,
-    ) -> openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities {
-        openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities {
+    ) -> alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities{
+        alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities {
             native_tool_calling: self.native_tools,
             vision: false,
         }

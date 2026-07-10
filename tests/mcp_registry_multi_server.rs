@@ -12,9 +12,11 @@
 //! temp-dir workspace so they do not share SQLite state with each other
 //! or with `mcp_registry_e2e.rs`.
 
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::mcp_registry::types::{CommandKind, InstalledServer, Transport};
-use openhuman_core::openhuman::mcp_registry::{connections, ops, store};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::mcp_registry::types::{
+    CommandKind, InstalledServer, Transport,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::mcp_registry::{connections, ops, store};
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 

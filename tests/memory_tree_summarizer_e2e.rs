@@ -30,9 +30,11 @@ use async_trait::async_trait;
 use chrono::{DateTime, TimeZone, Utc};
 use tempfile::tempdir;
 
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::inference::provider::traits::Provider;
-use openhuman_core::openhuman::memory_tree::tree_runtime::{engine, store};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::Provider;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::{
+    engine, store,
+};
 
 // ── Env isolation ─────────────────────────────────────────────────────────
 

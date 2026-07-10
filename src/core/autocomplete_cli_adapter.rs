@@ -4,8 +4,10 @@
 
 use anyhow::Result;
 
+use crate::alexander_ai_solutions::autocomplete::ops::{
+    autocomplete_start_cli, AutocompleteStartCliOptions,
+};
 use crate::core::logging::CliLogDefault;
-use crate::openhuman::autocomplete::ops::{autocomplete_start_cli, AutocompleteStartCliOptions};
 
 pub struct NamespacePreparse {
     pub args: Vec<String>,

@@ -19,15 +19,21 @@
 //! regression where the tool wrapper exists but the orchestrator can't see
 //! it.
 
-use chrono::{TimeZone, Utc};
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::memory::ingest_pipeline::{ingest_chat, ingest_email};
-use openhuman_core::openhuman::memory::jobs::drain_until_idle;
-use openhuman_core::openhuman::memory_sync::canonicalize::chat::{ChatBatch, ChatMessage};
-use openhuman_core::openhuman::memory_sync::canonicalize::email::{EmailMessage, EmailThread};
-use openhuman_core::openhuman::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::ingest_pipeline::{
+    ingest_chat, ingest_email,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::jobs::drain_until_idle;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::canonicalize::chat::{
+    ChatBatch, ChatMessage,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::canonicalize::email::{
+    EmailMessage, EmailThread,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
     MemoryTreeFetchLeavesTool, MemoryTreeSearchEntitiesTool, Tool,
 };
+use chrono::{TimeZone, Utc};
 use serde_json::{json, Value};
 use tempfile::TempDir;
 
@@ -378,9 +384,9 @@ async fn fetch_leaves_hydrates_source_ref_for_cited_chunks() {
     let _ws_guard = set_workspace_env(&tmp);
 
     // List the ingested chunks directly to get leaf chunk ids with their refs.
-    let chunks = openhuman_core::openhuman::memory_store::chunks::store::list_chunks(
+    let chunks = alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::store::list_chunks(
         &cfg,
-        &openhuman_core::openhuman::memory_store::chunks::store::ListChunksQuery::default(),
+        &alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::store::ListChunksQuery::default(),
     )
     .expect("list_chunks must not error");
 

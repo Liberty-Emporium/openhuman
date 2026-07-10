@@ -231,7 +231,7 @@ test ... ok
 
 **Status:** ✅ Done
 
-**Problem:** Even after change 1.11, the agent still used the broken filter-field approach and didn't play. Transcript analysis (`~/.openhuman/users/<id>/workspace/session_raw/*.jsonl`) revealed two real root causes:
+**Problem:** Even after change 1.11, the agent still used the broken filter-field approach and didn't play. Transcript analysis (`~/.alexanderai/users/<id>/workspace/session_raw/*.jsonl`) revealed two real root causes:
 
 1. **The orchestrator has no `shell` tool.** Change 1.11 put the play guidance in `SOUL.md` — but the orchestrator runs with `omit_identity = true` and **never sees SOUL.md**. Change 1.11b moved it to the `ax_interact` description, which told the agent to "use the shell tool to open `music://...`" — but the orchestrator can't run shell (it delegates). The agent wrapped the command in a `prompt` arg to a delegation tool; it never executed, and it fell back to the filter approach.
 2. **Cross-chat memory contamination.** The user message was prefixed with `[Cross-chat context — historical]` containing prior filter-approach "Progress Checkpoint" steps, biasing the agent back to the wrong method.
@@ -649,7 +649,7 @@ Shipped on the Windows machine (2026-06-02):
 
 ## Fine-tuning backlog ⏳ (deferred until all phases complete)
 
-From live agent-in-the-loop testing on 2026-06-03 (grounded in `~/.openhuman/logs/openhuman.2026-06-03.log`, `session_raw/*.jsonl`, and the dev run: **keyboard=69 / mouse=0 / screenshot=10** tool calls; **26 wake matches vs 93 misses**; emit=true utterances ranged 0.7s–28s). The feature works but needs tuning. **Do not implement until Phases 3–4 land.**
+From live agent-in-the-loop testing on 2026-06-03 (grounded in `~/.alexanderai/logs/openhuman.2026-06-03.log`, `session_raw/*.jsonl`, and the dev run: **keyboard=69 / mouse=0 / screenshot=10** tool calls; **26 wake matches vs 93 misses**; emit=true utterances ranged 0.7s–28s). The feature works but needs tuning. **Do not implement until Phases 3–4 land.**
 
 ### F1 — Listening window too short for long commands
 - **Observed:** `vad_hangover_ms = 800` closes an utterance on any pause > 0.8s, so multi-clause commands ("Hey Tiny, open Slack and message the team channel saying …") split across utterances — the tail lacks the wake word and is dropped. Compounded by the notch "Listening" pill TTL (2500ms) expiring mid-speech, so it *looks* like it stopped listening.

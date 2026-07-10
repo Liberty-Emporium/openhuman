@@ -15,22 +15,22 @@ use axum::routing::post;
 use axum::Router;
 use serde_json::{json, Value};
 
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::embeddings::catalog;
-use openhuman_core::openhuman::embeddings::cloud::{
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::catalog;
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::cloud::{
     OpenHumanCloudEmbedding, DEFAULT_CLOUD_EMBEDDING_DIMENSIONS, DEFAULT_CLOUD_EMBEDDING_MODEL,
 };
-use openhuman_core::openhuman::embeddings::cohere::CohereEmbedding;
-use openhuman_core::openhuman::embeddings::noop::NoopEmbedding;
-use openhuman_core::openhuman::embeddings::ollama::DEFAULT_OLLAMA_URL;
-use openhuman_core::openhuman::embeddings::openai::OpenAiEmbedding;
-use openhuman_core::openhuman::embeddings::retry_after::{
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::cohere::CohereEmbedding;
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::noop::NoopEmbedding;
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::ollama::DEFAULT_OLLAMA_URL;
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::openai::OpenAiEmbedding;
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::retry_after::{
     backoff_ms_for_attempt, parse_retry_after_ms, BASE_BACKOFF_MS, MAX_BACKOFF_MS,
 };
-use openhuman_core::openhuman::embeddings::voyage::VoyageEmbedding;
-use openhuman_core::openhuman::embeddings::{
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::voyage::VoyageEmbedding;
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::{
     create_embedding_provider, create_embedding_provider_with_credentials, EmbeddingProvider,
     OllamaEmbedding, DEFAULT_OLLAMA_DIMENSIONS, DEFAULT_OLLAMA_MODEL,
 };
@@ -477,7 +477,7 @@ async fn cohere_embedding_reports_parse_count_dimension_and_http_errors() {
 
 #[tokio::test]
 async fn embedding_rate_limit_public_paths_cover_disabled_loopback_and_malformed_urls() {
-    use openhuman_core::openhuman::embeddings::rate_limit::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::rate_limit::{
         acquire_embedding_slot, embedding_rate_limit, set_embedding_rate_limit,
     };
 
@@ -624,9 +624,11 @@ async fn embedding_catalog_factory_retry_noop_and_cloud_empty_paths_are_reachabl
         Err(err) => assert!(err.to_string().contains("unknown embedding provider")),
     }
 
-    let default_cloud = openhuman_core::openhuman::embeddings::default_embedding_provider();
+    let default_cloud =
+        alexander_ai_solutions_core::alexander_ai_solutions::embeddings::default_embedding_provider(
+        );
     assert_eq!(default_cloud.name(), "cloud");
-    let default_local = openhuman_core::openhuman::embeddings::default_local_embedding_provider();
+    let default_local = alexander_ai_solutions_core::alexander_ai_solutions::embeddings::default_local_embedding_provider();
     assert_eq!(default_local.name(), "ollama");
 
     for (provider, model, dims, key, endpoint, expected_name) in [

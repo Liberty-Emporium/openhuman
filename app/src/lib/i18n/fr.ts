@@ -582,7 +582,7 @@ const messages: TranslationMap = {
   'skills.channels': 'Messagerie',
   'skills.explorer.emptyCta': 'Installer depuis une URL',
   'skills.explorer.emptyDescription':
-    'Installez un paquet SKILL.md ou placez des dossiers de style Hermes dans ~/.openhuman/skills.',
+    'Installez un paquet SKILL.md ou placez des dossiers de style Hermes dans ~/.alexanderai/skills.',
   'skills.explorer.emptyTitle': 'Aucune skill trouvée',
   'skills.explorer.installFromUrl': 'Installer depuis une URL',
   'skills.explorer.newSkill': 'Nouvelle skill',
@@ -3815,7 +3815,7 @@ const messages: TranslationMap = {
   'settings.ai.claudeCode.fullAccessOff':
     'Accepter uniquement les modifications — applique automatiquement les modifications de fichiers, limite les commandes et le réseau.',
   'settings.ai.claudeCode.sandboxNoteMac':
-    'Sur macOS, ~/.openhuman reste protégé par le bac à sable dans les deux modes.',
+    'Sur macOS, ~/.alexanderai reste protégé par le bac à sable dans les deux modes.',
   'settings.ai.claudeCode.sandboxNoteOther':
     "L'accès complet n'est pas confiné sur cette plateforme — ne l'activez que si vous faites confiance à l'espace de travail.",
   'settings.ai.claudeCode.enableToCheck': 'Activez Claude Code pour vérifier la connexion.',
@@ -5164,9 +5164,9 @@ const messages: TranslationMap = {
   'skills.create.name': 'Nom',
   'skills.create.namePlaceholder': 'ex. Journal de trading',
   'skills.create.scope': 'Portée',
-  'skills.create.scopeProjectHint': '/.openhuman/skills/',
+  'skills.create.scopeProjectHint': '/.alexanderai/skills/',
   'skills.create.scopeUserHint':
-    'Écrit dans ~/.openhuman/skills/<slug>/SKILL.md — disponible dans tous les espaces de travail.',
+    'Écrit dans ~/.alexanderai/skills/<slug>/SKILL.md — disponible dans tous les espaces de travail.',
   'skills.create.slugLabel': 'Libellé du slug',
   'skills.create.subtitle': 'SKILL.md',
   'skills.create.tags': 'Étiquettes',
@@ -5213,7 +5213,7 @@ const messages: TranslationMap = {
     "Seuls les liens directs `.md` fonctionnent. Pour GitHub, créez un lien vers un fichier (github.com/owner/repo/blob/.../SKILL.md) - les racines de l'arborescence et du dépôt ne sont pas installées.",
   'skills.install.errors.unsupportedUrlTitle': 'Formulaire URL non pris en charge.',
   'skills.install.errors.writeFailedHint':
-    "Le répertoire des compétences de l'espace de travail n'était pas accessible en écriture. Vérifiez les autorisations du système de fichiers pour `<workspace>/.openhuman/skills/`.",
+    "Le répertoire des compétences de l'espace de travail n'était pas accessible en écriture. Vérifiez les autorisations du système de fichiers pour `<workspace>/.alexanderai/skills/`.",
   'skills.install.errors.writeFailedTitle': "Impossible d'écrire SKILL.md",
   'skills.install.fetchLog': 'Récupérer le journal',
   'skills.install.fetchingPrefix': 'Récupération',

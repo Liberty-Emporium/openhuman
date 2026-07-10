@@ -558,7 +558,7 @@ const messages: TranslationMap = {
   'skills.channels': 'المراسلة',
   'skills.explorer.emptyCta': 'التثبيت من رابط',
   'skills.explorer.emptyDescription':
-    'ثبّت حزمة SKILL.md أو ضع مجلدات بنمط Hermes داخل ~/.openhuman/skills.',
+    'ثبّت حزمة SKILL.md أو ضع مجلدات بنمط Hermes داخل ~/.alexanderai/skills.',
   'skills.explorer.emptyTitle': 'لم يتم العثور على مهارات',
   'skills.explorer.installFromUrl': 'التثبيت من رابط',
   'skills.explorer.newSkill': 'مهارة جديدة',
@@ -3656,7 +3656,7 @@ const messages: TranslationMap = {
   'settings.ai.claudeCode.fullAccessOff':
     'قبول التعديلات فقط — يطبّق تعديلات الملفات تلقائيًا ويقيّد الأوامر والشبكة.',
   'settings.ai.claudeCode.sandboxNoteMac':
-    'على نظام macOS، يظل ~/.openhuman محميًا بواسطة البيئة المعزولة في كلا الوضعين.',
+    'على نظام macOS، يظل ~/.alexanderai محميًا بواسطة البيئة المعزولة في كلا الوضعين.',
   'settings.ai.claudeCode.sandboxNoteOther':
     'الوصول الكامل غير مقيّد على هذه المنصة — فعّله فقط إذا كنت تثق بمساحة العمل.',
   'settings.ai.claudeCode.enableToCheck': 'فعّل Claude Code للتحقق من تسجيل الدخول.',
@@ -4947,9 +4947,9 @@ const messages: TranslationMap = {
   'skills.create.name': 'الاسم',
   'skills.create.namePlaceholder': 'مثال: يومية التداول',
   'skills.create.scope': 'النطاق',
-  'skills.create.scopeProjectHint': '/.openhuman/skills/',
+  'skills.create.scopeProjectHint': '/.alexanderai/skills/',
   'skills.create.scopeUserHint':
-    'مكتوب في ~/.openhuman/skills/<slug>/SKILL.md — متاح في جميع مساحات العمل.',
+    'مكتوب في ~/.alexanderai/skills/<slug>/SKILL.md — متاح في جميع مساحات العمل.',
   'skills.create.slugLabel': 'تسمية المعرف',
   'skills.create.subtitle': 'SKILL.md',
   'skills.create.tags': 'الوسوم',
@@ -4995,7 +4995,7 @@ const messages: TranslationMap = {
     'تعمل فقط الروابط المباشرة `.md`. بالنسبة إلى GitHub، قم بالارتباط بملف (github.com/owner/repo/blob/.../SKILL.md) - لم يتم تثبيت جذور الشجرة والريبو.',
   'skills.install.errors.unsupportedUrlTitle': 'URL النموذج غير مدعوم',
   'skills.install.errors.writeFailedHint':
-    'دليل مهارات مساحة العمل غير قابل للكتابة. تحقق من أذونات نظام الملفات لـ `<workspace>/.openhuman/skills/`.',
+    'دليل مهارات مساحة العمل غير قابل للكتابة. تحقق من أذونات نظام الملفات لـ `<workspace>/.alexanderai/skills/`.',
   'skills.install.errors.writeFailedTitle': 'تعذر كتابة SKILL.md',
   'skills.install.fetchLog': 'جلب السجل',
   'skills.install.fetchingPrefix': 'جلب',

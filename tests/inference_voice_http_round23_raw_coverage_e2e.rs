@@ -8,6 +8,19 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 
+use alexander_ai_solutions_core::alexander_ai_solutions::config::schema::cloud_providers::{
+    AuthStyle as CloudAuthStyle, CloudProviderCreds,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
+    AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::http;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::{
+    local_ai_assets_status, local_ai_downloads_progress, LocalAiService,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::voice::streaming::handle_dictation_ws;
+use alexander_ai_solutions_core::core::types::AppState;
 use axum::body::Body;
 use axum::extract::ws::WebSocketUpgrade;
 use axum::extract::State;
@@ -16,19 +29,6 @@ use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use futures_util::{SinkExt, StreamExt};
-use openhuman_core::core::types::AppState;
-use openhuman_core::openhuman::config::schema::cloud_providers::{
-    AuthStyle as CloudAuthStyle, CloudProviderCreds,
-};
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::credentials::{
-    AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
-};
-use openhuman_core::openhuman::inference::http;
-use openhuman_core::openhuman::inference::local::{
-    local_ai_assets_status, local_ai_downloads_progress, LocalAiService,
-};
-use openhuman_core::openhuman::inference::voice::streaming::handle_dictation_ws;
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 use tokio_tungstenite::tungstenite::Message as WsMessage;
@@ -467,7 +467,7 @@ fn remember(state: &MockState, path: &str, body: Value) {
 }
 
 fn temp_config(tmp: &TempDir) -> Config {
-    let root = tmp.path().join(".openhuman");
+    let root = tmp.path().join(".alexanderai");
     std::fs::create_dir_all(root.join("workspace")).expect("workspace dir");
     let mut config = Config::default();
     config.config_path = root.join("config.toml");

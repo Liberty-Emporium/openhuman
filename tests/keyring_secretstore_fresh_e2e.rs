@@ -1,5 +1,7 @@
-use openhuman_core::openhuman::config::schema::{Config, StreamMode, TelegramConfig};
-use openhuman_core::openhuman::keyring;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::schema::{
+    Config, StreamMode, TelegramConfig,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::keyring;
 use std::sync::{Mutex, OnceLock};
 
 fn env_lock() -> std::sync::MutexGuard<'static, ()> {
@@ -71,18 +73,19 @@ async fn config_secrets_create_master_key_in_keyring_on_fresh_install() {
         config_path: config_path.clone(),
         workspace_dir: workspace_dir.clone(),
         api_key: Some("sk-fresh-secret".into()),
-        channels_config: openhuman_core::openhuman::config::schema::ChannelsConfig {
-            telegram: Some(TelegramConfig {
-                bot_token: "fresh-tg-secret".into(),
-                chat_id: None,
-                allowed_users: vec!["bob".into()],
-                stream_mode: StreamMode::default(),
-                draft_update_interval_ms: 1000,
-                silent_streaming: true,
-                mention_only: false,
-            }),
-            ..Default::default()
-        },
+        channels_config:
+            alexander_ai_solutions_core::alexander_ai_solutions::config::schema::ChannelsConfig {
+                telegram: Some(TelegramConfig {
+                    bot_token: "fresh-tg-secret".into(),
+                    chat_id: None,
+                    allowed_users: vec!["bob".into()],
+                    stream_mode: StreamMode::default(),
+                    draft_update_interval_ms: 1000,
+                    silent_streaming: true,
+                    mention_only: false,
+                }),
+                ..Default::default()
+            },
         ..Default::default()
     };
 

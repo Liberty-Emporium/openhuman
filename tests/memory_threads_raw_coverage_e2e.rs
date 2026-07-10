@@ -17,20 +17,20 @@ use std::path::Path;
 use std::sync::{Arc, Mutex, OnceLock};
 use tempfile::TempDir;
 
-use openhuman_core::openhuman::agent::progress::AgentProgress;
-use openhuman_core::openhuman::agent::task_board::{TaskBoard, TaskBoardCard, TaskCardStatus};
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::embeddings::NoopEmbedding;
-use openhuman_core::openhuman::memory::query::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::progress::AgentProgress;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::task_board::{TaskBoard, TaskBoardCard, TaskCardStatus};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::NoopEmbedding;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::query::{
     MemoryQueryTool, MemoryTreeDrillDownTool, MemoryTreeFetchLeavesTool,
     MemoryTreeIngestDocumentTool, MemoryTreeQuerySourceTool, MemoryTreeSearchEntitiesTool,
 };
-use openhuman_core::openhuman::memory::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::tools::{
     MemoryForgetTool, MemoryRecallTool, MemoryStoreTool,
 };
-use openhuman_core::openhuman::memory::tree_policy::TreePolicy;
-use openhuman_core::openhuman::memory::tree_source;
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::tree_policy::TreePolicy;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::tree_source;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     all_memory_controller_schemas, all_memory_registered_controllers,
     preferences::{
         load_general_preferences, recall_related_preferences, recall_situational_preferences,
@@ -52,61 +52,61 @@ use openhuman_core::openhuman::memory::{
     util::redact::{redact, redact_endpoint},
     MemoryIngestionConfig, MemoryIngestionRequest,
 };
-use openhuman_core::openhuman::memory_queue::types::ReembedBackfillPayload;
-use openhuman_core::openhuman::memory_queue::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_queue::types::ReembedBackfillPayload;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_queue::{
     self, AppendBufferPayload, AppendTarget, ExtractChunkPayload, FlushStalePayload, JobKind,
     JobStatus, NewJob, NodeRef, SealPayload, DEFAULT_LOCK_DURATION_MS,
 };
-use openhuman_core::openhuman::memory_sources::readers::reader_for;
-use openhuman_core::openhuman::memory_sources::registry;
-use openhuman_core::openhuman::memory_sources::rpc as memory_sources_rpc;
-use openhuman_core::openhuman::memory_sources::status::{source_status, FreshnessLabel};
-use openhuman_core::openhuman::memory_sources::sync::sync_source;
-use openhuman_core::openhuman::memory_sources::types::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::readers::reader_for;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::registry;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::rpc as memory_sources_rpc;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::status::{source_status, FreshnessLabel};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::sync::sync_source;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::types::{
     ContentType, MemorySourceEntry, SourceContent, SourceItem, SourceKind,
 };
-use openhuman_core::openhuman::memory_sources::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::{
     all_memory_sources_controller_schemas, all_memory_sources_registered_controllers,
 };
-use openhuman_core::openhuman::memory_store::chunks::store::{upsert_chunks, with_connection};
-use openhuman_core::openhuman::memory_store::chunks::types::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::store::{upsert_chunks, with_connection};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::types::{
     approx_token_count, chunk_id, Chunk, DataSource, Metadata, SourceKind as ChunkSourceKind,
     SourceRef,
 };
-use openhuman_core::openhuman::memory_store::trees::types::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::trees::types::{
     SummaryNode, Tree, TreeKind, TreeStatus as StoredTreeStatus,
 };
-use openhuman_core::openhuman::memory_store::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::{
     MemoryClient, NamespaceDocumentInput, UnifiedMemory,
 };
-use openhuman_core::openhuman::memory_sync::canonicalize::chat::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::canonicalize::chat::{
     canonicalise as canonicalise_chat, ChatBatch, ChatMessage,
 };
-use openhuman_core::openhuman::memory_sync::canonicalize::document::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::canonicalize::document::{
     canonicalise as canonicalise_document, DocumentInput,
 };
-use openhuman_core::openhuman::memory_sync::canonicalize::email::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::canonicalize::email::{
     canonicalise as canonicalise_email, EmailMessage, EmailThread,
 };
-use openhuman_core::openhuman::memory_sync::canonicalize::email_clean;
-use openhuman_core::openhuman::memory_sync::composio;
-use openhuman_core::openhuman::memory_sync::composio::providers::profile::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::canonicalize::email_clean;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::profile::{
     canonicalize, delete_connected_identity_facets, is_self_identity, is_self_identity_any_toolkit,
     load_connected_identities, render_connected_identities_section, ConnectedIdentity,
     IdentityKind,
 };
-use openhuman_core::openhuman::memory_sync::composio::providers::profile_md::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::profile_md::{
     block_end, block_start, merge_provider_into_profile_md, remove_provider_from_profile_md,
     replace_managed_block,
 };
-use openhuman_core::openhuman::memory_sync::composio::providers::slack::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::slack::{
     post_process as slack_post_process, schemas as slack_memory_schemas,
 };
-use openhuman_core::openhuman::memory_sync::composio::providers::sync_state::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::sync_state::{
     extract_item_id, DailyBudget, SyncState, DEFAULT_DAILY_REQUEST_LIMIT,
 };
-use openhuman_core::openhuman::memory_sync::composio::providers::user_scopes;
-use openhuman_core::openhuman::memory_sync::composio::providers::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::user_scopes;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::{
     agent_ready_toolkits, all_providers as all_composio_providers, capability_matrix,
     catalog_for_toolkit, classify_unknown, curated_scope_for, find_curated, get_provider,
     init_default_providers as init_default_composio_providers, is_action_visible_with_pref,
@@ -114,58 +114,58 @@ use openhuman_core::openhuman::memory_sync::composio::providers::{
     NormalizedTask, ProviderContext, ProviderUserProfile, SyncOutcome as ComposioSyncOutcome,
     SyncReason, TaskFetchFilter, ToolScope, UserScopePref,
 };
-use openhuman_core::openhuman::memory_sync::sync_status::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::sync_status::{
     rpc as memory_sync_status_rpc, schemas as memory_sync_status_schemas,
 };
-use openhuman_core::openhuman::memory_sync::traits::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::traits::{
     SyncOutcome as PipelineSyncOutcome, SyncPipeline, SyncPipelineKind,
 };
-use openhuman_core::openhuman::memory_tools::tools::{MemoryToolsListTool, MemoryToolsPutTool};
-use openhuman_core::openhuman::memory_tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tools::tools::{MemoryToolsListTool, MemoryToolsPutTool};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tools::{
     render_tool_memory_rules, tool_memory_namespace, ToolMemoryPriority, ToolMemoryRule,
     ToolMemoryRulesSection, ToolMemorySource, ToolMemoryStore, TOOL_MEMORY_HEADING,
     TOOL_MEMORY_PROMPT_CAP,
 };
-use openhuman_core::openhuman::memory_tree::score::embed::Embedder;
-use openhuman_core::openhuman::memory_tree::score::extract::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::embed::Embedder;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::extract::{
     CompositeExtractor, EntityExtractor, EntityKind, ExtractedEntities, ExtractedEntity,
     ExtractedTopic,
 };
-use openhuman_core::openhuman::memory_tree::score::resolver::CanonicalEntity;
-use openhuman_core::openhuman::memory_tree::score::signals::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::resolver::CanonicalEntity;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::signals::{
     combine, combine_cheap_only, compute as compute_score_signals, entity_density_score,
     interaction, metadata_weight, source_weight, token_count, unique_words, ScoreSignals,
     SignalWeights,
 };
-use openhuman_core::openhuman::memory_tree::score::store as score_store;
-use openhuman_core::openhuman::memory_tree::score::{resolver, ScoringConfig};
-use openhuman_core::openhuman::memory_tree::summarise::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::store as score_store;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::{resolver, ScoringConfig};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::summarise::{
     fallback_summary, SummaryContext, SummaryInput,
 };
-use openhuman_core::openhuman::memory_tree::tree::bucket_seal::LeafRef;
-use openhuman_core::openhuman::memory_tree::tree_runtime::store as tree_runtime_store;
-use openhuman_core::openhuman::memory_tree::tree_runtime::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::bucket_seal::LeafRef;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::store as tree_runtime_store;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::{
     all_tree_summarizer_controller_schemas, all_tree_summarizer_registered_controllers,
     derive_node_ids, derive_parent_id, estimate_tokens, level_from_node_id, node_id_to_path,
     NodeLevel, TreeNode,
 };
-use openhuman_core::openhuman::memory_tree::{retrieval, score::embed};
-use openhuman_core::openhuman::security::{AutonomyLevel, SecurityPolicy};
-use openhuman_core::openhuman::threads::ops as thread_ops;
-use openhuman_core::openhuman::threads::title::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::{retrieval, score::embed};
+use alexander_ai_solutions_core::alexander_ai_solutions::security::{AutonomyLevel, SecurityPolicy};
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::ops as thread_ops;
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::title::{
     build_title_prompt, collapse_whitespace, is_auto_generated_thread_title,
     sanitize_generated_title, title_from_user_message, title_log_fingerprint,
 };
-use openhuman_core::openhuman::threads::turn_state::{
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::turn_state::{
     self, ClearTurnStateRequest, GetTurnStateRequest, GetTurnStateResponse, ListTurnStatesResponse,
     SubagentActivity, SubagentToolCall, ToolTimelineEntry, ToolTimelineStatus, TurnLifecycle,
     TurnPhase, TurnState, TurnStateMirror, TurnStateStore,
 };
-use openhuman_core::openhuman::threads::ThreadsError;
-use openhuman_core::openhuman::threads::{
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::ThreadsError;
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::{
     all_threads_controller_schemas, all_threads_registered_controllers,
 };
-use openhuman_core::openhuman::tools::traits::{PermissionLevel, Tool, ToolCategory};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::traits::{PermissionLevel, Tool, ToolCategory};
 
 struct EnvVarGuard {
     key: &'static str,
@@ -465,7 +465,7 @@ Kitchen is north of Garden.
                 category: "core".into(),
                 session_id: Some("session-coverage".into()),
                 document_id: Some("doc-memory-raw-ingestion".into()),
-                taint: openhuman_core::openhuman::memory::MemoryTaint::Internal,
+                taint: alexander_ai_solutions_core::alexander_ai_solutions::memory::MemoryTaint::Internal,
             },
             config: MemoryIngestionConfig::default(),
         })
@@ -535,10 +535,10 @@ Kitchen is north of Garden.
                 category: "core".into(),
                 session_id: None,
                 document_id: Some("doc-memory-raw-ingestion".into()),
-                taint: openhuman_core::openhuman::memory::MemoryTaint::Internal,
+                taint: alexander_ai_solutions_core::alexander_ai_solutions::memory::MemoryTaint::Internal,
             },
             &MemoryIngestionConfig {
-                extraction_mode: openhuman_core::openhuman::memory::ExtractionMode::Chunk,
+                extraction_mode: alexander_ai_solutions_core::alexander_ai_solutions::memory::ExtractionMode::Chunk,
                 ..Default::default()
             },
         )
@@ -774,7 +774,8 @@ async fn memory_thread_tree_and_sync_controller_schemas_execute_public_handlers(
     assert_eq!(thread_schemas.len(), 17);
     assert_eq!(thread_schemas.len(), thread_controllers.len());
     assert_eq!(
-        openhuman_core::openhuman::threads::schemas::schemas("missing").function,
+        alexander_ai_solutions_core::alexander_ai_solutions::threads::schemas::schemas("missing")
+            .function,
         "unknown"
     );
     for function in [
@@ -989,7 +990,8 @@ fn memory_schema_registries_and_query_tool_metadata_cover_public_surfaces() {
         "tool_rules_for_prompt",
         "tool_rules_json",
     ] {
-        let schema = openhuman_core::openhuman::memory::schemas::schemas(function);
+        let schema =
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::schemas::schemas(function);
         assert_eq!(schema.namespace, "memory");
         assert_eq!(schema.function, function);
         assert!(memory_schemas
@@ -997,13 +999,16 @@ fn memory_schema_registries_and_query_tool_metadata_cover_public_surfaces() {
             .any(|candidate| candidate.function == function));
     }
     assert_eq!(
-        openhuman_core::openhuman::memory::schemas::schemas("missing").function,
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::schemas::schemas("missing")
+            .function,
         "unknown"
     );
 
-    let legacy_tree_schemas = openhuman_core::openhuman::memory::schema::all_controller_schemas();
+    let legacy_tree_schemas =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::schema::all_controller_schemas(
+        );
     let legacy_tree_controllers =
-        openhuman_core::openhuman::memory::schema::all_registered_controllers();
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::schema::all_registered_controllers();
     assert!(
         legacy_tree_schemas.len() >= 19,
         "expected at least 19 memory controller schemas, got {}",
@@ -1031,7 +1036,8 @@ fn memory_schema_registries_and_query_tool_metadata_cover_public_surfaces() {
         "pipeline_status",
         "set_enabled",
     ] {
-        let schema = openhuman_core::openhuman::memory::schema::schemas(function);
+        let schema =
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::schema::schemas(function);
         assert_eq!(schema.namespace, "memory_tree");
         assert_eq!(schema.function, function);
         assert!(legacy_tree_schemas
@@ -1039,7 +1045,8 @@ fn memory_schema_registries_and_query_tool_metadata_cover_public_surfaces() {
             .any(|candidate| candidate.function == function));
     }
     assert_eq!(
-        openhuman_core::openhuman::memory::schema::schemas("missing").function,
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::schema::schemas("missing")
+            .function,
         "unknown"
     );
 
@@ -1086,7 +1093,7 @@ fn memory_tree_policy_and_source_registry_write_metadata_mirror() {
         0.0
     );
 
-    let stats = openhuman_core::openhuman::memory_store::trees::types::EntityIndexStats {
+    let stats = alexander_ai_solutions_core::alexander_ai_solutions::memory_store::trees::types::EntityIndexStats {
         mention_count_30d: 9,
         distinct_sources: 4,
         last_seen_ms: Some(now - 4 * 86_400_000),
@@ -1390,7 +1397,7 @@ fn memory_tree_scoring_signal_helpers_cover_boundaries_and_serialization() {
     assert!(!EntityKind::Person.is_mechanical());
     assert!(EntityKind::parse("unknown").is_err());
 
-    let regex_entities = openhuman_core::openhuman::memory_tree::score::extract::regex::extract(
+    let regex_entities = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::extract::regex::extract(
         "Alice emailed bob@example.com from https://example.test and mentioned #coverage.",
     );
     assert!(regex_entities
@@ -1669,12 +1676,13 @@ fn memory_tree_runtime_store_buffers_and_retrieval_wire_helpers() {
         0
     );
 
-    let source_factory = openhuman_core::openhuman::memory_tree::tree::TreeFactory::source(
-        "gmail:alice@example.com|bob@example.com",
-    );
+    let source_factory =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::TreeFactory::source(
+            "gmail:alice@example.com|bob@example.com",
+        );
     assert_eq!(
         source_factory.profile(),
-        openhuman_core::openhuman::memory_tree::tree::TreeProfile::Source
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::TreeProfile::Source
     );
     assert_eq!(
         source_factory.scope_slug(),
@@ -1684,26 +1692,33 @@ fn memory_tree_runtime_store_buffers_and_retrieval_wire_helpers() {
         .get_or_create(&config)
         .expect("source tree from factory");
     assert_eq!(
-        openhuman_core::openhuman::memory_tree::tree::TreeFactory::from_tree(&source_tree).kind(),
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::TreeFactory::from_tree(&source_tree).kind(),
         TreeKind::Source
     );
     let topic_factory =
-        openhuman_core::openhuman::memory_tree::tree::TreeFactory::topic("email:alice@example.com");
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::TreeFactory::topic(
+            "email:alice@example.com",
+        );
     assert!(matches!(
         topic_factory.summary_tree_kind(),
-        openhuman_core::openhuman::memory_store::content::SummaryTreeKind::Topic
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_store::content::SummaryTreeKind::Topic
     ));
     let topic_tree = topic_factory
         .get_or_create(&config)
         .expect("topic tree from factory");
     assert_ne!(source_tree.id, topic_tree.id);
     assert!(
-        openhuman_core::openhuman::memory_tree::tree::new_tree_id(TreeKind::Global)
-            .starts_with("global:")
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::new_tree_id(
+            TreeKind::Global
+        )
+        .starts_with("global:")
     );
-    assert!(openhuman_core::openhuman::memory_tree::tree::new_summary_id(2).contains(":L2-"));
     assert!(
-        openhuman_core::openhuman::memory_tree::tree::registry::is_unique_violation(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::new_summary_id(2)
+            .contains(":L2-")
+    );
+    assert!(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::registry::is_unique_violation(
             &anyhow::anyhow!("UNIQUE constraint failed: mem_trees.kind, mem_trees.scope")
         )
     );
@@ -1711,7 +1726,7 @@ fn memory_tree_runtime_store_buffers_and_retrieval_wire_helpers() {
         .archive(&config)
         .expect("archive source tree");
     assert_eq!(
-        openhuman_core::openhuman::memory_tree::tree::store::get_tree_by_scope(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::store::get_tree_by_scope(
             &config,
             TreeKind::Source,
             "gmail:alice@example.com|bob@example.com"
@@ -1913,13 +1928,17 @@ async fn memory_read_rpc_score_index_and_summary_helpers_cover_dashboard_paths()
         token_budget: 100,
     };
     let empty =
-        openhuman_core::openhuman::memory_tree::summarise::summarise(&config, &[], &empty_ctx)
-            .await
-            .expect("empty summarise avoids provider");
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::summarise::summarise(
+            &config,
+            &[],
+            &empty_ctx,
+        )
+        .await
+        .expect("empty summarise avoids provider");
     assert_eq!(empty.token_count, 0);
 
     let embedder =
-        openhuman_core::openhuman::memory_tree::score::embed::factory::build_embedder_from_config(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::embed::factory::build_embedder_from_config(
             &config,
         )
         .expect("inert embedder");
@@ -2296,7 +2315,7 @@ async fn memory_tools_and_user_scope_prefs_cover_public_execution_paths() {
     assert!(!forgot.is_error);
     assert!(forgot.output().contains("Forgot memory"));
 
-    let scoped_client: openhuman_core::openhuman::memory_store::MemoryClientRef =
+    let scoped_client: alexander_ai_solutions_core::alexander_ai_solutions::memory_store::MemoryClientRef =
         Arc::new(MemoryClient::from_workspace_dir(tmp.path().join("scope-prefs")).unwrap());
     assert_eq!(
         user_scopes::load(&scoped_client, " GMAIL ").await,
@@ -2675,25 +2694,28 @@ async fn memory_source_sync_entrypoint_rejects_disabled_and_ingests_folder_items
 #[test]
 fn memory_tree_io_contract_types_round_trip_leaf_read_and_write_shapes() {
     let now = Utc.with_ymd_and_hms(2026, 5, 29, 16, 0, 0).unwrap();
-    let payload = openhuman_core::openhuman::memory_tree::io::TreeLeafPayload {
-        chunk_id: "chunk-contract-1".into(),
-        token_count: 42,
-        timestamp: now,
-        content: "Leaf content for a canonical write request".into(),
-        entities: vec!["person:alice".into(), "email:alice@example.com".into()],
-        topics: vec!["coverage".into()],
-        score: 0.77,
-    };
+    let payload =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::io::TreeLeafPayload {
+            chunk_id: "chunk-contract-1".into(),
+            token_count: 42,
+            timestamp: now,
+            content: "Leaf content for a canonical write request".into(),
+            entities: vec!["person:alice".into(), "email:alice@example.com".into()],
+            topics: vec!["coverage".into()],
+            score: 0.77,
+        };
     let leaf_ref = LeafRef::from(&payload);
     assert_eq!(leaf_ref.chunk_id, payload.chunk_id);
     assert_eq!(leaf_ref.entities, payload.entities);
     let round_trip =
-        openhuman_core::openhuman::memory_tree::io::TreeLeafPayload::from(leaf_ref.clone());
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::io::TreeLeafPayload::from(
+            leaf_ref.clone(),
+        );
     assert_eq!(round_trip.content, payload.content);
     assert_eq!(round_trip.score, payload.score);
 
     let write_default_json = serde_json::to_value(
-        openhuman_core::openhuman::memory_tree::io::TreeWriteRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::io::TreeWriteRequest {
             tree_id: "tree-contract".into(),
             tree_kind: TreeKind::Source,
             leaf: round_trip.clone(),
@@ -2705,7 +2727,7 @@ fn memory_tree_io_contract_types_round_trip_leaf_read_and_write_shapes() {
     assert_eq!(write_default_json["label_strategy"], "inherit");
     assert_eq!(write_default_json["deferred"], false);
 
-    let decoded_write: openhuman_core::openhuman::memory_tree::io::TreeWriteRequest =
+    let decoded_write: alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::io::TreeWriteRequest =
         serde_json::from_value(json!({
             "tree_id": "tree-contract",
             "tree_kind": "global",
@@ -2722,20 +2744,21 @@ fn memory_tree_io_contract_types_round_trip_leaf_read_and_write_shapes() {
     assert_eq!(decoded_write.tree_kind, TreeKind::Global);
     assert_eq!(
         decoded_write.label_strategy,
-        openhuman_core::openhuman::memory_tree::io::TreeLabelStrategy::Empty
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::io::TreeLabelStrategy::Empty
     );
     assert!(decoded_write.leaf.entities.is_empty());
     assert!(decoded_write.deferred);
 
-    let outcome = openhuman_core::openhuman::memory_tree::io::TreeWriteOutcome {
-        new_summary_ids: vec!["summary-1".into()],
-        seal_pending: true,
-    };
+    let outcome =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::io::TreeWriteOutcome {
+            new_summary_ids: vec!["summary-1".into()],
+            seal_pending: true,
+        };
     let outcome_json = serde_json::to_value(outcome).expect("outcome json");
     assert_eq!(outcome_json["new_summary_ids"][0], "summary-1");
     assert_eq!(outcome_json["seal_pending"], true);
 
-    let read_request: openhuman_core::openhuman::memory_tree::io::TreeReadRequest =
+    let read_request: alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::io::TreeReadRequest =
         serde_json::from_value(json!({
             "tree_id": "tree-contract",
             "max_depth": 2,
@@ -2747,18 +2770,19 @@ fn memory_tree_io_contract_types_round_trip_leaf_read_and_write_shapes() {
     assert_eq!(read_request.max_depth, 2);
     assert_eq!(read_request.limit, Some(3));
 
-    let hit = openhuman_core::openhuman::memory_tree::io::TreeReadHit {
+    let hit = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::io::TreeReadHit {
         node_id: "summary-1".into(),
         node_kind: "summary".into(),
         level: 1,
         content: "Summary text".into(),
         score: 0.42,
     };
-    let result = openhuman_core::openhuman::memory_tree::io::TreeReadResult {
-        hits: vec![hit],
-        total: 4,
-        tree_id: "tree-contract".into(),
-    };
+    let result =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::io::TreeReadResult {
+            hits: vec![hit],
+            total: 4,
+            tree_id: "tree-contract".into(),
+        };
     let result_json = serde_json::to_value(result).expect("read result json");
     assert_eq!(result_json["hits"][0]["node_kind"], "summary");
     assert_eq!(result_json["total"], 4);
@@ -2773,7 +2797,10 @@ fn memory_tree_io_contract_types_round_trip_leaf_read_and_write_shapes() {
         created_at: now,
         last_sealed_at: None,
     };
-    let empty = openhuman_core::openhuman::memory_tree::io::TreeReadResult::empty(&tree);
+    let empty =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::io::TreeReadResult::empty(
+            &tree,
+        );
     assert_eq!(empty.tree_id, "empty-tree");
     assert!(empty.hits.is_empty());
 }
@@ -2862,7 +2889,7 @@ fn memory_sync_profile_identity_helpers_cover_public_no_client_paths_and_renderi
 #[test]
 fn gmail_post_processor_and_provider_registry_cover_public_edges() {
     let gmail_provider =
-        openhuman_core::openhuman::memory_sync::composio::providers::gmail::GmailProvider::new();
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::gmail::GmailProvider::new();
     let mut raw_html_passthrough = json!({
         "messages": [{ "messageId": "m-raw", "messageText": "<b>keep raw</b>" }]
     });
@@ -3049,8 +3076,10 @@ async fn memory_sync_provider_trait_defaults_and_connection_hook_are_determinist
     // global, so under parallel execution this test could otherwise observe an
     // unready client and see 0 instead of 1. Bind the global to this test's
     // workspace up front so the assertion is independent of execution order.
-    openhuman_core::openhuman::memory::global::init(tmp.path().to_path_buf())
-        .expect("init global memory client");
+    alexander_ai_solutions_core::alexander_ai_solutions::memory::global::init(
+        tmp.path().to_path_buf(),
+    )
+    .expect("init global memory client");
     let ctx = ProviderContext {
         config: Arc::new(config_in(&tmp)),
         toolkit: "raw_coverage".into(),
@@ -3346,24 +3375,24 @@ fn memory_sync_profile_markdown_and_status_helpers_are_idempotent() {
 
     let now = 1_700_000_000_000_i64;
     assert_eq!(
-        openhuman_core::openhuman::memory_sync::sync_status::types::FreshnessLabel::from_age_ms(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::sync_status::types::FreshnessLabel::from_age_ms(
             Some(now - 30_000),
             now
         ),
-        openhuman_core::openhuman::memory_sync::sync_status::types::FreshnessLabel::Active
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::sync_status::types::FreshnessLabel::Active
     );
     assert_eq!(
-        openhuman_core::openhuman::memory_sync::sync_status::types::FreshnessLabel::from_age_ms(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::sync_status::types::FreshnessLabel::from_age_ms(
             Some(now - 30_001),
             now
         ),
-        openhuman_core::openhuman::memory_sync::sync_status::types::FreshnessLabel::Recent
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::sync_status::types::FreshnessLabel::Recent
     );
     assert_eq!(
-        openhuman_core::openhuman::memory_sync::sync_status::types::FreshnessLabel::from_age_ms(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::sync_status::types::FreshnessLabel::from_age_ms(
             None, now
         ),
-        openhuman_core::openhuman::memory_sync::sync_status::types::FreshnessLabel::Idle
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::sync_status::types::FreshnessLabel::Idle
     );
 }
 
@@ -3822,7 +3851,10 @@ async fn memory_sources_registry_rpc_and_schema_handlers_cover_crud_edges() {
     );
     assert_eq!(schemas.len(), controllers.len());
     assert_eq!(
-        openhuman_core::openhuman::memory_sources::schemas::schemas("read_item").function,
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::schemas::schemas(
+            "read_item"
+        )
+        .function,
         "read_item"
     );
 
@@ -4035,9 +4067,11 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     let tmp = TempDir::new().expect("tempdir");
     let _workspace = EnvVarGuard::set_to_path("OPENHUMAN_WORKSPACE", tmp.path());
 
-    let init = openhuman_core::openhuman::memory::ops::memory_init(MemoryInitRequest {
-        jwt_token: Some("ignored-token".into()),
-    })
+    let init = alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::memory_init(
+        MemoryInitRequest {
+            jwt_token: Some("ignored-token".into()),
+        },
+    )
     .await
     .expect("memory init")
     .value
@@ -4047,42 +4081,48 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     assert!(init.memory_dir.ends_with("/memory"));
     let memory_dir = std::path::PathBuf::from(&init.memory_dir);
 
-    let sync_channel = openhuman_core::openhuman::memory::ops::memory_sync_channel(
-        openhuman_core::openhuman::memory::ops::SyncChannelParams {
-            channel_id: "conn-not-present".into(),
-        },
-    )
-    .await
-    .expect("sync channel request")
-    .value;
+    let sync_channel =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::memory_sync_channel(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::SyncChannelParams {
+                channel_id: "conn-not-present".into(),
+            },
+        )
+        .await
+        .expect("sync channel request")
+        .value;
     assert!(sync_channel.requested);
     assert_eq!(sync_channel.channel_id, "conn-not-present");
-    let sync_all = openhuman_core::openhuman::memory::ops::memory_sync_all()
-        .await
-        .expect("sync all request")
-        .value;
+    let sync_all =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::memory_sync_all()
+            .await
+            .expect("sync all request")
+            .value;
     assert!(sync_all.requested);
-    let ingestion = openhuman_core::openhuman::memory::ops::memory_ingestion_status()
-        .await
-        .expect("ingestion status")
-        .value;
+    let ingestion =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::memory_ingestion_status()
+            .await
+            .expect("ingestion status")
+            .value;
     assert_eq!(ingestion.queue_depth, 0);
-    let learn_none = openhuman_core::openhuman::memory::ops::memory_learn_all(
-        openhuman_core::openhuman::memory::ops::LearnAllParams {
-            namespaces: Some(Vec::new()),
-        },
-    )
-    .await
-    .expect("learn empty request")
-    .value;
+    let learn_none =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::memory_learn_all(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::LearnAllParams {
+                namespaces: Some(Vec::new()),
+            },
+        )
+        .await
+        .expect("learn empty request")
+        .value;
     assert_eq!(learn_none.namespaces_processed, 0);
     assert!(learn_none.results.is_empty());
 
     let write =
-        openhuman_core::openhuman::memory::ops::ai_write_memory_file(WriteMemoryFileRequest {
-            relative_path: "notes/raw.md".into(),
-            content: "Memory file coverage".into(),
-        })
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ai_write_memory_file(
+            WriteMemoryFileRequest {
+                relative_path: "notes/raw.md".into(),
+                content: "Memory file coverage".into(),
+            },
+        )
         .await
         .expect("write memory file")
         .value
@@ -4091,22 +4131,27 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     assert!(write.written);
     assert_eq!(write.bytes_written, "Memory file coverage".len());
 
-    let read = openhuman_core::openhuman::memory::ops::ai_read_memory_file(ReadMemoryFileRequest {
-        relative_path: "notes/raw.md".into(),
-    })
-    .await
-    .expect("read memory file")
-    .value
-    .data
-    .expect("read data");
+    let read =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ai_read_memory_file(
+            ReadMemoryFileRequest {
+                relative_path: "notes/raw.md".into(),
+            },
+        )
+        .await
+        .expect("read memory file")
+        .value
+        .data
+        .expect("read data");
     assert_eq!(read.content, "Memory file coverage");
 
     std::fs::write(memory_dir.join("root.md"), "root").expect("root note");
     std::fs::write(memory_dir.join("memory.db"), "hidden").expect("sqlite stub");
     let root_files =
-        openhuman_core::openhuman::memory::ops::ai_list_memory_files(ListMemoryFilesRequest {
-            relative_dir: "".into(),
-        })
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ai_list_memory_files(
+            ListMemoryFilesRequest {
+                relative_dir: "".into(),
+            },
+        )
         .await
         .expect("list root memory files")
         .value
@@ -4115,9 +4160,11 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     assert_eq!(root_files.files, vec!["root.md"]);
 
     let listed =
-        openhuman_core::openhuman::memory::ops::ai_list_memory_files(ListMemoryFilesRequest {
-            relative_dir: "notes".into(),
-        })
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ai_list_memory_files(
+            ListMemoryFilesRequest {
+                relative_dir: "notes".into(),
+            },
+        )
         .await
         .expect("list memory files")
         .value
@@ -4125,17 +4172,19 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
         .expect("list data");
     assert_eq!(listed.files, vec!["raw.md"]);
     assert!(
-        openhuman_core::openhuman::memory::ops::ai_list_memory_files(ListMemoryFilesRequest {
-            relative_dir: "../escape".into(),
-        })
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ai_list_memory_files(
+            ListMemoryFilesRequest {
+                relative_dir: "../escape".into(),
+            }
+        )
         .await
         .unwrap_err()
         .contains("traversal")
     );
 
     let namespace = "ops-raw-coverage";
-    let document_id = openhuman_core::openhuman::memory::ops::doc_put(
-        openhuman_core::openhuman::memory::ops::PutDocParams {
+    let document_id = alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::doc_put(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::PutDocParams {
             namespace: namespace.into(),
             key: "doc-1".into(),
             title: "Ops coverage document".into(),
@@ -4155,28 +4204,31 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     .document_id;
     assert_eq!(document_id, "doc-ops-raw");
 
-    let namespaces = openhuman_core::openhuman::memory::ops::namespace_list()
-        .await
-        .expect("namespace list")
-        .value;
+    let namespaces =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::namespace_list()
+            .await
+            .expect("namespace list")
+            .value;
     assert!(namespaces.iter().any(|candidate| candidate == namespace));
-    let learn_disabled = openhuman_core::openhuman::memory::ops::memory_learn_all(
-        openhuman_core::openhuman::memory::ops::LearnAllParams {
-            namespaces: Some(vec![namespace.into(), namespace.into(), "missing".into()]),
-        },
-    )
-    .await
-    .unwrap_err();
+    let learn_disabled =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::memory_learn_all(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::LearnAllParams {
+                namespaces: Some(vec![namespace.into(), namespace.into(), "missing".into()]),
+            },
+        )
+        .await
+        .unwrap_err();
     assert!(learn_disabled.contains("local_ai.runtime_enabled=true"));
 
-    let direct_docs = openhuman_core::openhuman::memory::ops::doc_list(Some(
-        openhuman_core::openhuman::memory::ops::NamespaceOnlyParams {
-            namespace: namespace.into(),
-        },
-    ))
-    .await
-    .expect("doc list")
-    .value;
+    let direct_docs =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::doc_list(Some(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::NamespaceOnlyParams {
+                namespace: namespace.into(),
+            },
+        ))
+        .await
+        .expect("doc list")
+        .value;
     assert!(direct_docs["documents"]
         .as_array()
         .unwrap()
@@ -4184,9 +4236,11 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
         .any(|doc| doc["documentId"] == "doc-ops-raw"));
 
     let envelope_docs =
-        openhuman_core::openhuman::memory::ops::memory_list_documents(ListDocumentsRequest {
-            namespace: Some(namespace.into()),
-        })
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::memory_list_documents(
+            ListDocumentsRequest {
+                namespace: Some(namespace.into()),
+            },
+        )
         .await
         .expect("memory list documents")
         .value;
@@ -4201,8 +4255,8 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
         Some(&1)
     );
 
-    let query = openhuman_core::openhuman::memory::ops::context_query(
-        openhuman_core::openhuman::memory::ops::QueryNamespaceParams {
+    let query = alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::context_query(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::QueryNamespaceParams {
             namespace: namespace.into(),
             query: "who owns deterministic coverage".into(),
             limit: Some(5),
@@ -4212,8 +4266,8 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     .expect("context query")
     .value;
     assert!(query.to_lowercase().contains("coverage"));
-    let recalled = openhuman_core::openhuman::memory::ops::context_recall(
-        openhuman_core::openhuman::memory::ops::RecallNamespaceParams {
+    let recalled = alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::context_recall(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::RecallNamespaceParams {
             namespace: namespace.into(),
             limit: Some(5),
         },
@@ -4224,8 +4278,8 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     .expect("recall text");
     assert!(recalled.contains("Ops coverage document"));
 
-    openhuman_core::openhuman::memory::ops::kv_set(
-        openhuman_core::openhuman::memory::ops::KvSetParams {
+    alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::kv_set(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::KvSetParams {
             namespace: Some(namespace.into()),
             key: "state".into(),
             value: json!({ "covered": true }),
@@ -4233,8 +4287,8 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     )
     .await
     .expect("kv set");
-    let kv = openhuman_core::openhuman::memory::ops::kv_get(
-        openhuman_core::openhuman::memory::ops::KvGetDeleteParams {
+    let kv = alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::kv_get(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::KvGetDeleteParams {
             namespace: Some(namespace.into()),
             key: "state".into(),
         },
@@ -4243,18 +4297,19 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     .expect("kv get")
     .value;
     assert_eq!(kv, Some(json!({ "covered": true })));
-    let kv_rows = openhuman_core::openhuman::memory::ops::kv_list_namespace(
-        openhuman_core::openhuman::memory::ops::NamespaceOnlyParams {
-            namespace: namespace.into(),
-        },
-    )
-    .await
-    .expect("kv list")
-    .value;
+    let kv_rows =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::kv_list_namespace(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::NamespaceOnlyParams {
+                namespace: namespace.into(),
+            },
+        )
+        .await
+        .expect("kv list")
+        .value;
     assert!(kv_rows.iter().any(|row| row["key"] == "state"));
     assert!(
-        openhuman_core::openhuman::memory::ops::kv_delete(
-            openhuman_core::openhuman::memory::ops::KvGetDeleteParams {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::kv_delete(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::KvGetDeleteParams {
                 namespace: Some(namespace.into()),
                 key: "state".into(),
             },
@@ -4264,8 +4319,8 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
         .value
     );
 
-    openhuman_core::openhuman::memory::ops::graph_upsert(
-        openhuman_core::openhuman::memory::ops::GraphUpsertParams {
+    alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::graph_upsert(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::GraphUpsertParams {
             namespace: Some(namespace.into()),
             subject: "Alice".into(),
             predicate: "OWNS".into(),
@@ -4275,8 +4330,8 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     )
     .await
     .expect("graph upsert");
-    let relations = openhuman_core::openhuman::memory::ops::graph_query(
-        openhuman_core::openhuman::memory::ops::GraphQueryParams {
+    let relations = alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::graph_query(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::GraphQueryParams {
             namespace: Some(namespace.into()),
             subject: Some("Alice".into()),
             predicate: Some("OWNS".into()),
@@ -4287,46 +4342,49 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     .value;
     assert_eq!(relations[0]["object"], "MEMORY OPS COVERAGE");
 
-    let tool_rule = openhuman_core::openhuman::memory::ops::tool_rule_put(
-        openhuman_core::openhuman::memory::ops::ToolRulePutParams {
-            tool_name: "shell".into(),
-            rule: "Use dry-run flags before changing files.".into(),
-            priority: Some(ToolMemoryPriority::High),
-            source: Some(ToolMemorySource::UserExplicit),
-            tags: vec!["safety".into()],
-            id: Some("ops-rule-1".into()),
-        },
-    )
-    .await
-    .expect("tool rule put")
-    .value;
+    let tool_rule =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::tool_rule_put(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ToolRulePutParams {
+                tool_name: "shell".into(),
+                rule: "Use dry-run flags before changing files.".into(),
+                priority: Some(ToolMemoryPriority::High),
+                source: Some(ToolMemorySource::UserExplicit),
+                tags: vec!["safety".into()],
+                id: Some("ops-rule-1".into()),
+            },
+        )
+        .await
+        .expect("tool rule put")
+        .value;
     assert_eq!(tool_rule.id, "ops-rule-1");
     assert_eq!(tool_rule.priority, ToolMemoryPriority::High);
-    let fetched_rule = openhuman_core::openhuman::memory::ops::tool_rule_get(
-        openhuman_core::openhuman::memory::ops::ToolRuleRefParams {
-            tool_name: "shell".into(),
-            id: "ops-rule-1".into(),
-        },
-    )
-    .await
-    .expect("tool rule get")
-    .value
-    .expect("stored tool rule");
+    let fetched_rule =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::tool_rule_get(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ToolRuleRefParams {
+                tool_name: "shell".into(),
+                id: "ops-rule-1".into(),
+            },
+        )
+        .await
+        .expect("tool rule get")
+        .value
+        .expect("stored tool rule");
     assert_eq!(
         fetched_rule.rule,
         "Use dry-run flags before changing files."
     );
-    let listed_rules = openhuman_core::openhuman::memory::ops::tool_rule_list(
-        openhuman_core::openhuman::memory::ops::ToolRuleListParams {
-            tool_name: "shell".into(),
-        },
-    )
-    .await
-    .expect("tool rule list")
-    .value;
+    let listed_rules =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::tool_rule_list(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ToolRuleListParams {
+                tool_name: "shell".into(),
+            },
+        )
+        .await
+        .expect("tool rule list")
+        .value;
     assert!(listed_rules.iter().any(|rule| rule.id == "ops-rule-1"));
-    let prompt_rules = openhuman_core::openhuman::memory::ops::tool_rules_for_prompt(
-        openhuman_core::openhuman::memory::ops::ToolRulesForPromptParams {
+    let prompt_rules = alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::tool_rules_for_prompt(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ToolRulesForPromptParams {
             tools: vec!["shell".into()],
         },
     )
@@ -4335,22 +4393,23 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     .value;
     assert!(prompt_rules.rendered.contains("Use dry-run flags"));
     assert_eq!(prompt_rules.rules[0].id, "ops-rule-1");
-    let tool_rules_json = openhuman_core::openhuman::memory::ops::tool_rules_json(
-        openhuman_core::openhuman::memory::ops::ToolRuleListParams {
-            tool_name: "shell".into(),
-        },
-    )
-    .await
-    .expect("tool rules json")
-    .value;
+    let tool_rules_json =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::tool_rules_json(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ToolRuleListParams {
+                tool_name: "shell".into(),
+            },
+        )
+        .await
+        .expect("tool rules json")
+        .value;
     assert!(tool_rules_json
         .as_array()
         .unwrap()
         .iter()
         .any(|rule| rule["id"] == "ops-rule-1" && rule["priority"] == "high"));
     assert!(
-        openhuman_core::openhuman::memory::ops::tool_rule_delete(
-            openhuman_core::openhuman::memory::ops::ToolRuleRefParams {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::tool_rule_delete(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ToolRuleRefParams {
                 tool_name: "shell".into(),
                 id: "ops-rule-1".into(),
             },
@@ -4359,22 +4418,26 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
         .expect("tool rule delete")
         .value
     );
-    assert!(openhuman_core::openhuman::memory::ops::tool_rule_get(
-        openhuman_core::openhuman::memory::ops::ToolRuleRefParams {
-            tool_name: "shell".into(),
-            id: "ops-rule-1".into(),
-        },
-    )
-    .await
-    .expect("tool rule missing")
-    .value
-    .is_none());
+    assert!(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::tool_rule_get(
+            alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ToolRuleRefParams {
+                tool_name: "shell".into(),
+                id: "ops-rule-1".into(),
+            },
+        )
+        .await
+        .expect("tool rule missing")
+        .value
+        .is_none()
+    );
 
     let delete_missing =
-        openhuman_core::openhuman::memory::ops::memory_delete_document(DeleteDocumentRequest {
-            namespace: namespace.into(),
-            document_id: "missing".into(),
-        })
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::memory_delete_document(
+            DeleteDocumentRequest {
+                namespace: namespace.into(),
+                document_id: "missing".into(),
+            },
+        )
         .await
         .expect("delete missing")
         .value
@@ -4382,8 +4445,8 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
         .expect("delete missing data");
     assert_eq!(delete_missing.status, "not_found");
 
-    let deleted = openhuman_core::openhuman::memory::ops::doc_delete(
-        openhuman_core::openhuman::memory::ops::DeleteDocParams {
+    let deleted = alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::doc_delete(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::DeleteDocParams {
             namespace: namespace.into(),
             document_id,
         },
@@ -4392,8 +4455,8 @@ async fn memory_ops_public_handlers_cover_document_file_kv_graph_and_envelopes_b
     .expect("doc delete")
     .value;
     assert_eq!(deleted["deleted"], true);
-    let cleared = openhuman_core::openhuman::memory::ops::clear_namespace(
-        openhuman_core::openhuman::memory::ops::ClearNamespaceParams {
+    let cleared = alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::clear_namespace(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ops::ClearNamespaceParams {
             namespace: namespace.into(),
         },
     )
@@ -4411,13 +4474,13 @@ async fn memory_tree_retrieval_rpc_and_schema_wrappers_cover_empty_and_invalid_p
     let config = config_in(&tmp);
 
     let schemas =
-        openhuman_core::openhuman::memory_tree::retrieval::schemas::all_controller_schemas();
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::schemas::all_controller_schemas();
     let controllers =
-        openhuman_core::openhuman::memory_tree::retrieval::schemas::all_registered_controllers();
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::schemas::all_registered_controllers();
     assert_eq!(schemas.len(), 5);
     assert_eq!(schemas.len(), controllers.len());
     assert_eq!(
-        openhuman_core::openhuman::memory_tree::retrieval::schemas::schemas("missing").function,
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::schemas::schemas("missing").function,
         "unknown"
     );
     assert!(schemas
@@ -4427,9 +4490,9 @@ async fn memory_tree_retrieval_rpc_and_schema_wrappers_cover_empty_and_invalid_p
         .description
         .contains("Batch-fetch"));
 
-    let source = openhuman_core::openhuman::memory_tree::retrieval::rpc::query_source_rpc(
+    let source = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::query_source_rpc(
         &config,
-        openhuman_core::openhuman::memory_tree::retrieval::rpc::QuerySourceRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::QuerySourceRequest {
             source_id: Some("slack:#raw".into()),
             source_kind: Some("chat".into()),
             time_window_days: Some(7),
@@ -4443,9 +4506,9 @@ async fn memory_tree_retrieval_rpc_and_schema_wrappers_cover_empty_and_invalid_p
     assert!(source.logs[0].contains("has_source_id=true"));
     assert!(!source.logs[0].contains("slack:#raw"));
     assert!(
-        openhuman_core::openhuman::memory_tree::retrieval::rpc::query_source_rpc(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::query_source_rpc(
             &config,
-            openhuman_core::openhuman::memory_tree::retrieval::rpc::QuerySourceRequest {
+            alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::QuerySourceRequest {
                 source_id: None,
                 source_kind: Some("bogus".into()),
                 time_window_days: None,
@@ -4458,9 +4521,9 @@ async fn memory_tree_retrieval_rpc_and_schema_wrappers_cover_empty_and_invalid_p
         .contains("unknown source kind")
     );
 
-    let search = openhuman_core::openhuman::memory_tree::retrieval::rpc::search_entities_rpc(
+    let search = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::search_entities_rpc(
         &config,
-        openhuman_core::openhuman::memory_tree::retrieval::rpc::SearchEntitiesRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::SearchEntitiesRequest {
             query: "alice".into(),
             kinds: Some(vec!["email".into()]),
             limit: Some(10),
@@ -4471,9 +4534,9 @@ async fn memory_tree_retrieval_rpc_and_schema_wrappers_cover_empty_and_invalid_p
     assert!(search.value.matches.is_empty());
     assert!(search.logs[0].contains("has_kinds=true"));
     assert!(
-        openhuman_core::openhuman::memory_tree::retrieval::rpc::search_entities_rpc(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::search_entities_rpc(
             &config,
-            openhuman_core::openhuman::memory_tree::retrieval::rpc::SearchEntitiesRequest {
+            alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::SearchEntitiesRequest {
                 query: "alice".into(),
                 kinds: Some(vec!["missing".into()]),
                 limit: None,
@@ -4484,9 +4547,9 @@ async fn memory_tree_retrieval_rpc_and_schema_wrappers_cover_empty_and_invalid_p
         .contains("unknown entity kind")
     );
 
-    let drill = openhuman_core::openhuman::memory_tree::retrieval::rpc::drill_down_rpc(
+    let drill = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::drill_down_rpc(
         &config,
-        openhuman_core::openhuman::memory_tree::retrieval::rpc::DrillDownRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::DrillDownRequest {
             node_id: "summary:source:redacted".into(),
             max_depth: None,
             query: None,
@@ -4499,9 +4562,9 @@ async fn memory_tree_retrieval_rpc_and_schema_wrappers_cover_empty_and_invalid_p
     assert!(drill.logs[0].contains("node_kind=summary"));
     assert!(!drill.logs[0].contains("redacted"));
 
-    let fetch = openhuman_core::openhuman::memory_tree::retrieval::rpc::fetch_leaves_rpc(
+    let fetch = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::fetch_leaves_rpc(
         &config,
-        openhuman_core::openhuman::memory_tree::retrieval::rpc::FetchLeavesRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::retrieval::rpc::FetchLeavesRequest {
             chunk_ids: vec!["missing-1".into(), "missing-2".into()],
         },
     )
@@ -4572,18 +4635,18 @@ async fn memory_query_backend_and_tree_flush_wrappers_cover_public_edges() {
     assert!(leaves.is_empty());
 
     let no_stale =
-        openhuman_core::openhuman::memory_tree::tree::flush::flush_stale_buffers_default(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::flush::flush_stale_buffers_default(
             &config,
-            &openhuman_core::openhuman::memory_tree::tree::LabelStrategy::Empty,
+            &alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::LabelStrategy::Empty,
         )
         .await
         .expect("flush empty buffers");
     assert_eq!(no_stale, 0);
-    let missing_flush = openhuman_core::openhuman::memory_tree::tree::flush::force_flush_tree(
+    let missing_flush = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::flush::force_flush_tree(
         &config,
         "tree:missing",
         None,
-        &openhuman_core::openhuman::memory_tree::tree::LabelStrategy::Empty,
+        &alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::LabelStrategy::Empty,
     )
     .await
     .unwrap_err();
@@ -4597,7 +4660,7 @@ async fn tree_summarizer_ops_cover_validation_query_and_local_provider_guards() 
     config.local_ai.runtime_enabled = false;
 
     let empty_content =
-        openhuman_core::openhuman::memory_tree::tree_runtime::ops::tree_summarizer_ingest(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::ops::tree_summarizer_ingest(
             &config, "ops_ns", "   ", None, None,
         )
         .await
@@ -4605,7 +4668,7 @@ async fn tree_summarizer_ops_cover_validation_query_and_local_provider_guards() 
     assert!(empty_content.contains("content must not be empty"));
 
     let ts = Utc.with_ymd_and_hms(2026, 5, 29, 17, 0, 0).unwrap();
-    let ingest = openhuman_core::openhuman::memory_tree::tree_runtime::ops::tree_summarizer_ingest(
+    let ingest = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::ops::tree_summarizer_ingest(
         &config,
         " ops_ns ",
         "buffered raw content for summarizer ops",
@@ -4618,7 +4681,7 @@ async fn tree_summarizer_ops_cover_validation_query_and_local_provider_guards() 
     assert_eq!(ingest.value["namespace"], "ops_ns");
     assert_eq!(ingest.value["has_metadata"], true);
 
-    let status = openhuman_core::openhuman::memory_tree::tree_runtime::ops::tree_summarizer_status(
+    let status = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::ops::tree_summarizer_status(
         &config, "ops_ns",
     )
     .await
@@ -4628,7 +4691,7 @@ async fn tree_summarizer_ops_cover_validation_query_and_local_provider_guards() 
 
     let node = tree_node("ops_ns", "root", "Root summary from ops");
     tree_runtime_store::write_node(&config, &node).expect("write ops node");
-    let query = openhuman_core::openhuman::memory_tree::tree_runtime::ops::tree_summarizer_query(
+    let query = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::ops::tree_summarizer_query(
         &config, "ops_ns", None,
     )
     .await
@@ -4636,7 +4699,7 @@ async fn tree_summarizer_ops_cover_validation_query_and_local_provider_guards() 
     assert_eq!(query.value["node"]["node_id"], "root");
     assert!(query.logs[0].contains("queried node 'root'"));
 
-    let missing = openhuman_core::openhuman::memory_tree::tree_runtime::ops::tree_summarizer_query(
+    let missing = alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::ops::tree_summarizer_query(
         &config,
         "ops_ns",
         Some("2026/05/29/17"),
@@ -4646,7 +4709,7 @@ async fn tree_summarizer_ops_cover_validation_query_and_local_provider_guards() 
     assert!(missing.contains("node '2026/05/29/17' not found"));
 
     let provider_guard =
-        openhuman_core::openhuman::memory_tree::tree_runtime::ops::tree_summarizer_run(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::ops::tree_summarizer_run(
             &config, "ops_ns",
         )
         .await
@@ -4655,7 +4718,7 @@ async fn tree_summarizer_ops_cover_validation_query_and_local_provider_guards() 
     // local-AI remediation in user-facing prose ("enable local AI ...").
     assert!(provider_guard.contains("local AI"));
     let rebuild_guard =
-        openhuman_core::openhuman::memory_tree::tree_runtime::ops::tree_summarizer_rebuild(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::ops::tree_summarizer_rebuild(
             &config, "ops_ns",
         )
         .await
@@ -4669,7 +4732,7 @@ async fn memory_sources_types_registry_and_sync_state_cover_public_persistence_e
     let tmp = TempDir::new().expect("tempdir");
     let _workspace = EnvVarGuard::set_to_path("OPENHUMAN_WORKSPACE", tmp.path());
     let _config = Config::load_or_init().await.expect("init isolated config");
-    openhuman_core::openhuman::memory_sources::reconcile::ensure_composio_sources().await;
+    alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::reconcile::ensure_composio_sources().await;
 
     let decoded_default: MemorySourceEntry = serde_json::from_value(json!({
         "id": "src_default",
@@ -4860,7 +4923,7 @@ fn welcome_migration_public_entrypoint_covers_empty_marker_and_transcript_paths(
     std::fs::create_dir_all(markdown.parent().unwrap()).expect("markdown dir");
     std::fs::write(&markdown, "# Session transcript\n").expect("markdown");
 
-    let result = openhuman_core::openhuman::threads::migrate_welcome_agent_artifacts(workspace)
+    let result = alexander_ai_solutions_core::alexander_ai_solutions::threads::migrate_welcome_agent_artifacts(workspace)
         .expect("migrate welcome artifacts");
     assert_eq!(result.threads_updated, 0);
     assert_eq!(result.transcripts_updated, 1);
@@ -4873,7 +4936,7 @@ fn welcome_migration_public_entrypoint_covers_empty_marker_and_transcript_paths(
         .join("sessions/2026_05_01/1715000000_orchestrator_thread-abc.md")
         .exists());
 
-    let second = openhuman_core::openhuman::threads::migrate_welcome_agent_artifacts(workspace)
+    let second = alexander_ai_solutions_core::alexander_ai_solutions::threads::migrate_welcome_agent_artifacts(workspace)
         .expect("second migration");
     assert!(second.already_done);
 }

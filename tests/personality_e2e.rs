@@ -18,20 +18,22 @@ use std::sync::Arc;
 use serde_json::json;
 use tempfile::tempdir;
 
-use openhuman_core::openhuman::agent::prompts::types::LearnedContextData;
-use openhuman_core::openhuman::agent::prompts::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::prompts::types::LearnedContextData;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::prompts::{
     IdentitySection, PersonalityRosterEntry, PersonalityRosterSection, PromptContext,
     PromptSection, ToolCallFormat, UserFilesSection,
 };
-use openhuman_core::openhuman::embeddings::NoopEmbedding;
-use openhuman_core::openhuman::memory::{NamespaceDocumentInput, UnifiedMemory};
-use openhuman_core::openhuman::memory_conversations::{
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::NoopEmbedding;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
+    NamespaceDocumentInput, UnifiedMemory,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_conversations::{
     ensure_thread, list_threads, update_thread_title, ConversationStore, CreateConversationThread,
 };
-use openhuman_core::openhuman::profiles::{
+use alexander_ai_solutions_core::alexander_ai_solutions::profiles::{
     built_in_profiles, AgentProfile, AgentProfileStore, DEFAULT_PROFILE_ID,
 };
-use openhuman_core::openhuman::profiles::{
+use alexander_ai_solutions_core::alexander_ai_solutions::profiles::{
     filter_integrations, memory_subdir_for_suffix, memory_tree_subdir_for_suffix,
     resolve_personality_memory_md, resolve_personality_soul, session_raw_subdir_for_suffix,
     HasToolkit, PersonalityContext,
@@ -268,7 +270,8 @@ async fn two_personalities_have_isolated_sqlite_stores() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: openhuman_core::openhuman::memory::MemoryTaint::Internal,
+            taint:
+                alexander_ai_solutions_core::alexander_ai_solutions::memory::MemoryTaint::Internal,
         })
         .await
         .expect("write default");
@@ -286,7 +289,8 @@ async fn two_personalities_have_isolated_sqlite_stores() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: openhuman_core::openhuman::memory::MemoryTaint::Internal,
+            taint:
+                alexander_ai_solutions_core::alexander_ai_solutions::memory::MemoryTaint::Internal,
         })
         .await
         .expect("write alice");
@@ -342,7 +346,8 @@ async fn personality_memory_persists_across_reopens() {
             category: "core".to_string(),
             session_id: None,
             document_id: None,
-            taint: openhuman_core::openhuman::memory::MemoryTaint::Internal,
+            taint:
+                alexander_ai_solutions_core::alexander_ai_solutions::memory::MemoryTaint::Internal,
         })
         .await
         .expect("write");

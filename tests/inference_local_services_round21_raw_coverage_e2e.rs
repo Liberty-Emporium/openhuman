@@ -7,22 +7,22 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::ops::{
+    local_ai_assets_status, local_ai_chat, local_ai_download_asset, local_ai_downloads_progress,
+    local_ai_prompt, local_ai_should_react, local_ai_transcribe, local_ai_transcribe_bytes,
+    LocalAiChatMessage,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::{
+    all_local_inference_registered_controllers, LocalAiService,
+};
+use alexander_ai_solutions_core::core::all::RegisteredController;
 use axum::body::Body;
 use axum::extract::State;
 use axum::http::{header, HeaderMap, Response, StatusCode};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use openhuman_core::core::all::RegisteredController;
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::inference::local::ops::{
-    local_ai_assets_status, local_ai_chat, local_ai_download_asset, local_ai_downloads_progress,
-    local_ai_prompt, local_ai_should_react, local_ai_transcribe, local_ai_transcribe_bytes,
-    LocalAiChatMessage,
-};
-use openhuman_core::openhuman::inference::local::{
-    all_local_inference_registered_controllers, LocalAiService,
-};
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
@@ -536,7 +536,7 @@ async fn call(controller: &RegisteredController, params: Value) -> Result<Value,
 }
 
 fn temp_config(tmp: &TempDir) -> Config {
-    let root = tmp.path().join(".openhuman");
+    let root = tmp.path().join(".alexanderai");
     std::fs::create_dir_all(root.join("workspace")).expect("workspace dir");
     let mut config = Config::default();
     config.config_path = root.join("config.toml");

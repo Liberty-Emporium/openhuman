@@ -1,10 +1,10 @@
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::embed::{
+    Embedder, OllamaEmbedder, EMBEDDING_DIM,
+};
 use axum::extract::Json;
 use axum::http::StatusCode;
 use axum::routing::post;
 use axum::Router;
-use openhuman_core::openhuman::memory_tree::score::embed::{
-    Embedder, OllamaEmbedder, EMBEDDING_DIM,
-};
 use serde_json::{json, Value};
 
 async fn start_embed_server(app: Router) -> String {

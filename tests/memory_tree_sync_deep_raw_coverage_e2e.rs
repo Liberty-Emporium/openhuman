@@ -17,31 +17,39 @@ use chrono::{TimeZone, Utc};
 use serde_json::json;
 use tempfile::TempDir;
 
-use openhuman_core::openhuman::config::{Config, SchedulerGateMode};
-use openhuman_core::openhuman::memory::chat::{ChatPrompt, ChatProvider};
-use openhuman_core::openhuman::memory_queue as jobs;
-use openhuman_core::openhuman::memory_queue::types::ReembedBackfillPayload;
-use openhuman_core::openhuman::memory_queue::{ExtractChunkPayload, NewJob};
-use openhuman_core::openhuman::memory_store::chunks::store::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{Config, SchedulerGateMode};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::chat::{ChatPrompt, ChatProvider};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_queue as jobs;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_queue::types::ReembedBackfillPayload;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_queue::{
+    ExtractChunkPayload, NewJob,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::store::{
     set_chunk_embedding, upsert_chunks, with_connection,
 };
-use openhuman_core::openhuman::memory_store::chunks::types::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::types::{
     chunk_id, Chunk, Metadata, SourceKind, SourceRef,
 };
-use openhuman_core::openhuman::memory_store::trees::types::{SummaryNode, Tree, TreeKind};
-use openhuman_core::openhuman::memory_tree::score::embed::EMBEDDING_DIM;
-use openhuman_core::openhuman::memory_tree::score::extract::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::trees::types::{
+    SummaryNode, Tree, TreeKind,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::embed::EMBEDDING_DIM;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::extract::{
     EntityExtractor, EntityKind, ExtractedEntities, LlmEntityExtractor, LlmExtractorConfig,
 };
-use openhuman_core::openhuman::memory_tree::score::resolver::{canonicalise, CanonicalEntity};
-use openhuman_core::openhuman::memory_tree::score::store::{index_entity, lookup_entity};
-use openhuman_core::openhuman::memory_tree::tree::rpc::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::resolver::{
+    canonicalise, CanonicalEntity,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::score::store::{
+    index_entity, lookup_entity,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::rpc::{
     backfill_status_rpc, get_chunk_rpc, ingest_rpc, list_chunks_rpc, pipeline_status_rpc,
     set_enabled_rpc, GetChunkRequest, IngestRequest, ListChunksRequest, SetEnabledRequest,
 };
-use openhuman_core::openhuman::memory_tree::tree::set_summary_embedding;
-use openhuman_core::openhuman::memory_tree::tree::store as tree_store;
-use openhuman_core::openhuman::memory_tree::tree::TreeStatus;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::set_summary_embedding;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::store as tree_store;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree::TreeStatus;
 
 struct EnvVarGuard {
     key: &'static str,

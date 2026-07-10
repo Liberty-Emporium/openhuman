@@ -7,6 +7,11 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::{
+    all_local_inference_registered_controllers, local_ai_transcribe_bytes,
+};
+use alexander_ai_solutions_core::core::all::RegisteredController;
 use axum::body::Body;
 use axum::extract::State;
 use axum::http::{Response, StatusCode};
@@ -15,11 +20,6 @@ use axum::routing::get;
 use axum::Router;
 use flate2::write::GzEncoder;
 use flate2::Compression;
-use openhuman_core::core::all::RegisteredController;
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::inference::local::{
-    all_local_inference_registered_controllers, local_ai_transcribe_bytes,
-};
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
@@ -100,7 +100,7 @@ async fn piper_controller_installs_skips_existing_and_records_failures_from_mock
     write_stub_script(scripts.path(), "piper", "#!/bin/sh\nexit 42\n");
 
     let _path = EnvVarGuard::set("PATH", scripts.path());
-    let _workspace = EnvVarGuard::set("OPENHUMAN_WORKSPACE", tmp.path().join(".openhuman"));
+    let _workspace = EnvVarGuard::set("OPENHUMAN_WORKSPACE", tmp.path().join(".alexanderai"));
     let _release = EnvVarGuard::set("OPENHUMAN_PIPER_RELEASE_BASE_URL", &base);
     let _voices = EnvVarGuard::set("OPENHUMAN_PIPER_VOICES_BASE_URL", format!("{base}/voices"));
     let _ollama_bin = EnvVarGuard::unset("OLLAMA_BIN");
@@ -125,7 +125,7 @@ async fn piper_controller_installs_skips_existing_and_records_failures_from_mock
         let installed = wait_for_piper_state(status, "installed").await;
         assert_eq!(installed["progress"], 100);
         assert_eq!(installed["stage"], "install complete");
-        let piper_bin = tmp.path().join(".openhuman/bin/piper/piper/piper");
+        let piper_bin = tmp.path().join(".alexanderai/bin/piper/piper/piper");
         assert!(piper_bin.is_file(), "workspace piper binary extracted");
 
         call(
@@ -332,7 +332,7 @@ async fn call(controller: &RegisteredController, params: Value) -> Result<Value,
 }
 
 fn temp_config(tmp: &TempDir) -> Config {
-    let root = tmp.path().join(".openhuman");
+    let root = tmp.path().join(".alexanderai");
     std::fs::create_dir_all(root.join("workspace")).expect("workspace dir");
     let mut config = Config::default();
     config.config_path = root.join("config.toml");

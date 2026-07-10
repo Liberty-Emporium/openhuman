@@ -32,7 +32,7 @@ const fixture: WorkflowSummary = {
   sourceFormat: 'openhuman',
   tools: [],
   prompts: [],
-  location: '/Users/me/.openhuman/skills/weather-helper/SKILL.md',
+  location: '/Users/me/.alexanderai/skills/weather-helper/SKILL.md',
   resources: [],
   scope: 'user',
   legacy: false,
@@ -51,7 +51,7 @@ describe('UninstallSkillConfirmDialog', () => {
     );
     expect(screen.getByText(/Delete weather-helper\?/)).toBeInTheDocument();
     expect(screen.getByText(/permanently deletes/i)).toBeInTheDocument();
-    expect(screen.getByText('/Users/me/.openhuman/skills/weather-helper')).toBeInTheDocument();
+    expect(screen.getByText('/Users/me/.alexanderai/skills/weather-helper')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Cancel/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Delete$/ })).toBeInTheDocument();
   });
@@ -65,7 +65,7 @@ describe('UninstallSkillConfirmDialog', () => {
     const { workflowsApi } = await import('../../../services/api/workflowsApi');
     vi.mocked(workflowsApi.uninstallWorkflow).mockResolvedValueOnce({
       name: 'weather-helper',
-      removedPath: '/Users/me/.openhuman/skills/weather-helper',
+      removedPath: '/Users/me/.alexanderai/skills/weather-helper',
       scope: 'user',
     });
 
@@ -108,7 +108,7 @@ describe('UninstallSkillConfirmDialog', () => {
     const { workflowsApi } = await import('../../../services/api/workflowsApi');
     vi.mocked(workflowsApi.uninstallWorkflow).mockResolvedValueOnce({
       name: 'weather-helper',
-      removedPath: '/Users/me/.openhuman/skills/weather-helper',
+      removedPath: '/Users/me/.alexanderai/skills/weather-helper',
       scope: 'user',
     });
 
@@ -131,7 +131,7 @@ describe('UninstallSkillConfirmDialog', () => {
     await waitFor(() => {
       expect(onUninstalled).toHaveBeenCalledWith({
         name: 'weather-helper',
-        removedPath: '/Users/me/.openhuman/skills/weather-helper',
+        removedPath: '/Users/me/.alexanderai/skills/weather-helper',
         scope: 'user',
       });
     });
@@ -199,7 +199,7 @@ describe('UninstallSkillConfirmDialog', () => {
 
     deferred.resolve?.({
       name: 'weather-helper',
-      removedPath: '/Users/me/.openhuman/skills/weather-helper',
+      removedPath: '/Users/me/.alexanderai/skills/weather-helper',
       scope: 'user',
     });
   });

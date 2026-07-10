@@ -3,8 +3,8 @@
 //! Run manually (requires a funded wallet):
 //!   GGML_NATIVE=OFF cargo test --test x402_twit_sh_live -- --ignored --nocapture
 
-use openhuman_core::openhuman::tools::traits::Tool;
-use openhuman_core::openhuman::x402;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::traits::Tool;
+use alexander_ai_solutions_core::alexander_ai_solutions::x402;
 use serde_json::json;
 
 #[tokio::test]
@@ -26,7 +26,7 @@ async fn x402_pay_twit_sh_for_hal_finney_tweet() {
 
     println!("=== x402 tool result ===");
     for content in &result.content {
-        if let openhuman_core::openhuman::workflows::types::ToolContent::Text { text } = content {
+        if let alexander_ai_solutions_core::alexander_ai_solutions::workflows::types::ToolContent::Text { text } = content {
             println!("{text}");
         }
     }

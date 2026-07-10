@@ -15,17 +15,19 @@ use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
-use openhuman_core::openhuman::connectivity::ops::is_port_in_use;
-use openhuman_core::openhuman::connectivity::rpc::{
+use alexander_ai_solutions_core::alexander_ai_solutions::connectivity::ops::is_port_in_use;
+use alexander_ai_solutions_core::alexander_ai_solutions::connectivity::rpc::{
     diag, pick_listen_port, pick_listen_port_for_host, PickListenPortError,
 };
-use openhuman_core::openhuman::connectivity::{
+use alexander_ai_solutions_core::alexander_ai_solutions::connectivity::{
     all_connectivity_controller_schemas, all_connectivity_registered_controllers,
     connectivity_controller_schema,
 };
-use openhuman_core::openhuman::socket::{set_global_socket_manager, SocketManager};
+use alexander_ai_solutions_core::alexander_ai_solutions::socket::{
+    set_global_socket_manager, SocketManager,
+};
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 const TEST_RPC_TOKEN: &str = "connectivity-raw-coverage-e2e-token";
 
@@ -119,7 +121,7 @@ async fn serve_rpc() -> (
 }
 
 fn write_min_config(openhuman_dir: &Path) {
-    std::fs::create_dir_all(openhuman_dir).expect("create .openhuman");
+    std::fs::create_dir_all(openhuman_dir).expect("create .alexanderai");
     std::fs::write(
         openhuman_dir.join("config.toml"),
         r#"api_url = "http://127.0.0.1:9"
@@ -143,7 +145,7 @@ embedding_dimensions = 0
 
 async fn setup() -> TestHarness {
     let tmp = tempdir().expect("tempdir");
-    let openhuman_dir = tmp.path().join(".openhuman");
+    let openhuman_dir = tmp.path().join(".alexanderai");
     write_min_config(&openhuman_dir);
     let guards = vec![
         EnvVarGuard::set_to_path("OPENHUMAN_HOME", &openhuman_dir),

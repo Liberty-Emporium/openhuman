@@ -9,18 +9,17 @@ use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 use std::time::Duration as StdDuration;
 
-use chrono::Utc;
-use openhuman_core::openhuman::app_state::{
+use alexander_ai_solutions_core::alexander_ai_solutions::app_state::{
     snapshot, update_local_state, StoredAppStatePatch, StoredOnboardingTasks,
 };
-use openhuman_core::openhuman::config::rpc as config_rpc;
-use openhuman_core::openhuman::credentials::profiles::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::rpc as config_rpc;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::profiles::{
     AuthProfile, AuthProfileKind, AuthProfilesStore,
 };
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     ai_list_memory_files, ai_read_memory_file, ai_write_memory_file, clear_namespace,
     context_query, context_recall, doc_delete, doc_list, doc_put, memory_delete_document,
     memory_init, memory_list_documents, memory_list_namespaces, memory_query_namespace,
@@ -29,11 +28,14 @@ use openhuman_core::openhuman::memory::{
     PutDocParams, QueryNamespaceParams, QueryNamespaceRequest, ReadMemoryFileRequest,
     RecallContextRequest, RecallMemoriesRequest, RecallNamespaceParams, WriteMemoryFileRequest,
 };
-use openhuman_core::openhuman::memory_sources::readers::SourceReader;
-use openhuman_core::openhuman::memory_sources::sync::sync_source;
-use openhuman_core::openhuman::memory_sources::{ContentType, MemorySourceEntry, SourceKind};
-use openhuman_core::openhuman::threads::ops as thread_ops;
-use openhuman_core::openhuman::threads::welcome_migration::migrate_welcome_agent_artifacts;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::readers::SourceReader;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::sync::sync_source;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::{
+    ContentType, MemorySourceEntry, SourceKind,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::ops as thread_ops;
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::welcome_migration::migrate_welcome_agent_artifacts;
+use chrono::Utc;
 use serde_json::{json, Value};
 use tempfile::{Builder, TempDir};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -79,7 +81,7 @@ struct Harness {
 }
 
 impl Harness {
-    async fn config(&self) -> openhuman_core::openhuman::config::Config {
+    async fn config(&self) -> alexander_ai_solutions_core::alexander_ai_solutions::config::Config {
         config_rpc::load_config_with_timeout()
             .await
             .expect("isolated config should load")
@@ -148,7 +150,7 @@ embedding_strict = false
 "#
     );
     std::fs::write(root.join("config.toml"), &cfg).expect("write config.toml");
-    let _: openhuman_core::openhuman::config::Config =
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
         toml::from_str(&cfg).expect("round20 config must match schema");
 }
 
@@ -397,7 +399,7 @@ async fn round20_memory_sources_readers_and_sync_cover_error_edges_without_netwo
     let harness = setup("http://127.0.0.1:9");
     let config = harness.config().await;
 
-    let rss = openhuman_core::openhuman::memory_sources::readers::rss::RssReader;
+    let rss = alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::readers::rss::RssReader;
     let mut missing_url = source_entry("rss-missing-url", SourceKind::RssFeed);
     assert_eq!(
         rss.list_items(&missing_url, &config)
@@ -458,7 +460,7 @@ async fn round20_memory_sources_readers_and_sync_cover_error_edges_without_netwo
     let old_path = std::env::var("PATH").unwrap_or_default();
     let _path = EnvGuard::set("PATH", format!("{}:{old_path}", bin.display()));
 
-    let github = openhuman_core::openhuman::memory_sources::readers::github::GithubReader;
+    let github = alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::readers::github::GithubReader;
     let mut entry = source_entry("github-round20", SourceKind::GithubRepo);
     entry.url = Some("git@github.com:tinyhumansai/openhuman.git".to_string());
     if !gh_available {
@@ -662,16 +664,17 @@ async fn round20_memory_documents_files_and_envelopes_cover_success_and_failure_
     .expect("memories data");
     assert!(!memories.memories.is_empty());
 
-    let deleted =
-        memory_delete_document(openhuman_core::openhuman::memory::DeleteDocumentRequest {
+    let deleted = memory_delete_document(
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::DeleteDocumentRequest {
             namespace: namespace.clone(),
             document_id: "doc-round20".to_string(),
-        })
-        .await
-        .expect("delete document envelope")
-        .value
-        .data
-        .expect("delete data");
+        },
+    )
+    .await
+    .expect("delete document envelope")
+    .value
+    .data
+    .expect("delete data");
     assert!(deleted.deleted);
     let second_delete = doc_delete(DeleteDocParams {
         namespace: namespace.clone(),
@@ -696,7 +699,7 @@ async fn round20_threads_fallback_title_delete_missing_and_welcome_noop_paths() 
     let harness = setup("http://127.0.0.1:9");
 
     let created = thread_ops::thread_create_new(
-        openhuman_core::openhuman::memory::CreateConversationThreadRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::CreateConversationThreadRequest {
             labels: None,
             personality_id: None,
         },
@@ -707,17 +710,18 @@ async fn round20_threads_fallback_title_delete_missing_and_welcome_noop_paths() 
     .data
     .expect("created data");
 
-    let user_message = openhuman_core::openhuman::memory::ConversationMessageRecord {
-        id: "round20-user-msg".to_string(),
-        content: "Please map the onboarding telemetry rollout across product analytics and QA."
-            .to_string(),
-        message_type: "text".to_string(),
-        extra_metadata: Value::Null,
-        sender: "user".to_string(),
-        created_at: Utc::now().to_rfc3339(),
-    };
+    let user_message =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ConversationMessageRecord {
+            id: "round20-user-msg".to_string(),
+            content: "Please map the onboarding telemetry rollout across product analytics and QA."
+                .to_string(),
+            message_type: "text".to_string(),
+            extra_metadata: Value::Null,
+            sender: "user".to_string(),
+            created_at: Utc::now().to_rfc3339(),
+        };
     thread_ops::message_append(
-        openhuman_core::openhuman::memory::AppendConversationMessageRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::AppendConversationMessageRequest {
             thread_id: created.id.clone(),
             message: user_message,
         },
@@ -726,7 +730,7 @@ async fn round20_threads_fallback_title_delete_missing_and_welcome_noop_paths() 
     .expect("append user");
 
     let fallback = thread_ops::thread_generate_title(
-        openhuman_core::openhuman::memory::GenerateConversationThreadTitleRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::GenerateConversationThreadTitleRequest {
             thread_id: created.id.clone(),
             assistant_message: None,
         },
@@ -740,7 +744,7 @@ async fn round20_threads_fallback_title_delete_missing_and_welcome_noop_paths() 
     assert_ne!(fallback.title, created.title);
 
     let missing_update = thread_ops::message_update(
-        openhuman_core::openhuman::memory::UpdateConversationMessageRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::UpdateConversationMessageRequest {
             thread_id: created.id.clone(),
             message_id: "missing-message".to_string(),
             extra_metadata: Some(json!({"x": true})),
@@ -751,7 +755,7 @@ async fn round20_threads_fallback_title_delete_missing_and_welcome_noop_paths() 
     assert!(missing_update.contains("message") || missing_update.contains("not found"));
 
     let missing_delete = thread_ops::thread_delete(
-        openhuman_core::openhuman::memory::DeleteConversationThreadRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::DeleteConversationThreadRequest {
             thread_id: "missing-thread-round20".to_string(),
             deleted_at: Utc::now().to_rfc3339(),
         },

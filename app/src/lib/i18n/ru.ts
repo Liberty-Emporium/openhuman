@@ -572,7 +572,7 @@ const messages: TranslationMap = {
   'skills.channels': 'Сообщения',
   'skills.explorer.emptyCta': 'Установить по URL',
   'skills.explorer.emptyDescription':
-    'Установите пакет SKILL.md или поместите папки в стиле Hermes в ~/.openhuman/skills.',
+    'Установите пакет SKILL.md или поместите папки в стиле Hermes в ~/.alexanderai/skills.',
   'skills.explorer.emptyTitle': 'Навыки не найдены',
   'skills.explorer.installFromUrl': 'Установить по URL',
   'skills.explorer.newSkill': 'Новый навык',
@@ -3766,7 +3766,7 @@ const messages: TranslationMap = {
   'settings.ai.claudeCode.fullAccessOff':
     'Принимать только правки — автоматически применяет правки файлов, ограничивает команды и сеть.',
   'settings.ai.claudeCode.sandboxNoteMac':
-    'В macOS каталог ~/.openhuman остаётся защищённым песочницей в обоих режимах.',
+    'В macOS каталог ~/.alexanderai остаётся защищённым песочницей в обоих режимах.',
   'settings.ai.claudeCode.sandboxNoteOther':
     'Полный доступ не ограничен на этой платформе — включайте его только если доверяете рабочему пространству.',
   'settings.ai.claudeCode.enableToCheck': 'Включите Claude Code, чтобы проверить вход.',
@@ -5097,9 +5097,9 @@ const messages: TranslationMap = {
   'skills.create.name': 'Название',
   'skills.create.namePlaceholder': 'напр. Trade Journal',
   'skills.create.scope': 'Область',
-  'skills.create.scopeProjectHint': '/.openhuman/skills/',
+  'skills.create.scopeProjectHint': '/.alexanderai/skills/',
   'skills.create.scopeUserHint':
-    'Записывается в ~/.openhuman/skills/<slug>/SKILL.md — доступно во всех рабочих пространствах.',
+    'Записывается в ~/.alexanderai/skills/<slug>/SKILL.md — доступно во всех рабочих пространствах.',
   'skills.create.slugLabel': 'Slug',
   'skills.create.subtitle': 'SKILL.md',
   'skills.create.tags': 'Теги',
@@ -5146,7 +5146,7 @@ const messages: TranslationMap = {
     'Работают только прямые ссылки `.md`. Для GitHub ссылка на файл (github.com/owner/repo/blob/.../SKILL.md) — корни дерева и репо не установлены.',
   'skills.install.errors.unsupportedUrlTitle': 'Форма URL не поддерживается.',
   'skills.install.errors.writeFailedHint':
-    'Каталог навыков рабочей области не был доступен для записи. Проверьте разрешения файловой системы для `<workspace>/.openhuman/skills/`.',
+    'Каталог навыков рабочей области не был доступен для записи. Проверьте разрешения файловой системы для `<workspace>/.alexanderai/skills/`.',
   'skills.install.errors.writeFailedTitle': 'Не удалось записать SKILL.md.',
   'skills.install.fetchLog': 'Получить лог',
   'skills.install.fetchingPrefix': 'Получение',

@@ -25,7 +25,7 @@ use std::{
 /// per-session tmpfs, cleaned on reboot), falls back to /tmp with UID.
 pub(crate) fn socket_path() -> PathBuf {
     if let Ok(dir) = std::env::var("XDG_RUNTIME_DIR") {
-        return PathBuf::from(dir).join("com.openhuman.app-deeplink.sock");
+        return PathBuf::from(dir).join("com.alexanderai.app-deeplink.sock");
     }
     // Fallback: include UID so multi-user machines don't collide.
     let uid = nix::unistd::getuid().as_raw();
@@ -306,7 +306,7 @@ mod tests {
         let path = socket_path();
         assert_eq!(
             path,
-            PathBuf::from("/run/user/1234/com.openhuman.app-deeplink.sock")
+            PathBuf::from("/run/user/1234/com.alexanderai.app-deeplink.sock")
         );
     }
 

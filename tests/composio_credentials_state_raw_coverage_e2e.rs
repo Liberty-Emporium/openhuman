@@ -18,36 +18,38 @@ use chrono::{Duration as ChronoDuration, Utc};
 use serde_json::{json, Value};
 use tempfile::{Builder, TempDir};
 
-use openhuman_core::openhuman::app_state::{
+use alexander_ai_solutions_core::alexander_ai_solutions::app_state::{
     snapshot, update_local_state, StoredAppStatePatch, StoredOnboardingTasks,
 };
-use openhuman_core::openhuman::composio::ops::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::ops::{
     cached_active_integrations, composio_authorize, composio_clear_api_key, composio_get_mode,
     composio_list_connections, composio_list_tools, composio_list_trigger_history,
     composio_set_api_key, fetch_connected_integrations_status,
 };
-use openhuman_core::openhuman::composio::trigger_history::ComposioTriggerHistoryStore;
-use openhuman_core::openhuman::composio::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::trigger_history::ComposioTriggerHistoryStore;
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::{
     init_composio_trigger_history, invalidate_connected_integrations_cache, ComposioActionTool,
     FetchConnectedIntegrationsStatus,
 };
-use openhuman_core::openhuman::config::rpc as config_rpc;
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::credentials::profiles::{AuthProfile, AuthProfilesStore, TokenSet};
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::rpc as config_rpc;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::profiles::{
+    AuthProfile, AuthProfilesStore, TokenSet,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     AppendConversationMessageRequest, ConversationMessageRecord, CreateConversationThreadRequest,
     EmptyRequest, GenerateConversationThreadTitleRequest, UpdateConversationMessageRequest,
     UpdateConversationThreadTitleRequest,
 };
-use openhuman_core::openhuman::threads::migrate_welcome_agent_artifacts;
-use openhuman_core::openhuman::threads::ops::{
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::migrate_welcome_agent_artifacts;
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::ops::{
     message_append, message_update, messages_list, thread_create_new, thread_generate_title,
     thread_update_title, threads_list,
 };
-use openhuman_core::openhuman::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
     ComposioExecuteTool, ComposioListConnectionsTool, ComposioListToolkitsTool,
     ComposioListToolsTool, Tool, ToolCallOptions,
 };
@@ -407,10 +409,12 @@ async fn round15_composio_direct_key_mode_flips_without_network() {
     assert_eq!(mode["api_key_set"], true);
 
     let direct_toolkits =
-        openhuman_core::openhuman::composio::ops::composio_list_toolkits(&reloaded)
-            .await
-            .expect("direct list toolkits is local")
-            .value;
+        alexander_ai_solutions_core::alexander_ai_solutions::composio::ops::composio_list_toolkits(
+            &reloaded,
+        )
+        .await
+        .expect("direct list toolkits is local")
+        .value;
     assert!(direct_toolkits.toolkits.is_empty());
 
     let cleared = composio_clear_api_key(&reloaded)
@@ -647,7 +651,7 @@ async fn round15_threads_ops_and_welcome_migration_public_paths() {
     assert_eq!(updated_msg.extra_metadata["edited"], true);
 
     let messages = messages_list(
-        openhuman_core::openhuman::memory::ConversationMessagesRequest {
+        alexander_ai_solutions_core::alexander_ai_solutions::memory::ConversationMessagesRequest {
             thread_id: thread_id.clone(),
         },
     )

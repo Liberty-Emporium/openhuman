@@ -3,16 +3,16 @@
 //! Loopback servers and parser fixtures only: no real Discord, Lark, IMAP, or
 //! SMTP traffic is performed.
 
-use axum::{extract::Path, http::StatusCode, routing::get, Json, Router};
-use openhuman_core::openhuman::channels::providers::discord::api::test_support as discord_support;
-use openhuman_core::openhuman::channels::providers::email_channel::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::providers::discord::api::test_support as discord_support;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::providers::email_channel::{
     test_support as email_support, EmailChannel, EmailConfig,
 };
-use openhuman_core::openhuman::channels::providers::lark::test_support as lark_support;
-use openhuman_core::openhuman::channels::test_support::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::providers::lark::test_support as lark_support;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::test_support::{
     run_dispatch_harness, DispatchHarnessOptions, TestMemoryEntry,
 };
-use openhuman_core::openhuman::channels::LarkChannel;
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::LarkChannel;
+use axum::{extract::Path, http::StatusCode, routing::get, Json, Router};
 use reqwest::StatusCode as ReqwestStatusCode;
 use serde_json::json;
 use tokio_tungstenite::tungstenite::Message as WsMsg;

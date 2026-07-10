@@ -17,28 +17,28 @@ use futures_util::StreamExt;
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
-use openhuman_core::openhuman::config::schema::cloud_providers::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::schema::cloud_providers::{
     AuthStyle as CloudAuthStyle, CloudProviderCreds,
 };
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::inference::local::ops::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::ops::{
     local_ai_chat, local_ai_should_react, LocalAiChatMessage,
 };
-use openhuman_core::openhuman::inference::local::LocalAiService;
-use openhuman_core::openhuman::inference::provider::compatible::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::LocalAiService;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::compatible::{
     AuthStyle as CompatibleAuthStyle, OpenAiCompatibleProvider,
 };
-use openhuman_core::openhuman::inference::provider::factory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::factory::{
     auth_key_for_slug, create_chat_provider_from_string, provider_for_role,
 };
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     create_resilient_provider, create_routed_provider, list_configured_models, ChatMessage,
     ChatRequest, Provider, ProviderDelta,
 };
-use openhuman_core::openhuman::tools::ToolSpec;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::ToolSpec;
 
 #[derive(Clone, Default)]
 struct MockState {
@@ -220,7 +220,7 @@ async fn compatible_native_leftovers_cover_tool_history_function_call_and_stream
             "count tokens",
             "raw-stream-two-lines",
             0.2,
-            openhuman_core::openhuman::inference::provider::traits::StreamOptions::new(true),
+            alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::StreamOptions::new(true),
         )
         .collect::<Vec<_>>()
         .await;
@@ -985,7 +985,7 @@ fn err_string<T>(result: anyhow::Result<T>) -> String {
 }
 
 fn temp_config(tmp: &TempDir) -> Config {
-    let root = tmp.path().join(".openhuman");
+    let root = tmp.path().join(".alexanderai");
     std::fs::create_dir_all(root.join("workspace")).expect("workspace dir");
     let mut config = Config::default();
     config.config_path = root.join("config.toml");

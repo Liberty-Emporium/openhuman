@@ -69,7 +69,7 @@ Required GitHub Actions secrets:
 | `ANDROID_UPLOAD_KEY_ALIAS`            | Keystore alias for the upload key.                                                              |
 | `ANDROID_UPLOAD_KEYSTORE_PASSWORD`    | Keystore password.                                                                              |
 | `ANDROID_UPLOAD_KEY_PASSWORD`         | Key password.                                                                                   |
-| `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`    | Raw JSON for the Play Console service account with release permissions for `com.openhuman.app`. |
+| `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`    | Raw JSON for the Play Console service account with release permissions for `com.alexanderai.app`. |
 
 Optional GitHub Actions variables:
 

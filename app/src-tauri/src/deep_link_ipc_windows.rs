@@ -28,7 +28,7 @@ use windows_sys::Win32::{
     },
 };
 
-const PIPE_NAME: &str = r"\\.\pipe\com.openhuman.app-deeplink";
+const PIPE_NAME: &str = r"\\.\pipe\com.alexanderai.app-deeplink";
 const FORWARD_RETRY_ATTEMPTS: usize = 40;
 const FORWARD_RETRY_DELAY: Duration = Duration::from_millis(50);
 
@@ -368,6 +368,6 @@ mod tests {
 
     #[test]
     fn pipe_name_is_stable_and_app_scoped() {
-        assert_eq!(PIPE_NAME, r"\\.\pipe\com.openhuman.app-deeplink");
+        assert_eq!(PIPE_NAME, r"\\.\pipe\com.alexanderai.app-deeplink");
     }
 }

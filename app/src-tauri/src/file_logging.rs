@@ -2,7 +2,7 @@
 //!
 //! Resolves the OpenHuman data directory the same way the core does
 //! (`~/.openhuman` or `OPENHUMAN_WORKSPACE` override) and hands it to
-//! [`openhuman_core::core::logging::init_for_embedded`], which installs a
+//! [`alexander_ai_solutions_core::core::logging::init_for_embedded`], which installs a
 //! daily-rotated file appender so packaged GUI builds — where stderr is
 //! invisible — still produce a log users can share for support.
 //!
@@ -11,7 +11,7 @@
 
 use std::path::PathBuf;
 
-use openhuman_core::core::logging::{self, log_directory};
+use alexander_ai_solutions_core::core::logging::{self, log_directory};
 
 /// Initialize logging for the Tauri shell + embedded core. Idempotent and
 /// safe to call from any startup position; the underlying `Once` guard means
@@ -41,12 +41,13 @@ pub(crate) fn resolve_data_dir() -> PathBuf {
             return PathBuf::from(workspace);
         }
     }
-    openhuman_core::openhuman::config::default_root_openhuman_dir().unwrap_or_else(|err| {
-        eprintln!(
+    alexander_ai_solutions_core::alexander_ai_solutions::config::default_root_openhuman_dir()
+        .unwrap_or_else(|err| {
+            eprintln!(
             "[file_logging] default_root_openhuman_dir failed ({err}); falling back to temp dir"
         );
-        std::env::temp_dir().join("openhuman")
-    })
+            std::env::temp_dir().join("openhuman")
+        })
 }
 
 #[cfg(test)]
@@ -103,7 +104,7 @@ mod tests {
         // If logging hasn't been initialized, the command must surface a
         // typed error so the UI can show it instead of silently launching
         // an `open` against an empty path.
-        if openhuman_core::core::logging::log_directory().is_none() {
+        if alexander_ai_solutions_core::core::logging::log_directory().is_none() {
             let err = reveal_logs_folder().expect_err("must error pre-init");
             assert!(err.contains("not initialized"), "unexpected error: {err}");
         }

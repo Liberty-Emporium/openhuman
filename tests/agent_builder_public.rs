@@ -1,11 +1,15 @@
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::XmlToolDispatcher;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::SystemPromptBuilder;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
+    ChatRequest, ChatResponse, Provider,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
+    Memory, MemoryCategory, MemoryEntry,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{Tool, ToolResult};
 use anyhow::Result;
 use async_trait::async_trait;
-use openhuman_core::openhuman::agent::dispatcher::XmlToolDispatcher;
-use openhuman_core::openhuman::agent::Agent;
-use openhuman_core::openhuman::context::prompt::SystemPromptBuilder;
-use openhuman_core::openhuman::inference::provider::{ChatRequest, ChatResponse, Provider};
-use openhuman_core::openhuman::memory::{Memory, MemoryCategory, MemoryEntry};
-use openhuman_core::openhuman::tools::{Tool, ToolResult};
 use std::collections::HashSet;
 use std::sync::Arc;
 
@@ -83,7 +87,7 @@ impl Memory for StubMemory {
         &self,
         _query: &str,
         _limit: usize,
-        _opts: openhuman_core::openhuman::memory::RecallOpts<'_>,
+        _opts: alexander_ai_solutions_core::alexander_ai_solutions::memory::RecallOpts<'_>,
     ) -> Result<Vec<MemoryEntry>> {
         Ok(Vec::new())
     }
@@ -107,7 +111,8 @@ impl Memory for StubMemory {
 
     async fn namespace_summaries(
         &self,
-    ) -> Result<Vec<openhuman_core::openhuman::memory::NamespaceSummary>> {
+    ) -> Result<Vec<alexander_ai_solutions_core::alexander_ai_solutions::memory::NamespaceSummary>>
+    {
         Ok(Vec::new())
     }
 
@@ -124,7 +129,7 @@ impl Memory for StubMemory {
     }
 }
 
-fn base_builder() -> openhuman_core::openhuman::agent::AgentBuilder {
+fn base_builder() -> alexander_ai_solutions_core::alexander_ai_solutions::agent::AgentBuilder {
     Agent::builder()
         .provider(Box::new(StubProvider))
         .tools(vec![
@@ -178,7 +183,7 @@ fn builder_applies_defaults_and_exposes_public_accessors() {
     assert_eq!(agent.tool_specs().len(), 2);
     assert_eq!(
         agent.model_name(),
-        openhuman_core::openhuman::config::DEFAULT_MODEL
+        alexander_ai_solutions_core::alexander_ai_solutions::config::DEFAULT_MODEL
     );
     assert_eq!(agent.temperature(), 0.7);
     assert_eq!(agent.workspace_dir(), std::path::Path::new("."));

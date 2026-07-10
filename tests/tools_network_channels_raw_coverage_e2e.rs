@@ -17,19 +17,21 @@ use serde_json::json;
 use tempfile::{tempdir, TempDir};
 use tokio::time::timeout;
 
-use openhuman_core::core::socketio::WebChannelEvent;
-use openhuman_core::openhuman::channels::providers::web::{
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::providers::web::{
     all_web_channel_controller_schemas, all_web_channel_registered_controllers, cancel_chat,
     channel_web_cancel, publish_web_channel_event, schemas as web_channel_schema, start_chat,
     subscribe_web_channel_events, ChatRequestMetadata,
 };
-use openhuman_core::openhuman::config::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
     AutonomyConfig, Config, PolymarketClobCredentials, PolymarketConfig,
 };
-use openhuman_core::openhuman::security::{AutonomyLevel, SecurityPolicy};
-use openhuman_core::openhuman::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::security::{
+    AutonomyLevel, SecurityPolicy,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
     ComposioTool, GitOperationsTool, MouseTool, PolymarketTool, ScheduleTool, Tool, ToolCallOptions,
 };
+use alexander_ai_solutions_core::core::socketio::WebChannelEvent;
 
 #[derive(Clone, Debug)]
 struct MockRequest {
@@ -173,7 +175,7 @@ fn temp_config() -> (TempDir, Config) {
     (tmp, config)
 }
 
-fn text(result: &openhuman_core::openhuman::tools::ToolResult) -> String {
+fn text(result: &alexander_ai_solutions_core::alexander_ai_solutions::tools::ToolResult) -> String {
     result.output()
 }
 

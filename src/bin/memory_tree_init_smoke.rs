@@ -29,8 +29,8 @@ use std::process::ExitCode;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::memory_store::chunks::store::with_connection;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::chunks::store::with_connection;
 
 fn main() -> ExitCode {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))

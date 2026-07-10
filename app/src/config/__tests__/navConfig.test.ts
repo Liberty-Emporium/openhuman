@@ -8,21 +8,11 @@ describe('NAV_TABS', () => {
   });
 
   it('has the correct ids in order', () => {
-    expect(NAV_TABS.map(t => t.id)).toEqual([
-      'chat',
-      'human',
-      'brain',
-      'connections',
-    ]);
+    expect(NAV_TABS.map(t => t.id)).toEqual(['chat', 'human', 'brain', 'connections']);
   });
 
   it('has the correct paths', () => {
-    expect(NAV_TABS.map(t => t.path)).toEqual([
-      '/chat',
-      '/human',
-      '/brain',
-      '/connections',
-    ]);
+    expect(NAV_TABS.map(t => t.path)).toEqual(['/chat', '/human', '/brain', '/connections']);
   });
 
   it('has the correct labelKeys', () => {
@@ -76,12 +66,7 @@ describe('AVATAR_MENU_ITEMS', () => {
   });
 
   it('has the correct ids in order', () => {
-    expect(AVATAR_MENU_ITEMS.map(i => i.id)).toEqual([
-      'account',
-      'billing',
-      'rewards',
-      'invites',
-    ]);
+    expect(AVATAR_MENU_ITEMS.map(i => i.id)).toEqual(['account', 'billing', 'rewards', 'invites']);
   });
 
   it('billing, rewards, and invites are cloudOnly; account is not', () => {

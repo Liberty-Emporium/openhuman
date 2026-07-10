@@ -16,8 +16,7 @@ use serde_json::Map;
 use serde_json::{json, Value};
 use tempfile::tempdir;
 
-use openhuman_core::core::all::RegisteredController;
-use openhuman_core::openhuman::composio::ops::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::ops::{
     cached_active_integrations, composio_authorize, composio_create_trigger,
     composio_delete_connection, composio_disable_trigger, composio_enable_trigger,
     composio_execute, composio_get_mode, composio_list_agent_ready_toolkits,
@@ -27,15 +26,18 @@ use openhuman_core::openhuman::composio::ops::{
     fetch_connected_integrations, fetch_connected_integrations_status,
     invalidate_connected_integrations_cache, FetchConnectedIntegrationsStatus,
 };
-use openhuman_core::openhuman::composio::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::{
     all_composio_controller_schemas, all_composio_registered_controllers,
 };
-use openhuman_core::openhuman::composio::{init_composio_trigger_history, ComposioActionTool};
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::{
+    init_composio_trigger_history, ComposioActionTool,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::tools::{ComposioExecuteTool, Tool};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{ComposioExecuteTool, Tool};
+use alexander_ai_solutions_core::core::all::RegisteredController;
 
 #[derive(Clone, Default)]
 struct MockState {
@@ -282,7 +284,7 @@ async fn composio_ops_use_loopback_backend_for_happy_and_error_paths() {
 
     init_composio_trigger_history(config.workspace_dir.clone())
         .expect("init trigger history store");
-    let store = openhuman_core::openhuman::composio::global_composio_trigger_history()
+    let store = alexander_ai_solutions_core::alexander_ai_solutions::composio::global_composio_trigger_history()
         .expect("global trigger history");
     store
         .record_trigger(
@@ -432,13 +434,17 @@ async fn composio_controller_registry_validates_params_without_backend_network()
         ("set_api_key", 2),
         ("clear_api_key", 0),
     ] {
-        let schema = openhuman_core::openhuman::composio::schemas::schemas(function);
+        let schema =
+            alexander_ai_solutions_core::alexander_ai_solutions::composio::schemas::schemas(
+                function,
+            );
         assert_eq!(schema.namespace, "composio");
         assert_eq!(schema.function, function);
         assert_eq!(schema.inputs.len(), input_count, "{function}");
         assert!(!schema.description.is_empty(), "{function}");
     }
-    let unknown = openhuman_core::openhuman::composio::schemas::schemas("missing");
+    let unknown =
+        alexander_ai_solutions_core::alexander_ai_solutions::composio::schemas::schemas("missing");
     assert_eq!(unknown.function, "unknown");
 
     let authorize_missing = composio_call(controller(&controllers, "authorize"), json!({}))

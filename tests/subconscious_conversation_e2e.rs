@@ -31,13 +31,13 @@ use std::time::Duration;
 
 use async_trait::async_trait;
 
-use openhuman_core::core::event_bus::{global, init_global, DomainEvent};
-use openhuman_core::openhuman::subconscious_triggers::types::{
+use alexander_ai_solutions_core::alexander_ai_solutions::subconscious_triggers::types::{
     GateDecision, Trigger, TriggerPriority, TriggerSource,
 };
-use openhuman_core::openhuman::subconscious_triggers::{
+use alexander_ai_solutions_core::alexander_ai_solutions::subconscious_triggers::{
     Gate, OrchestratorConfig, SessionExecutor, TriggerOrchestrator,
 };
+use alexander_ai_solutions_core::core::event_bus::{global, init_global, DomainEvent};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared conversation transcript — the record of "what happened".
@@ -178,7 +178,7 @@ impl SessionExecutor for ScriptedSession {
             // A sub-agent conclusion came back → merge + tell the human.
             self.transcript
                 .push("SESSION merge  sub-agent conclusion → notifying human");
-            openhuman_core::openhuman::subconscious::notify_user(
+            alexander_ai_solutions_core::alexander_ai_solutions::subconscious::notify_user(
                 self.workspace.clone(),
                 "Your research is ready — here's the summary.",
                 Some("research done"),
@@ -195,7 +195,7 @@ impl SessionExecutor for ScriptedSession {
             // Simple Q → answer the human directly, no sub-agent.
             self.transcript
                 .push(format!("SESSION reply  directly :: {summary}"));
-            openhuman_core::openhuman::subconscious::notify_user(
+            alexander_ai_solutions_core::alexander_ai_solutions::subconscious::notify_user(
                 self.workspace.clone(),
                 "Here's your status.",
                 None,
@@ -230,7 +230,7 @@ struct Harness {
     emit: Emitter,
     notifications: Arc<StdMutex<Vec<String>>>,
     _loop: tokio::task::JoinHandle<()>,
-    _sub: openhuman_core::core::event_bus::SubscriptionHandle,
+    _sub: alexander_ai_solutions_core::core::event_bus::SubscriptionHandle,
     _tmp: tempfile::TempDir,
 }
 

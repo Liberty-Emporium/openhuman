@@ -13,14 +13,16 @@ use chrono::{TimeZone, Utc};
 use serde_json::{json, Map, Value};
 use tempfile::TempDir;
 
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::embeddings::NoopEmbedding;
-use openhuman_core::openhuman::inference::provider::traits::Provider;
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::NoopEmbedding;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::Provider;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     ExtractionMode, MemoryIngestionConfig, MemoryIngestionRequest,
 };
-use openhuman_core::openhuman::memory_store::{NamespaceDocumentInput, UnifiedMemory};
-use openhuman_core::openhuman::memory_tree::tree_runtime::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::{
+    NamespaceDocumentInput, UnifiedMemory,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::tree_runtime::{
     all_tree_summarizer_registered_controllers, engine, rpc as tree_runtime_rpc,
     store as tree_runtime_store,
 };
@@ -133,7 +135,7 @@ Bob Builder will review the memory tree recap.
                 category: "coverage".into(),
                 session_id: Some("round23-session".into()),
                 document_id: None,
-                taint: openhuman_core::openhuman::memory::MemoryTaint::Internal,
+                taint: alexander_ai_solutions_core::alexander_ai_solutions::memory::MemoryTaint::Internal,
             },
             config: MemoryIngestionConfig {
                 model_name: "round23-heuristic".into(),

@@ -542,7 +542,7 @@ const messages: TranslationMap = {
   'skills.channels': '消息',
   'skills.explorer.emptyCta': '通过 URL 安装',
   'skills.explorer.emptyDescription':
-    '安装 SKILL.md 包，或将 Hermes 风格的文件夹放到 ~/.openhuman/skills 下。',
+    '安装 SKILL.md 包，或将 Hermes 风格的文件夹放到 ~/.alexanderai/skills 下。',
   'skills.explorer.emptyTitle': '未找到技能',
   'skills.explorer.installFromUrl': '通过 URL 安装',
   'skills.explorer.newSkill': '新建技能',
@@ -3553,7 +3553,7 @@ const messages: TranslationMap = {
   'settings.ai.claudeCode.fullAccess': '完全访问权限',
   'settings.ai.claudeCode.fullAccessOn': 'Claude Code 可以运行命令、使用网络并生成子智能体。',
   'settings.ai.claudeCode.fullAccessOff': '仅接受编辑 — 自动应用文件编辑，限制命令和网络。',
-  'settings.ai.claudeCode.sandboxNoteMac': '在 macOS 上，两种模式下 ~/.openhuman 都受沙盒保护。',
+  'settings.ai.claudeCode.sandboxNoteMac': '在 macOS 上，两种模式下 ~/.alexanderai 都受沙盒保护。',
   'settings.ai.claudeCode.sandboxNoteOther':
     '在此平台上，完全访问不受限制 — 仅在你信任该工作区时才启用。',
   'settings.ai.claudeCode.enableToCheck': '启用 Claude Code 以检查登录状态。',
@@ -4802,7 +4802,7 @@ const messages: TranslationMap = {
   'skills.create.scope': '范围',
   'skills.create.scopeProjectHint': '/.open human/技能/',
   'skills.create.scopeUserHint':
-    '写入 ~/.openhuman/skills/<slug>/SKILL.md — 在所有工作空间中可用。',
+    '写入 ~/.alexanderai/skills/<slug>/SKILL.md — 在所有工作空间中可用。',
   'skills.create.slugLabel': '标识符',
   'skills.create.subtitle': '技能.md',
   'skills.create.tags': '标签',

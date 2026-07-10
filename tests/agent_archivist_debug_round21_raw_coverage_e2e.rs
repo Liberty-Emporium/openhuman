@@ -1,27 +1,33 @@
-use anyhow::Result;
-use async_trait::async_trait;
-use openhuman_core::openhuman::agent::debug::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::debug::{
     dump_agent_prompt, write_prompt_dumps, DumpPromptOptions, DumpedPrompt,
 };
-use openhuman_core::openhuman::agent::harness::archivist::ArchivistHook;
-use openhuman_core::openhuman::agent::harness::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::archivist::ArchivistHook;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::{
     run_subagent, with_parent_context, AgentDefinition, DefinitionSource, ModelSpec,
     ParentExecutionContext, PromptSource, SandboxMode, SubagentRunError, SubagentRunOptions,
     ToolScope,
 };
-use openhuman_core::openhuman::agent::hooks::{PostTurnHook, ToolCallRecord, TurnContext};
-use openhuman_core::openhuman::config::AgentConfig;
-use openhuman_core::openhuman::context::prompt::ToolCallFormat;
-use openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::hooks::{
+    PostTurnHook, ToolCallRecord, TurnContext,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::AgentConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::ToolCallFormat;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatRequest, ChatResponse, Provider, ToolCall, UsageInfo,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     Memory, MemoryCategory, MemoryEntry, NamespaceSummary, RecallOpts,
 };
-use openhuman_core::openhuman::memory_store::{events, fts5, profile, segments};
-use openhuman_core::openhuman::tokenjuice::AgentTokenjuiceCompression;
-use openhuman_core::openhuman::tools::{PermissionLevel, Tool, ToolResult};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::{
+    events, fts5, profile, segments,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tokenjuice::AgentTokenjuiceCompression;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
+    PermissionLevel, Tool, ToolResult,
+};
+use anyhow::Result;
+use async_trait::async_trait;
 use parking_lot::Mutex;
 use rusqlite::Connection;
 use serde_json::json;

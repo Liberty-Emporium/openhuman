@@ -7,20 +7,24 @@
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::local::LocalAiService;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::compatible::{
+    AuthStyle as CompatibleAuthStyle, OpenAiCompatibleProvider,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::{
+    ChatRequest, ProviderDelta,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
+    ChatMessage, Provider,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::ToolSpec;
 use axum::body::Body;
 use axum::extract::State;
 use axum::http::{header, HeaderMap, Response, StatusCode};
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::inference::local::LocalAiService;
-use openhuman_core::openhuman::inference::provider::compatible::{
-    AuthStyle as CompatibleAuthStyle, OpenAiCompatibleProvider,
-};
-use openhuman_core::openhuman::inference::provider::traits::{ChatRequest, ProviderDelta};
-use openhuman_core::openhuman::inference::provider::{ChatMessage, Provider};
-use openhuman_core::openhuman::tools::ToolSpec;
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
@@ -504,7 +508,7 @@ fn tool_spec(name: &str) -> ToolSpec {
 }
 
 fn temp_config(tmp: &TempDir) -> Config {
-    let root = tmp.path().join(".openhuman");
+    let root = tmp.path().join(".alexanderai");
     std::fs::create_dir_all(root.join("workspace")).expect("workspace dir");
     let mut config = Config::default();
     config.config_path = root.join("config.toml");

@@ -1,5 +1,16 @@
 use std::sync::{Arc, Mutex};
 
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::providers::web::{
+    cancel_chat, start_chat, subscribe_web_channel_events, ChatRequestMetadata,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::providers::yuanbao::{
+    YuanbaoChannel, YuanbaoConfig,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::channels::{
+    bus::ChannelInboundSubscriber, lark::LarkChannel, Channel, SendMessage, TelegramChannel,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{schema::LarkConfig, StreamMode};
+use alexander_ai_solutions_core::core::event_bus::{DomainEvent, EventHandler};
 use axum::{
     body::Bytes,
     extract::{Path, State},
@@ -8,15 +19,6 @@ use axum::{
     routing::post,
     Router,
 };
-use openhuman_core::core::event_bus::{DomainEvent, EventHandler};
-use openhuman_core::openhuman::channels::providers::web::{
-    cancel_chat, start_chat, subscribe_web_channel_events, ChatRequestMetadata,
-};
-use openhuman_core::openhuman::channels::providers::yuanbao::{YuanbaoChannel, YuanbaoConfig};
-use openhuman_core::openhuman::channels::{
-    bus::ChannelInboundSubscriber, lark::LarkChannel, Channel, SendMessage, TelegramChannel,
-};
-use openhuman_core::openhuman::config::{schema::LarkConfig, StreamMode};
 use serde_json::{json, Value};
 use tempfile::TempDir;
 

@@ -1,18 +1,18 @@
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 
-use chrono::Utc;
-use openhuman_core::openhuman::config::rpc as config_rpc;
-use openhuman_core::openhuman::credentials::profiles::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::rpc as config_rpc;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::profiles::{
     AuthProfile, AuthProfileKind, AuthProfilesStore, TokenSet,
 };
-use openhuman_core::openhuman::memory::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
     AppendConversationMessageRequest, ConversationMessageRecord, ConversationMessagesRequest,
     DeleteConversationThreadRequest, EmptyRequest, UpdateConversationMessageRequest,
     UpdateConversationThreadLabelsRequest, UpdateConversationThreadTitleRequest,
     UpsertConversationThreadRequest,
 };
-use openhuman_core::openhuman::threads::ops as thread_ops;
+use alexander_ai_solutions_core::alexander_ai_solutions::threads::ops as thread_ops;
+use chrono::Utc;
 use serde_json::json;
 use tempfile::{Builder, TempDir};
 

@@ -23,10 +23,10 @@
 use anyhow::{anyhow, Result};
 use std::path::PathBuf;
 
-use crate::openhuman::agent::debug::{
+use crate::alexander_ai_solutions::agent::debug::{
     dump_agent_prompt, dump_all_agent_prompts, write_prompt_dumps, DumpPromptOptions, DumpedPrompt,
 };
-use crate::openhuman::agent::harness::definition::AgentDefinitionRegistry;
+use crate::alexander_ai_solutions::agent::harness::definition::AgentDefinitionRegistry;
 
 /// Entry point for `openhuman agent <subcommand>`.
 pub fn run_agent_command(args: &[String]) -> Result<()> {
@@ -487,7 +487,7 @@ fn print_dump_prompt_help() {
     println!("                       `notion`). Must match a currently-connected integration —");
     println!("                       run `composio list_connection` to see the active slugs.");
     println!("  --workspace, -w <p>  Override the workspace directory (defaults to");
-    println!("                       Config::workspace_dir / ~/.openhuman/workspace).");
+    println!("                       Config::workspace_dir / ~/.alexanderai/workspace).");
     println!("  --model, -m <name>   Override the resolved model name (affects only the");
     println!("                       `## Runtime` section).");
     println!("  --with-tools         Also print the full list of tool names the agent sees.");

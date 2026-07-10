@@ -1,16 +1,22 @@
-use async_trait::async_trait;
-use openhuman_core::core::event_bus::{init_global, request_native_global, DEFAULT_CAPACITY};
-use openhuman_core::openhuman::agent::bus::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::bus::{
     register_agent_handlers, AgentTurnRequest, AgentTurnResponse, AGENT_RUN_TURN_METHOD,
 };
-use openhuman_core::openhuman::agent::progress::AgentProgress;
-use openhuman_core::openhuman::config::{MultimodalConfig, MultimodalFileConfig};
-use openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::progress::AgentProgress;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
+    MultimodalConfig, MultimodalFileConfig,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, ChatResponse, Provider, ProviderDelta, UsageInfo,
 };
-use openhuman_core::openhuman::security::POLICY_BLOCKED_MARKER;
-use openhuman_core::openhuman::tools::{PermissionLevel, Tool, ToolContent, ToolResult, ToolScope};
+use alexander_ai_solutions_core::alexander_ai_solutions::security::POLICY_BLOCKED_MARKER;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
+    PermissionLevel, Tool, ToolContent, ToolResult, ToolScope,
+};
+use alexander_ai_solutions_core::core::event_bus::{
+    init_global, request_native_global, DEFAULT_CAPACITY,
+};
+use async_trait::async_trait;
 use serde_json::json;
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
@@ -225,7 +231,7 @@ async fn run_turn(
             visible_tool_names: None,
             extra_tools: Vec::new(),
             on_progress,
-            origin: openhuman_core::openhuman::agent::turn_origin::AgentTurnOrigin::Cli,
+            origin: alexander_ai_solutions_core::alexander_ai_solutions::agent::turn_origin::AgentTurnOrigin::Cli,
         },
     )
     .await

@@ -5,7 +5,7 @@
  * Centered white modal that installs a skill via
  * `openhuman.workflows_install_from_url`. The Rust side fetches a single
  * `SKILL.md` file over HTTPS and writes it into
- * `<workspace>/.openhuman/skills/<slug>/SKILL.md`. URLs are allow-listed
+ * `<workspace>/.alexanderai/skills/<slug>/SKILL.md`. URLs are allow-listed
  * (https only, no private/loopback/link-local/multicast/cloud-metadata
  * hosts) and a wall-clock timeout applies (default 60s, max 600s).
  * `github.com/<o>/<r>/blob/<b>/<p>.md` URLs are auto-rewritten to their
@@ -262,7 +262,7 @@ export default function InstallSkillDialog({ onClose, onInstalled }: Props) {
               <p className="mt-0.5 text-xs text-content-muted">
                 {t('skills.install.subtitlePrefix')} <code className="font-mono">SKILL.md</code>{' '}
                 {t('skills.install.subtitleMiddle')}{' '}
-                <code className="font-mono">.openhuman/skills/</code>.{' '}
+                <code className="font-mono">.alexanderai/skills/</code>.{' '}
                 {t('skills.install.subtitleSuffix')}
               </p>
             </div>

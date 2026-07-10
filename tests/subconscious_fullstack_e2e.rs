@@ -22,16 +22,18 @@ use std::sync::{Arc, Mutex as StdMutex, OnceLock};
 
 use async_trait::async_trait;
 
-use openhuman_core::core::event_bus::{init_global, DomainEvent};
-use openhuman_core::openhuman::agent::harness::AgentDefinitionRegistry;
-use openhuman_core::openhuman::config::schema::SubconsciousMode;
-use openhuman_core::openhuman::inference::provider::factory::test_provider_override;
-use openhuman_core::openhuman::inference::provider::traits::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::AgentDefinitionRegistry;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::schema::SubconsciousMode;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::factory::test_provider_override;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::{
     ChatRequest, ChatResponse, ProviderCapabilities, ToolCall,
 };
-use openhuman_core::openhuman::inference::provider::Provider;
-use openhuman_core::openhuman::subconscious::LongLivedSession;
-use openhuman_core::openhuman::subconscious_triggers::{normalize, GatePass};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::Provider;
+use alexander_ai_solutions_core::alexander_ai_solutions::subconscious::LongLivedSession;
+use alexander_ai_solutions_core::alexander_ai_solutions::subconscious_triggers::{
+    normalize, GatePass,
+};
+use alexander_ai_solutions_core::core::event_bus::{init_global, DomainEvent};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mock LLM provider — deterministic, content-routed, no network.
@@ -245,7 +247,8 @@ runtime_enabled = false
     write(openhuman_dir);
     write(&openhuman_dir.join("users").join("local"));
     // Sanity: the config must match the schema.
-    let _: openhuman_core::openhuman::config::Config = toml::from_str(cfg).expect("config schema");
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
+        toml::from_str(cfg).expect("config schema");
 }
 
 fn harness() -> Harness {
@@ -259,7 +262,7 @@ fn harness_spawning() -> Harness {
 fn harness_with(mock: Arc<MockLlm>) -> Harness {
     let tmp = tempfile::tempdir().expect("tempdir");
     let home = tmp.path().to_path_buf();
-    let openhuman_dir = home.join(".openhuman");
+    let openhuman_dir = home.join(".alexanderai");
     write_config(&openhuman_dir);
     let workspace = home.join("workspace");
     std::fs::create_dir_all(&workspace).expect("mkdir ws");
@@ -270,7 +273,7 @@ fn harness_with(mock: Arc<MockLlm>) -> Harness {
 
     // Globals the real pipeline needs.
     init_global(64);
-    openhuman_core::openhuman::agent::bus::register_agent_handlers();
+    alexander_ai_solutions_core::alexander_ai_solutions::agent::bus::register_agent_handlers();
     let _ = AgentDefinitionRegistry::init_global_builtins();
 
     // Install the mock LLM — both provider funnels consult this first.
@@ -373,11 +376,12 @@ async fn fullstack_session_runs_real_agent_and_persists() {
     );
 
     // Real reserved-thread persistence: the user turn + agent reply landed.
-    let msgs = openhuman_core::openhuman::memory_conversations::get_messages(
-        h.workspace.clone(),
-        "subconscious:orchestrator",
-    )
-    .expect("read reserved thread");
+    let msgs =
+        alexander_ai_solutions_core::alexander_ai_solutions::memory_conversations::get_messages(
+            h.workspace.clone(),
+            "subconscious:orchestrator",
+        )
+        .expect("read reserved thread");
     let senders: Vec<&str> = msgs.iter().map(|m| m.sender.as_str()).collect();
     assert!(
         senders.contains(&"user"),

@@ -6,9 +6,11 @@ use std::path::{Path, PathBuf};
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
-use openhuman_core::openhuman::app_state::{snapshot, update_local_state, StoredAppStatePatch};
-use openhuman_core::openhuman::config::rpc as config_rpc;
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::app_state::{
+    snapshot, update_local_state, StoredAppStatePatch,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::rpc as config_rpc;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     auth_get_session_token_json, clear_session, list_provider_credentials,
     remove_provider_credentials, store_provider_credentials, store_session, AuthService,
 };
@@ -55,7 +57,7 @@ struct Round13Harness {
 }
 
 impl Round13Harness {
-    async fn config(&self) -> openhuman_core::openhuman::config::Config {
+    async fn config(&self) -> alexander_ai_solutions_core::alexander_ai_solutions::config::Config {
         config_rpc::load_config_with_timeout()
             .await
             .expect("isolated config should load")
@@ -103,7 +105,7 @@ auto_save = false
 embedding_strict = false
 "#;
     std::fs::write(openhuman_dir.join("config.toml"), cfg).expect("write config.toml");
-    let _: openhuman_core::openhuman::config::Config =
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
         toml::from_str(cfg).expect("test config must match schema");
 }
 
@@ -418,7 +420,7 @@ async fn raw_round13_connectivity_picker_identifies_openhuman_probe_listener() {
         return;
     };
 
-    let result = openhuman_core::openhuman::connectivity::rpc::pick_listen_port_for_host(
+    let result = alexander_ai_solutions_core::alexander_ai_solutions::connectivity::rpc::pick_listen_port_for_host(
         "127.0.0.1",
         preferred,
     )
@@ -427,7 +429,7 @@ async fn raw_round13_connectivity_picker_identifies_openhuman_probe_listener() {
     assert!(
         matches!(
             err,
-            openhuman_core::openhuman::connectivity::rpc::PickListenPortError::WouldTakeOver {
+            alexander_ai_solutions_core::alexander_ai_solutions::connectivity::rpc::PickListenPortError::WouldTakeOver {
                 preferred: p,
                 ref fingerprint
             } if p == preferred && fingerprint == "openhuman-core"
@@ -451,7 +453,7 @@ async fn raw_round13_connectivity_picker_falls_back_for_non_success_probe_status
         return;
     };
 
-    let picked = openhuman_core::openhuman::connectivity::rpc::pick_listen_port_for_host(
+    let picked = alexander_ai_solutions_core::alexander_ai_solutions::connectivity::rpc::pick_listen_port_for_host(
         "127.0.0.1",
         preferred,
     )
@@ -473,7 +475,7 @@ async fn raw_round13_connectivity_picker_falls_back_for_non_identifying_probe_bo
         return;
     };
 
-    let picked = openhuman_core::openhuman::connectivity::rpc::pick_listen_port_for_host(
+    let picked = alexander_ai_solutions_core::alexander_ai_solutions::connectivity::rpc::pick_listen_port_for_host(
         "127.0.0.1",
         preferred,
     )

@@ -20,8 +20,8 @@ use serde_json::{json, Value};
 use tempfile::tempdir;
 use tokio::time::timeout;
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 static LIVE_E2E_ENV_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
 static LIVE_RPC_AUTH_INIT: OnceLock<()> = OnceLock::new();
@@ -86,10 +86,10 @@ encrypt = false
 
     write_config_file(openhuman_dir, &cfg);
     // Match runtime config resolution order used during pre-login auth flows.
-    // If we seed ~/.openhuman, also seed ~/.openhuman/users/local.
+    // If we seed ~/.openhuman, also seed ~/.alexanderai/users/local.
     if openhuman_dir
         .file_name()
-        .is_some_and(|name| name == std::ffi::OsStr::new(".openhuman"))
+        .is_some_and(|name| name == std::ffi::OsStr::new(".alexanderai"))
     {
         write_config_file(&openhuman_dir.join("users").join("local"), &cfg);
     }
@@ -207,7 +207,7 @@ async fn live_channel_web_chat_routing_cases_trigger_real_backend() {
 
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
 
     write_live_config(&openhuman_home, &api_url);

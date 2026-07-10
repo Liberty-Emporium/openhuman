@@ -1,10 +1,12 @@
-use anyhow::Result;
-use openhuman_core::openhuman::agent::multimodal::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::multimodal::{
     contains_image_markers, count_image_markers, extract_ollama_image_payload, parse_image_markers,
     prepare_messages_for_provider,
 };
-use openhuman_core::openhuman::config::{MultimodalConfig, MultimodalFileConfig};
-use openhuman_core::openhuman::inference::provider::ChatMessage;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
+    MultimodalConfig, MultimodalFileConfig,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::ChatMessage;
+use anyhow::Result;
 
 #[test]
 fn marker_helpers_cover_mixed_content_and_payload_extraction() {

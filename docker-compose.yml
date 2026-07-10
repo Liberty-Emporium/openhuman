@@ -41,7 +41,7 @@ services:
       OPENHUMAN_CORE_HOST: 0.0.0.0
       OPENHUMAN_CORE_PORT: "7788"
       OPENHUMAN_WORKSPACE: /home/openhuman/.openhuman
-      XDG_CACHE_HOME: /home/openhuman/.openhuman/cache
+      XDG_CACHE_HOME: /home/openhuman/.alexanderai/cache
       TMPDIR: /tmp
       RUST_LOG: ${RUST_LOG:-info}
     volumes:

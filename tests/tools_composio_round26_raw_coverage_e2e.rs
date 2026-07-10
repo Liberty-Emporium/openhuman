@@ -13,9 +13,15 @@ use axum::routing::any;
 use axum::{Json, Router};
 use serde_json::{json, Value};
 
-use openhuman_core::openhuman::config::{PolymarketClobCredentials, PolymarketConfig};
-use openhuman_core::openhuman::security::{AutonomyLevel, SecurityPolicy};
-use openhuman_core::openhuman::tools::{ComposioTool, PermissionLevel, PolymarketTool, Tool};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
+    PolymarketClobCredentials, PolymarketConfig,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::security::{
+    AutonomyLevel, SecurityPolicy,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
+    ComposioTool, PermissionLevel, PolymarketTool, Tool,
+};
 
 #[derive(Clone, Debug)]
 struct RecordedRequest {

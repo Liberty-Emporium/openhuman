@@ -15,8 +15,8 @@ use reqwest::StatusCode;
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 const TEST_RPC_TOKEN: &str = "worker-b-domain-e2e-token";
 
@@ -88,7 +88,7 @@ async fn serve_rpc() -> (
 }
 
 fn write_min_config(openhuman_dir: &Path) {
-    std::fs::create_dir_all(openhuman_dir).expect("create .openhuman");
+    std::fs::create_dir_all(openhuman_dir).expect("create .alexanderai");
     let cfg = r#"api_url = "http://127.0.0.1:9"
 default_model = "e2e-model"
 default_temperature = 0.2
@@ -109,7 +109,7 @@ embedding_dimensions = 0
 embedding_strict = false
 "#;
     std::fs::write(openhuman_dir.join("config.toml"), cfg).expect("write config.toml");
-    let _: openhuman_core::openhuman::config::Config =
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
         toml::from_str(cfg).expect("test config must match schema");
 }
 
@@ -123,7 +123,7 @@ struct TestHarness {
 async fn setup() -> TestHarness {
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
     write_min_config(&openhuman_home);
 
     let guards = vec![
@@ -142,7 +142,7 @@ async fn setup() -> TestHarness {
     ];
 
     let _ =
-        openhuman_core::openhuman::agent::harness::AgentDefinitionRegistry::init_global_builtins();
+        alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::AgentDefinitionRegistry::init_global_builtins();
 
     let (addr, join) = serve_rpc().await;
     TestHarness {

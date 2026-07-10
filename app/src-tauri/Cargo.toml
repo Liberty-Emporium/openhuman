@@ -1,10 +1,10 @@
 [package]
-name = "OpenHuman"
+name = "alexander-ai-solutions"
 version = "1.0.0"
-description = "OpenHuman - AI-powered Super Assistant"
-authors = ["OpenHuman"]
+description = "Alexander AI Solutions - AI-powered Super Assistant"
+authors = ["Alexander AI Solutions"]
 edition = "2021"
-default-run = "OpenHuman"
+default-run = "alexander-ai-solutions"
 autobins = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -13,11 +13,11 @@ autobins = false
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-name = "openhuman"
+name = "alexander_ai_solutions"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [[bin]]
-name = "OpenHuman"
+name = "alexander-ai-solutions"
 path = "src/main.rs"
 
 [build-dependencies]
@@ -128,11 +128,11 @@ cef = { version = "=146.4.1", default-features = false }
 
 # Core domain logic, embedded in-process so the core's HTTP/JSON-RPC server
 # runs as a tokio task inside the Tauri host. Avoids the orphan-sidecar class
-# of bugs (PR #1061: Cmd+Q leaving `openhuman-core` and CEF helpers behind)
+# of bugs (PR #1061: Cmd+Q leaving `alexander-ai-solutions-core` and CEF helpers behind)
 # by tying the core's lifetime to the GUI process. The existing port-7788
 # probe in `core_process::ensure_running` still attaches to a running
-# `openhuman-core run` harness when one is already listening.
-openhuman_core = { path = "../..", package = "openhuman", default-features = false }
+# `alexander-ai-solutions-core run` harness when one is already listening.
+openhuman_core = { path = "../..", package = "alexander_ai_solutions", default-features = false }
 
 [target.'cfg(unix)'.dependencies]
 nix = { version = "0.29", default-features = false, features = ["signal", "user"] }

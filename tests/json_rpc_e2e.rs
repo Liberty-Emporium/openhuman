@@ -16,10 +16,10 @@ use futures_util::StreamExt;
 use serde_json::{json, Value};
 use tempfile::tempdir;
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
-use openhuman_core::openhuman::connectivity::rpc::pick_listen_port;
-use openhuman_core::openhuman::memory_tree::all_memory_tree_registered_controllers;
+use alexander_ai_solutions_core::alexander_ai_solutions::connectivity::rpc::pick_listen_port;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::all_memory_tree_registered_controllers;
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 const TEST_RPC_TOKEN: &str = "json-rpc-e2e-local-token";
 static JSON_RPC_AUTH_INIT: OnceLock<()> = OnceLock::new();
@@ -85,11 +85,13 @@ where
 {
     std::thread::Builder::new()
         .name(name.to_string())
-        .stack_size(openhuman_core::core::runtime::AGENT_WORKER_STACK_BYTES)
+        .stack_size(alexander_ai_solutions_core::core::runtime::AGENT_WORKER_STACK_BYTES)
         .spawn(move || {
             let rt = tokio::runtime::Builder::new_multi_thread()
                 .worker_threads(2)
-                .thread_stack_size(openhuman_core::core::runtime::AGENT_WORKER_STACK_BYTES)
+                .thread_stack_size(
+                    alexander_ai_solutions_core::core::runtime::AGENT_WORKER_STACK_BYTES,
+                )
                 .enable_all()
                 .build()
                 .expect("build json_rpc e2e runtime");
@@ -814,11 +816,14 @@ async fn wait_for_chat_completion_requests_len(expected_len: usize) -> Vec<Value
 
 async fn encrypt_test_mnemonic() -> String {
     let _keyring_backend_guard = EnvVarGuard::set("OPENHUMAN_KEYRING_BACKEND", "file");
-    let config = openhuman_core::openhuman::config::load_config_with_timeout()
-        .await
-        .expect("load config for encrypted test mnemonic");
-    openhuman_core::openhuman::keyring::init_workspace(&config.workspace_dir);
-    openhuman_core::openhuman::encryption::rpc::encrypt_secret(
+    let config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::load_config_with_timeout()
+            .await
+            .expect("load config for encrypted test mnemonic");
+    alexander_ai_solutions_core::alexander_ai_solutions::keyring::init_workspace(
+        &config.workspace_dir,
+    );
+    alexander_ai_solutions_core::alexander_ai_solutions::encryption::rpc::encrypt_secret(
         &config,
         "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
     )
@@ -892,15 +897,15 @@ encrypt = false
 
     // Runtime config resolution is user-scoped before login, so tests that seed
     // the root `~/.openhuman` directory also need the equivalent pre-login
-    // config under `~/.openhuman/users/local`.
+    // config under `~/.alexanderai/users/local`.
     if openhuman_dir
         .file_name()
-        .is_some_and(|name| name == std::ffi::OsStr::new(".openhuman"))
+        .is_some_and(|name| name == std::ffi::OsStr::new(".alexanderai"))
     {
         write_config_file(&openhuman_dir.join("users").join("local"), &cfg);
     }
 
-    let _: openhuman_core::openhuman::config::Config =
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
         toml::from_str(&cfg).expect("config toml must match Config schema");
 }
 
@@ -928,12 +933,12 @@ enabled = false
 
     if openhuman_dir
         .file_name()
-        .is_some_and(|name| name == std::ffi::OsStr::new(".openhuman"))
+        .is_some_and(|name| name == std::ffi::OsStr::new(".alexanderai"))
     {
         write_config_file(&openhuman_dir.join("users").join("local"), &cfg);
     }
 
-    let _: openhuman_core::openhuman::config::Config =
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
         toml::from_str(&cfg).expect("config toml must match Config schema");
 }
 
@@ -960,12 +965,12 @@ encrypt = false
 
     if openhuman_dir
         .file_name()
-        .is_some_and(|name| name == std::ffi::OsStr::new(".openhuman"))
+        .is_some_and(|name| name == std::ffi::OsStr::new(".alexanderai"))
     {
         write_config_file(&openhuman_dir.join("users").join("local"), &cfg);
     }
 
-    let _: openhuman_core::openhuman::config::Config =
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
         toml::from_str(&cfg).expect("config toml must match Config schema");
 }
 
@@ -1275,7 +1280,7 @@ async fn json_rpc_agent_registry_manages_defaults_and_custom_agents() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -1877,7 +1882,7 @@ async fn json_rpc_protocol_auth_and_agent_hello_inner() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -2008,7 +2013,7 @@ async fn json_rpc_model_council_runs_with_default_sentinel_and_repeated_jury_sea
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -2143,7 +2148,7 @@ async fn json_rpc_model_council_progressive_member_answers_then_synthesizes() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -2261,7 +2266,7 @@ async fn json_rpc_model_council_reports_total_member_failure_before_synthesis() 
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -2325,7 +2330,7 @@ async fn json_rpc_prompt_injection_is_rejected_before_model_call() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -2418,7 +2423,7 @@ async fn json_rpc_thread_labels_create_and_update() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -2524,7 +2529,7 @@ async fn json_rpc_todos_crud_on_personal_board() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -2642,7 +2647,7 @@ async fn json_rpc_todos_revise_plan_rejects_awaiting() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -2713,7 +2718,7 @@ async fn json_rpc_plan_review_decide_unknown_and_invalid() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -2772,7 +2777,7 @@ async fn json_rpc_thread_goal_lifecycle() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -2929,7 +2934,7 @@ async fn json_rpc_thread_title_create_and_update() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -3023,7 +3028,7 @@ async fn json_rpc_thread_not_found_errors_are_structured() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -3090,7 +3095,7 @@ async fn json_rpc_thread_generate_title_falls_back_when_provider_path_is_unavail
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -3198,7 +3203,7 @@ async fn json_rpc_thread_turn_state_lifecycle() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -3233,22 +3238,26 @@ async fn json_rpc_thread_turn_state_lifecycle() {
     // Drop a snapshot directly through the store — this is exactly what
     // the web-channel progress mirror does mid-turn.
     let workspace_dir = {
-        let cfg = openhuman_core::openhuman::config::Config::load_or_init()
-            .await
-            .expect("load config");
+        let cfg =
+            alexander_ai_solutions_core::alexander_ai_solutions::config::Config::load_or_init()
+                .await
+                .expect("load config");
         cfg.workspace_dir
     };
-    let mut state = openhuman_core::openhuman::threads::turn_state::TurnState::started(
+    let mut state = alexander_ai_solutions_core::alexander_ai_solutions::threads::turn_state::TurnState::started(
         "thread-turn-1",
         "req-turn-1",
         25,
         chrono::Utc::now().to_rfc3339(),
     );
-    state.lifecycle = openhuman_core::openhuman::threads::turn_state::TurnLifecycle::Streaming;
+    state.lifecycle = alexander_ai_solutions_core::alexander_ai_solutions::threads::turn_state::TurnLifecycle::Streaming;
     state.iteration = 2;
     state.streaming_text = "partial".into();
-    openhuman_core::openhuman::threads::turn_state::store::put(workspace_dir.clone(), &state)
-        .expect("seed snapshot");
+    alexander_ai_solutions_core::alexander_ai_solutions::threads::turn_state::store::put(
+        workspace_dir.clone(),
+        &state,
+    )
+    .expect("seed snapshot");
 
     // get → present
     let got = post_json_rpc(
@@ -3334,7 +3343,7 @@ async fn json_rpc_run_ledger_lifecycle() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -3349,19 +3358,20 @@ async fn json_rpc_run_ledger_lifecycle() {
     let (rpc_addr, rpc_join) = serve_on_ephemeral(build_core_http_router(false)).await;
     let rpc_base = format!("http://{rpc_addr}");
 
-    let config = openhuman_core::openhuman::config::Config::load_or_init()
-        .await
-        .expect("load config");
+    let config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::Config::load_or_init()
+            .await
+            .expect("load config");
 
-    openhuman_core::openhuman::session_db::run_ledger::upsert_agent_run(
+    alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::upsert_agent_run(
         &config,
-        openhuman_core::openhuman::session_db::run_ledger::AgentRunUpsert {
+        alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::AgentRunUpsert {
             id: "sub-run-1".to_string(),
-            kind: openhuman_core::openhuman::session_db::run_ledger::AgentRunKind::WorkerThread,
+            kind: alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::AgentRunKind::WorkerThread,
             parent_run_id: Some("req-run-1".to_string()),
             parent_thread_id: Some("thread-run-1".to_string()),
             agent_id: Some("researcher".to_string()),
-            status: openhuman_core::openhuman::session_db::run_ledger::AgentRunStatus::AwaitingUser,
+            status: alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::AgentRunStatus::AwaitingUser,
             prompt_ref: Some("thread:worker-1:message:seed".to_string()),
             worker_thread_id: Some("worker-1".to_string()),
             task_board_id: Some("thread-run-1".to_string()),
@@ -3380,9 +3390,9 @@ async fn json_rpc_run_ledger_lifecycle() {
     )
     .expect("seed run");
 
-    openhuman_core::openhuman::session_db::run_ledger::append_run_event(
+    alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::append_run_event(
         &config,
-        openhuman_core::openhuman::session_db::run_ledger::RunEventAppend {
+        alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::RunEventAppend {
             run_id: "sub-run-1".to_string(),
             event_type: "subagent_awaiting_user".to_string(),
             payload: json!({ "question": "Which repo should I inspect?" }),
@@ -3453,7 +3463,7 @@ async fn json_rpc_agent_work_list_groups_runs_by_bucket() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -3468,11 +3478,12 @@ async fn json_rpc_agent_work_list_groups_runs_by_bucket() {
     let (rpc_addr, rpc_join) = serve_on_ephemeral(build_core_http_router(false)).await;
     let rpc_base = format!("http://{rpc_addr}");
 
-    let config = openhuman_core::openhuman::config::Config::load_or_init()
-        .await
-        .expect("load config");
+    let config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::Config::load_or_init()
+            .await
+            .expect("load config");
 
-    use openhuman_core::openhuman::session_db::run_ledger::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::{
         upsert_agent_run, AgentRunKind, AgentRunStatus, AgentRunUpsert,
     };
     let seed = |id: &str, status: AgentRunStatus| AgentRunUpsert {
@@ -3545,7 +3556,7 @@ async fn json_rpc_workflow_run_definitions_and_runs_roundtrip() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -3560,9 +3571,10 @@ async fn json_rpc_workflow_run_definitions_and_runs_roundtrip() {
     let (rpc_addr, rpc_join) = serve_on_ephemeral(build_core_http_router(false)).await;
     let rpc_base = format!("http://{rpc_addr}");
 
-    let config = openhuman_core::openhuman::config::Config::load_or_init()
-        .await
-        .expect("load config");
+    let config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::Config::load_or_init()
+            .await
+            .expect("load config");
 
     // Builtin definitions are available with no seeding.
     let defs = post_json_rpc(
@@ -3587,16 +3599,16 @@ async fn json_rpc_workflow_run_definitions_and_runs_roundtrip() {
     );
 
     // Seed a durable workflow run, then list + get it.
-    openhuman_core::openhuman::session_db::run_ledger::upsert_workflow_run(
+    alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::upsert_workflow_run(
         &config,
-        openhuman_core::openhuman::session_db::run_ledger::WorkflowRunUpsert {
+        alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::WorkflowRunUpsert {
             id: "wf-run-1".to_string(),
             definition_id: "parallel_research_cross_check".to_string(),
             parent_thread_id: Some("thread-wf-1".to_string()),
             input: json!({ "question": "test" }),
             phase_states: json!({ "decompose": "completed" }),
             child_run_ids: vec!["child-1".to_string()],
-            status: openhuman_core::openhuman::session_db::run_ledger::WorkflowRunStatus::Running,
+            status: alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::WorkflowRunStatus::Running,
             summary: None,
             started_at: None,
             completed_at: None,
@@ -3650,7 +3662,7 @@ async fn json_rpc_agent_team_coordination_roundtrip() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -3665,9 +3677,10 @@ async fn json_rpc_agent_team_coordination_roundtrip() {
     let (rpc_addr, rpc_join) = serve_on_ephemeral(build_core_http_router(false)).await;
     let rpc_base = format!("http://{rpc_addr}");
 
-    let config = openhuman_core::openhuman::config::Config::load_or_init()
-        .await
-        .expect("load config");
+    let config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::Config::load_or_init()
+            .await
+            .expect("load config");
 
     // Create a team with two members.
     let created = post_json_rpc(
@@ -3786,17 +3799,17 @@ async fn json_rpc_agent_team_coordination_roundtrip() {
 
     // Mark A done directly via the run ledger, then B claims fine.
     let task_a =
-        openhuman_core::openhuman::session_db::run_ledger::get_agent_team_task(&config, &task_a_id)
+        alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::get_agent_team_task(&config, &task_a_id)
             .expect("get task A")
             .expect("task A present");
-    openhuman_core::openhuman::session_db::run_ledger::upsert_agent_team_task(
+    alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::upsert_agent_team_task(
         &config,
-        openhuman_core::openhuman::session_db::run_ledger::AgentTeamTaskUpsert {
+        alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::AgentTeamTaskUpsert {
             id: task_a.id.clone(),
             team_id: task_a.team_id.clone(),
             title: task_a.title.clone(),
             objective: task_a.objective.clone(),
-            status: openhuman_core::openhuman::session_db::run_ledger::AgentTeamTaskStatus::Done,
+            status: alexander_ai_solutions_core::alexander_ai_solutions::session_db::run_ledger::AgentTeamTaskStatus::Done,
             owner_member_id: task_a.owner_member_id.clone(),
             depends_on: task_a.depends_on.clone(),
             gate_status: Some(task_a.gate_status.clone()),
@@ -3972,7 +3985,7 @@ async fn json_rpc_task_board_brief_roundtrips_across_todos_and_threads_rpc() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -4181,7 +4194,7 @@ async fn json_rpc_memory_sync_and_learn() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -4304,7 +4317,7 @@ async fn json_rpc_memory_tree_end_to_end() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -4494,7 +4507,7 @@ async fn json_rpc_memory_diff_snapshot_diff_and_read_marker_lifecycle() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -4718,7 +4731,7 @@ async fn json_rpc_memory_tree_cover_window_end_to_end() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -4841,7 +4854,7 @@ async fn json_rpc_web_chat_routing_cases_use_expected_backend_models_inner() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -4961,7 +4974,7 @@ async fn json_rpc_web_chat_custom_chat_provider_uses_stored_key_and_rebuilds_on_
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -5200,7 +5213,7 @@ async fn json_rpc_web_chat_custom_chat_provider_with_auth_none_omits_auth_header
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -5272,10 +5285,11 @@ async fn json_rpc_web_chat_custom_chat_provider_with_auth_none_omits_auth_header
             .any(|e| e.get("slug").and_then(Value::as_str) == Some("proxy")),
         "user's auth-none 'proxy' entry must survive the update: {providers:?}"
     );
-    let loaded_config = openhuman_core::openhuman::config::load_config_with_timeout()
-        .await
-        .expect("load_config after auth-none update");
-    let (provider, model) = openhuman_core::openhuman::inference::provider::create_chat_provider(
+    let loaded_config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::load_config_with_timeout()
+            .await
+            .expect("load_config after auth-none update");
+    let (provider, model) = alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::create_chat_provider(
         "chat",
         &loaded_config,
     )
@@ -5361,7 +5375,7 @@ async fn json_rpc_rejects_non_object_params_with_clear_error() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -5402,7 +5416,7 @@ async fn json_rpc_screen_intelligence_capture_test_returns_stable_shape() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -5484,7 +5498,7 @@ async fn json_rpc_screen_intelligence_status_returns_stable_shape() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -5578,7 +5592,7 @@ async fn json_rpc_app_state_snapshot_returns_runtime_shape() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -5662,7 +5676,7 @@ async fn json_rpc_app_state_update_local_state_round_trips_into_snapshot() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -5727,7 +5741,7 @@ async fn json_rpc_wallet_setup_round_trips_status() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -5834,7 +5848,7 @@ async fn json_rpc_wallet_execution_surface_round_trips() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -6066,7 +6080,7 @@ async fn json_rpc_wallet_tx_reads_and_web3_gates_round_trip() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -6419,7 +6433,7 @@ async fn json_rpc_wallet_evm_base_network_prepare_execute_round_trips() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -6503,7 +6517,7 @@ async fn json_rpc_wallet_btc_prepare_execute_round_trips() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -6595,7 +6609,7 @@ async fn json_rpc_wallet_solana_prepare_execute_round_trips() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -6664,7 +6678,7 @@ async fn json_rpc_wallet_tron_prepare_execute_round_trips() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -6752,7 +6766,7 @@ async fn json_rpc_wallet_tron_trc20_prepare_execute_round_trips() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -6842,7 +6856,7 @@ async fn json_rpc_wallet_network_defaults_lists_all_chains() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -6907,7 +6921,7 @@ async fn json_rpc_app_state_snapshot_chat_onboarding_defaults_false() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -6963,7 +6977,7 @@ async fn json_rpc_screen_intelligence_vision_recent_returns_empty_without_sessio
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -7008,7 +7022,7 @@ async fn json_rpc_autocomplete_runtime_settings_and_logs_flow() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -7242,7 +7256,7 @@ async fn json_rpc_local_ai_device_profile_and_presets() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -7383,7 +7397,7 @@ async fn json_rpc_local_ai_lm_studio_config_diagnostics_and_prompt() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -7535,7 +7549,7 @@ async fn json_rpc_local_ai_ollama_endpoint_normalizes_bind_address_and_clears() 
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -7595,7 +7609,7 @@ async fn json_rpc_inference_namespace_lm_studio_prompt_and_status() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -7765,7 +7779,7 @@ async fn json_rpc_inference_prompt_requires_external_ollama_runtime_when_unreach
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -7834,7 +7848,7 @@ async fn billing_rpc_e2e() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -7984,7 +7998,7 @@ async fn team_rpc_e2e() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -8115,7 +8129,7 @@ async fn about_app_rpc_list_lookup_and_search() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -8224,7 +8238,7 @@ async fn voice_status_returns_availability() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -8285,7 +8299,7 @@ async fn notification_settings_roundtrip_and_disabled_ingest_skip() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -8376,7 +8390,7 @@ async fn credentials_crud_roundtrip() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -8511,7 +8525,7 @@ async fn credentials_crud_roundtrip() {
 ///
 /// Validates that the RPC method is registered, wire-decodes
 /// `UninstallSkillParams`, resolves the slug against
-/// `~/.openhuman/skills/<slug>/`, removes the directory on success, and
+/// `~/.alexanderai/skills/<slug>/`, removes the directory on success, and
 /// forwards the core error message verbatim for the two documented
 /// failure modes (missing SKILL.md and path traversal). Previously only
 /// the `uninstall_skill(...)` helper was tested — the wire layer
@@ -8525,7 +8539,7 @@ async fn skills_uninstall_rpc_e2e() {
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
 
-    let skills_root = home.join(".openhuman").join("skills");
+    let skills_root = home.join(".alexanderai").join("skills");
     std::fs::create_dir_all(&skills_root).expect("mkdir skills root");
 
     // Seed a skill whose on-disk slug differs from its frontmatter name —
@@ -8977,11 +8991,11 @@ async fn rpc_update_apply_can_be_disabled_by_config_policy() {
     let tmp = tempdir().expect("tempdir");
     let _workspace_guard = EnvVarGuard::set_to_path("OPENHUMAN_WORKSPACE", tmp.path());
 
-    let mut config = openhuman_core::openhuman::config::Config {
+    let mut config = alexander_ai_solutions_core::alexander_ai_solutions::config::Config {
         workspace_dir: tmp.path().join("workspace"),
         action_dir: tmp.path().join("workspace"),
         config_path: tmp.path().join("config.toml"),
-        ..openhuman_core::openhuman::config::Config::default()
+        ..alexander_ai_solutions_core::alexander_ai_solutions::config::Config::default()
     };
     config.update.rpc_mutations_enabled = false;
     config
@@ -9045,7 +9059,7 @@ async fn channels_status_reflects_managed_dm_credential_e2e() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -9145,7 +9159,7 @@ async fn whatsapp_data_ingest_and_query_e2e() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -9159,9 +9173,11 @@ async fn whatsapp_data_ingest_and_query_e2e() {
     // Init the whatsapp_data global before the router handles any requests.
     // Reset first so we attach to *this* test's tempdir even if a sibling
     // test left a stale handle pointing at an already-dropped tempdir.
-    openhuman_core::openhuman::whatsapp_data::global::reset_for_tests();
-    openhuman_core::openhuman::whatsapp_data::global::init(openhuman_home.clone())
-        .expect("whatsapp_data global init");
+    alexander_ai_solutions_core::alexander_ai_solutions::whatsapp_data::global::reset_for_tests();
+    alexander_ai_solutions_core::alexander_ai_solutions::whatsapp_data::global::init(
+        openhuman_home.clone(),
+    )
+    .expect("whatsapp_data global init");
 
     let (rpc_addr, rpc_join) = serve_on_ephemeral(build_core_http_router(false)).await;
     let rpc_base = format!("http://{}", rpc_addr);
@@ -9415,7 +9431,7 @@ async fn whatsapp_memory_doc_ingest_e2e() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -9534,7 +9550,7 @@ async fn voice_cloud_transcribe_registered_e2e() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -9851,18 +9867,18 @@ async fn json_rpc_meet_agent_session_lifecycle() {
 ///    the read-only boundary the issue requires.
 #[tokio::test(flavor = "multi_thread")]
 async fn whatsapp_data_agent_tools_e2e_1341() {
-    use openhuman_core::openhuman::tools::traits::Tool;
-    use openhuman_core::openhuman::tools::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::tools::traits::Tool;
+    use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
         WhatsAppDataListChatsTool, WhatsAppDataListMessagesTool, WhatsAppDataSearchMessagesTool,
     };
-    use openhuman_core::openhuman::whatsapp_data::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::whatsapp_data::{
         all_whatsapp_data_controller_schemas, global as wa_global, ops as wa_ops,
         types::{ChatMeta, IngestMessage, IngestRequest},
     };
 
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
-    let openhuman_home = tmp.path().join(".openhuman");
+    let openhuman_home = tmp.path().join(".alexanderai");
     std::fs::create_dir_all(&openhuman_home).expect("create openhuman home");
 
     // The whatsapp_data global store is process-wide. Reset before init so
@@ -9933,7 +9949,9 @@ async fn whatsapp_data_agent_tools_e2e_1341() {
     .expect("ingest");
 
     // Helper: parse a successful Tool response back into JSON.
-    fn parse_tool_output(result: openhuman_core::openhuman::workflows::types::ToolResult) -> Value {
+    fn parse_tool_output(
+        result: alexander_ai_solutions_core::alexander_ai_solutions::workflows::types::ToolResult,
+    ) -> Value {
         assert!(!result.is_error, "tool returned error: {result:?}");
         serde_json::from_str(&result.output()).expect("tool output is valid JSON")
     }
@@ -10077,7 +10095,7 @@ async fn companion_session_lifecycle_over_rpc() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -10218,7 +10236,7 @@ async fn mcp_clients_lifecycle() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -10368,7 +10386,7 @@ async fn mcp_clients_install_connect_tool_call_happy_path() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -10397,10 +10415,11 @@ async fn mcp_clients_install_connect_tool_call_happy_path() {
             "exampleConfig": { "command": stub_path, "args": [] }
         }]
     });
-    let seed_config = openhuman_core::openhuman::config::load_config_with_timeout()
-        .await
-        .expect("load config for cache seed");
-    openhuman_core::openhuman::mcp_registry::store::set_cached(
+    let seed_config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::load_config_with_timeout()
+            .await
+            .expect("load config for cache seed");
+    alexander_ai_solutions_core::alexander_ai_solutions::mcp_registry::store::set_cached(
         &seed_config,
         &format!("smithery:detail:{qualified_name}"),
         &detail.to_string(),
@@ -10556,7 +10575,7 @@ async fn mcp_clients_set_enabled_smoke() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -10585,10 +10604,11 @@ async fn mcp_clients_set_enabled_smoke() {
             "exampleConfig": { "command": stub_path, "args": [] }
         }]
     });
-    let seed_config = openhuman_core::openhuman::config::load_config_with_timeout()
-        .await
-        .expect("load config for cache seed");
-    openhuman_core::openhuman::mcp_registry::store::set_cached(
+    let seed_config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::load_config_with_timeout()
+            .await
+            .expect("load config for cache seed");
+    alexander_ai_solutions_core::alexander_ai_solutions::mcp_registry::store::set_cached(
         &seed_config,
         &format!("smithery:detail:{qualified_name}"),
         &detail.to_string(),
@@ -10670,7 +10690,7 @@ async fn mcp_clients_install_idempotent_refresh_and_canonical_dedup() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -10698,10 +10718,11 @@ async fn mcp_clients_install_idempotent_refresh_and_canonical_dedup() {
             "exampleConfig": { "command": stub_path, "args": [] }
         }]
     });
-    let seed_config = openhuman_core::openhuman::config::load_config_with_timeout()
-        .await
-        .expect("load config for cache seed");
-    openhuman_core::openhuman::mcp_registry::store::set_cached(
+    let seed_config =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::load_config_with_timeout()
+            .await
+            .expect("load config for cache seed");
+    alexander_ai_solutions_core::alexander_ai_solutions::mcp_registry::store::set_cached(
         &seed_config,
         &format!("smithery:detail:{qualified_name}"),
         &detail.to_string(),
@@ -10812,7 +10833,7 @@ async fn mcp_clients_registry_settings_roundtrip() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -10942,7 +10963,7 @@ async fn json_rpc_proxy_config_corruption_recovery() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -11012,9 +11033,10 @@ encrypt = false
     //    next call to load_config_with_timeout reads the on-disk file, finds
     //    it broken, falls back to the .bak, and returns the backup sentinel
     //    temperature (1.2) without returning an error.
-    let recovered = openhuman_core::openhuman::config::load_config_with_timeout()
-        .await
-        .expect("load_config_with_timeout must not error even with corrupt primary");
+    let recovered =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::load_config_with_timeout()
+            .await
+            .expect("load_config_with_timeout must not error even with corrupt primary");
     assert!(
         (recovered.default_temperature - 1.2).abs() < 1e-9
             || (recovered.default_temperature - 0.7).abs() < 1e-9,
@@ -11048,7 +11070,7 @@ async fn json_rpc_config_bak_recovery_after_primary_corruption() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -11115,9 +11137,10 @@ encrypt = false
     //    It should recover from the `.bak` (if save was called) or fall back
     //    to `Config::default()`.  Either outcome is acceptable — the contract
     //    is "no Err returned, no panic".
-    let recovered = openhuman_core::openhuman::config::load_config_with_timeout()
-        .await
-        .expect("load_config_with_timeout must not return Err with corrupt primary");
+    let recovered =
+        alexander_ai_solutions_core::alexander_ai_solutions::config::load_config_with_timeout()
+            .await
+            .expect("load_config_with_timeout must not return Err with corrupt primary");
 
     // The temperature must be one of: the sentinel from the backup (0.91) or
     // the compiled-in default (~0.7). Using 0.91 ensures that if we ever see
@@ -11157,7 +11180,7 @@ async fn json_rpc_stale_auth_profile_lock_auto_recovered() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -11229,7 +11252,7 @@ async fn json_rpc_config_autonomy_settings_roundtrip() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -11383,7 +11406,7 @@ async fn json_rpc_config_agent_timeout_settings_roundtrip() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -11493,8 +11516,8 @@ async fn json_rpc_config_agent_timeout_settings_roundtrip() {
 
     // Restore the process-global timeout so later tests in this binary don't
     // inherit the 300s value set above (the AtomicU64 is per-process, not per-test).
-    openhuman_core::openhuman::tool_timeout::set_tool_timeout_secs(
-        openhuman_core::openhuman::tool_timeout::DEFAULT_TIMEOUT_SECS,
+    alexander_ai_solutions_core::alexander_ai_solutions::tool_timeout::set_tool_timeout_secs(
+        alexander_ai_solutions_core::alexander_ai_solutions::tool_timeout::DEFAULT_TIMEOUT_SECS,
     );
 
     mock_join.abort();
@@ -11612,7 +11635,7 @@ async fn json_rpc_task_sources_crud_and_status() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -11760,11 +11783,11 @@ async fn json_rpc_task_sources_crud_and_status() {
 /// fetch → enrich → route → ingest pipeline can be exercised over RPC
 /// without a live Composio connection.
 mod task_sources_stub {
-    use async_trait::async_trait;
-    use openhuman_core::openhuman::memory_sync::composio::providers::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::{
         ComposioProvider, NormalizedTask, ProviderContext, ProviderUserProfile, SyncOutcome,
         SyncReason, TaskFetchFilter,
     };
+    use async_trait::async_trait;
 
     pub struct StubGithubProvider {
         pub tasks: Vec<NormalizedTask>,
@@ -11820,7 +11843,7 @@ async fn json_rpc_task_sources_fetch_pipeline_e2e() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -11831,7 +11854,7 @@ async fn json_rpc_task_sources_fetch_pipeline_e2e() {
 
     // Register the stub github provider BEFORE serving so the fetch RPC
     // resolves it from the global registry.
-    openhuman_core::openhuman::memory_sync::composio::providers::register_provider(Arc::new(
+    alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::register_provider(Arc::new(
         task_sources_stub::StubGithubProvider {
             tasks: vec![
                 task_sources_stub::task("101", "Fix flaky test", "2025-01-01T00:00:00Z"),
@@ -11952,21 +11975,21 @@ async fn json_rpc_task_sources_fetch_pipeline_e2e() {
     // Restore the global provider registry so the stub "github" provider
     // does not leak into other tests in this binary (re-registers the
     // real built-in providers).
-    openhuman_core::openhuman::memory_sync::composio::providers::init_default_providers();
+    alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::composio::providers::init_default_providers();
 
     rpc_join.abort();
 }
 
 /// Full lifecycle over JSON-RPC for the `workflows` namespace:
 /// create → list → read → phase → uninstall. Workflows are scaffolded under
-/// the user-scope root (`$HOME/.openhuman/workflows/<slug>/`), which the temp
+/// the user-scope root (`$HOME/.alexanderai/workflows/<slug>/`), which the temp
 /// `HOME` isolates per-test.
 #[tokio::test]
 async fn json_rpc_workflows_lifecycle_round_trip() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -12093,7 +12116,7 @@ async fn json_rpc_channel_web_chat_with_speak_reply_invokes_reply_speech_inner()
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -12102,11 +12125,11 @@ async fn json_rpc_channel_web_chat_with_speak_reply_invokes_reply_speech_inner()
     // Activate the reply_speech test seam so synthesize_reply records and
     // short-circuits instead of calling the hosted backend.
     let _seam_guard = EnvVarGuard::set(
-        openhuman_core::openhuman::voice::reply_speech::TEST_SEAM_ENV,
+        alexander_ai_solutions_core::alexander_ai_solutions::voice::reply_speech::TEST_SEAM_ENV,
         "1",
     );
 
-    openhuman_core::openhuman::voice::reply_speech::test_seam::clear();
+    alexander_ai_solutions_core::alexander_ai_solutions::voice::reply_speech::test_seam::clear();
 
     let (mock_addr, mock_join) = serve_on_ephemeral(mock_upstream_router()).await;
     let mock_origin = format!("http://{}", mock_addr);
@@ -12175,7 +12198,7 @@ async fn json_rpc_channel_web_chat_with_speak_reply_invokes_reply_speech_inner()
     // because the bridge task may finish slightly after chat_done.
     let mut observed: Vec<String> = Vec::new();
     for _ in 0..50 {
-        observed = openhuman_core::openhuman::voice::reply_speech::test_seam::observed();
+        observed = alexander_ai_solutions_core::alexander_ai_solutions::voice::reply_speech::test_seam::observed();
         if !observed.is_empty() {
             break;
         }
@@ -12212,7 +12235,7 @@ async fn json_rpc_voice_server_settings_roundtrip_always_on_and_wake_word() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -12293,7 +12316,7 @@ async fn json_rpc_memory_sync_settings_roundtrip_interval_and_manual() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -12426,7 +12449,7 @@ async fn json_rpc_memory_sync_settings_env_override_is_reflected() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -12734,11 +12757,11 @@ api_key = "ck_e2e_test"
     write_config_file(openhuman_dir, &cfg);
     if openhuman_dir
         .file_name()
-        .is_some_and(|name| name == std::ffi::OsStr::new(".openhuman"))
+        .is_some_and(|name| name == std::ffi::OsStr::new(".alexanderai"))
     {
         write_config_file(&openhuman_dir.join("users").join("local"), &cfg);
     }
-    let _: openhuman_core::openhuman::config::Config =
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
         toml::from_str(&cfg).expect("config toml must match Config schema");
 }
 
@@ -12795,7 +12818,7 @@ async fn json_rpc_memory_sources_list_filters_to_active_connections() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -12881,7 +12904,7 @@ async fn json_rpc_memory_sources_list_shows_all_when_scan_unavailable() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -12949,7 +12972,7 @@ async fn json_rpc_memory_sources_list_keeps_multiple_active_connections_per_tool
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -13027,7 +13050,7 @@ async fn json_rpc_workflow_run_engine_executes_builtin_to_completion_inner() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -13172,7 +13195,7 @@ async fn json_rpc_agent_team_live_member_run_roundtrip_inner() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);
     let _workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -13428,7 +13451,7 @@ async fn json_rpc_threads_token_usage_reads_persisted_thread_totals() {
     let _env_lock = json_rpc_e2e_env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
     let workspace = home.join("workspace");
 
     let _home_guard = EnvVarGuard::set_to_path("HOME", home);

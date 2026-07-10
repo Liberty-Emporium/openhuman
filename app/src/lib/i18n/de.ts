@@ -582,7 +582,7 @@ const messages: TranslationMap = {
   'skills.channels': 'Messaging',
   'skills.explorer.emptyCta': 'Von URL installieren',
   'skills.explorer.emptyDescription':
-    'Installiere ein SKILL.md-Paket oder lege Hermes-artige Ordner unter ~/.openhuman/skills ab.',
+    'Installiere ein SKILL.md-Paket oder lege Hermes-artige Ordner unter ~/.alexanderai/skills ab.',
   'skills.explorer.emptyTitle': 'Keine Skills gefunden',
   'skills.explorer.installFromUrl': 'Von URL installieren',
   'skills.explorer.newSkill': 'Neuer Skill',
@@ -3826,7 +3826,7 @@ const messages: TranslationMap = {
   'settings.ai.claudeCode.fullAccessOff':
     'Nur Änderungen akzeptieren — wendet Dateiänderungen automatisch an, begrenzt Befehle & Netzwerk.',
   'settings.ai.claudeCode.sandboxNoteMac':
-    'Unter macOS bleibt ~/.openhuman in beiden Modi durch die Sandbox geschützt.',
+    'Unter macOS bleibt ~/.alexanderai in beiden Modi durch die Sandbox geschützt.',
   'settings.ai.claudeCode.sandboxNoteOther':
     'Voller Zugriff ist auf dieser Plattform uneingeschränkt — aktiviere ihn nur, wenn du dem Workspace vertraust.',
   'settings.ai.claudeCode.enableToCheck': 'Aktiviere Claude Code, um die Anmeldung zu prüfen.',
@@ -5180,9 +5180,9 @@ const messages: TranslationMap = {
   'skills.create.name': 'Name',
   'skills.create.namePlaceholder': 'z.B. Fachzeitschrift',
   'skills.create.scope': 'Umfang',
-  'skills.create.scopeProjectHint': '/.openhuman/skills/',
+  'skills.create.scopeProjectHint': '/.alexanderai/skills/',
   'skills.create.scopeUserHint':
-    'Geschrieben an ~/.openhuman/skills/<slug>/SKILL.md – verfügbar in allen Arbeitsbereichen.',
+    'Geschrieben an ~/.alexanderai/skills/<slug>/SKILL.md – verfügbar in allen Arbeitsbereichen.',
   'skills.create.slugLabel': 'Schneckenetikett',
   'skills.create.subtitle': 'SKILL.md',
   'skills.create.tags': 'Schlagworte',
@@ -5229,7 +5229,7 @@ const messages: TranslationMap = {
     'Nur direkte „.md“-Links funktionieren. Für GitHub: Link zu einer Datei (github.com/owner/repo/blob/.../SKILL.md) – Baum- und Repo-Roots sind nicht installiert.',
   'skills.install.errors.unsupportedUrlTitle': 'URL-Formular nicht unterstützt',
   'skills.install.errors.writeFailedHint':
-    'Das Workspace-Skills-Verzeichnis war nicht beschreibbar. Überprüfen Sie die Dateisystemberechtigungen für „<workspace>/.openhuman/skills/“.',
+    'Das Workspace-Skills-Verzeichnis war nicht beschreibbar. Überprüfen Sie die Dateisystemberechtigungen für „<workspace>/.alexanderai/skills/“.',
   'skills.install.errors.writeFailedTitle': 'SKILL.md konnte nicht geschrieben werden.',
   'skills.install.fetchLog': 'Protokoll abrufen',
   'skills.install.fetchingPrefix': 'Das Abrufen von',

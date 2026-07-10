@@ -35,7 +35,7 @@ function makeReport(
 ): MigrationReport {
   return {
     source_workspace: '/home/u/.openclaw/workspace',
-    target_workspace: '/home/u/.openhuman/workspace',
+    target_workspace: '/home/u/.alexanderai/workspace',
     dry_run: true,
     stats: {
       from_sqlite: 4,

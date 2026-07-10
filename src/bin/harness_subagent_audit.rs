@@ -19,16 +19,16 @@ use std::sync::{
 };
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use anyhow::{Context, Result};
-use clap::Parser;
-use openhuman_core::openhuman::agent::harness::run_queue::QueueMode;
-use openhuman_core::openhuman::agent::progress::AgentProgress;
-use openhuman_core::openhuman::agent::Agent;
-use openhuman_core::openhuman::agent_orchestration::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::run_queue::QueueMode;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::progress::AgentProgress;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent_orchestration::{
     running_subagents,
     subagent_sessions::{DurableSubagentSession, DurableSubagentStatus, SubagentSessionStore},
 };
-use openhuman_core::openhuman::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use anyhow::{Context, Result};
+use clap::Parser;
 use serde::Serialize;
 use tokio::sync::mpsc;
 

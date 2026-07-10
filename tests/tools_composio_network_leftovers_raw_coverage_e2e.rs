@@ -14,13 +14,17 @@ use axum::{Json, Router};
 use serde_json::{json, Value};
 use tempfile::{Builder, TempDir};
 
-use openhuman_core::openhuman::composio::ops::{composio_authorize, composio_list_tools};
-use openhuman_core::openhuman::config::{Config, PolymarketClobCredentials};
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::ops::{
+    composio_authorize, composio_list_tools,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
+    Config, PolymarketClobCredentials,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
-use openhuman_core::openhuman::security::SecurityPolicy;
-use openhuman_core::openhuman::tools::{
+use alexander_ai_solutions_core::alexander_ai_solutions::security::SecurityPolicy;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
     ComposioAuthorizeTool, ComposioListConnectionsTool, ComposioListToolkitsTool,
     ComposioListToolsTool, ComposioTool, PolymarketTool, SpawnSubagentTool, Tool, ToolCallOptions,
 };

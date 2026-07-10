@@ -41,22 +41,28 @@ use std::process::Command;
 use chrono::Utc;
 use tempfile::TempDir;
 
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::memory::read_rpc::{graph_export_rpc, GraphMode};
-use openhuman_core::openhuman::memory::tree_source::get_or_create_source_tree;
-use openhuman_core::openhuman::memory_sources::sync::sync_source;
-use openhuman_core::openhuman::memory_sources::types::{MemorySourceEntry, SourceKind};
-use openhuman_core::openhuman::memory_store::content::raw::{
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::read_rpc::{
+    graph_export_rpc, GraphMode,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::tree_source::get_or_create_source_tree;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::sync::sync_source;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sources::types::{
+    MemorySourceEntry, SourceKind,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::content::raw::{
     raw_kind_dir, raw_source_dir, RawKind,
 };
-use openhuman_core::openhuman::memory_store::trees::store as tree_store;
-use openhuman_core::openhuman::memory_store::trees::types::SUMMARY_FANOUT;
-use openhuman_core::openhuman::memory_sync::sources::audit::read_audit_log;
-use openhuman_core::openhuman::memory_sync::sources::github::run_github_sync;
-use openhuman_core::openhuman::memory_sync::sources::rebuild::{
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::trees::store as tree_store;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_store::trees::types::SUMMARY_FANOUT;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::sources::audit::read_audit_log;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::sources::github::run_github_sync;
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_sync::sources::rebuild::{
     needs_rebuild, rebuild_tree_from_raw,
 };
-use openhuman_core::openhuman::memory_tree::ingest::{ingest_summary, SummaryIngestInput};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory_tree::ingest::{
+    ingest_summary, SummaryIngestInput,
+};
 
 // ── Shared harness ────────────────────────────────────────────────────────
 

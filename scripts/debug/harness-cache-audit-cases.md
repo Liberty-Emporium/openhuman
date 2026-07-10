@@ -10,19 +10,19 @@ chat.
 ## Workspace
 
 By default, `pnpm debug harness-cache-audit` reads
-`~/.openhuman/active_user.toml` and uses that user's workspace. To pin a
+`~/.alexanderai/active_user.toml` and uses that user's workspace. To pin a
 workspace explicitly, use the active per-user workspace, not the top-level
 `~/.openhuman` directory:
 
 ```bash
-ACTIVE_USER_ID="$(sed -n 's/^user_id = "\(.*\)"$/\1/p' "$HOME/.openhuman/active_user.toml")"
-WORKSPACE="$HOME/.openhuman/users/$ACTIVE_USER_ID/workspace"
+ACTIVE_USER_ID="$(sed -n 's/^user_id = "\(.*\)"$/\1/p' "$HOME/.alexanderai/active_user.toml")"
+WORKSPACE="$HOME/.alexanderai/users/$ACTIVE_USER_ID/workspace"
 ```
 
 Or inspect the active user directly:
 
 ```bash
-cat "$HOME/.openhuman/active_user.toml"
+cat "$HOME/.alexanderai/active_user.toml"
 ```
 
 ## Case 1: Baseline Delegation

@@ -31,7 +31,7 @@ pub type Tag<'a> = (&'a str, &'a str);
 /// - **504** Gateway Timeout
 ///
 /// Single source of truth for both the call-site classifier
-/// (`openhuman::inference::provider::ops::should_report_provider_http_failure`) and the
+/// (`alexander_ai_solutions::inference::provider::ops::should_report_provider_http_failure`) and the
 /// `before_send` filter (`is_transient_provider_http_failure`). Update here
 /// and both sites pick it up — keeps the two layers from drifting.
 pub const TRANSIENT_PROVIDER_HTTP_STATUSES: &[u16] = &[408, 429, 502, 503, 504, 520];
@@ -103,7 +103,7 @@ pub enum ExpectedErrorKind {
     /// Deterministic user-config state surfaced in the UI — Sentry has no
     /// remediation path (OPENHUMAN-TAURI-WJ / -QW / -HB / -NH, ~273
     /// events). See
-    /// [`crate::openhuman::inference::provider::is_provider_config_rejection_message`]
+    /// [`crate::alexander_ai_solutions::inference::provider::is_provider_config_rejection_message`]
     /// for the polarity contract and exact body shapes.
     ProviderConfigRejection,
     LocalAiCapabilityUnavailable,
@@ -174,7 +174,7 @@ pub enum ExpectedErrorKind {
     /// /Users/<user>/Documents/<vault>`, observed on
     /// `openhuman@0.56.0`) and preempts the symmetric
     /// `hosted path is not a directory:` shape from
-    /// `openhuman::http_host::path_utils` once it starts surfacing.
+    /// `alexander_ai_solutions::http_host::path_utils` once it starts surfacing.
     /// See [`is_filesystem_user_path_invalid_message`] for the polarity
     /// contract — the safety-guard variant in `skills::ops_install`
     /// (`{path} is not a directory — refusing to remove`) is
@@ -273,7 +273,7 @@ pub enum ExpectedErrorKind {
     /// Drops Sentry TAURI-RUST-83A (~430 events / 40 users on
     /// `openhuman@0.57.13`). Anchored to the `codex cli auth` /
     /// `.codex/auth.json` envelope produced by
-    /// [`crate::openhuman::inference::openai_oauth::store::import_codex_cli_auth_from_path`]
+    /// [`crate::alexander_ai_solutions::inference::openai_oauth::store::import_codex_cli_auth_from_path`]
     /// — a genuine keyring/persist failure in `upsert_profile` carries neither
     /// anchor, so a real defect in the import code still reaches Sentry.
     CodexCliAuthUnavailable,
@@ -292,12 +292,12 @@ pub enum ExpectedErrorKind {
     /// The single exception — a backend-flagged **malformed** `BAD_REQUEST` —
     /// is NOT classified here (it is a client-built payload the backend
     /// couldn't parse, and the FE *does* page for it, F8). See
-    /// [`crate::openhuman::inference::provider::backend_error_code_skips_sentry`].
+    /// [`crate::alexander_ai_solutions::inference::provider::backend_error_code_skips_sentry`].
     BackendErrorCodeOwned,
     /// A remote MCP server answered the connect handshake with HTTP 401 — it
     /// needs OAuth sign-in, not a code fix. `McpHttpClient::read_response`
     /// (`src/openhuman/mcp_client/client.rs`) raises the typed
-    /// [`crate::openhuman::mcp_client::McpUnauthorizedError`], and
+    /// [`crate::alexander_ai_solutions::mcp_client::McpUnauthorizedError`], and
     /// `mcp_registry::connections::connect` already classifies it and stores a
     /// `needs_auth` flag so the UI prompts the user to authenticate (the
     /// `needs_auth` UX shipped in #3733 / #3719). But `mcp_clients_connect`
@@ -325,7 +325,7 @@ pub fn expected_error_kind(message: &str) -> Option<ExpectedErrorKind> {
     // decision is gated on the managed-backend envelope so a BYO payload
     // carrying an `errorCode`-shaped field is not wrongly suppressed
     // (CodeRabbit).
-    if crate::openhuman::inference::provider::managed_error_skips_sentry(message) {
+    if crate::alexander_ai_solutions::inference::provider::managed_error_skips_sentry(message) {
         return Some(ExpectedErrorKind::BackendErrorCodeOwned);
     }
     // A managed-backend client-guard-leak code (`PAYLOAD_TOO_LARGE` /
@@ -338,8 +338,8 @@ pub fn expected_error_kind(message: &str) -> Option<ExpectedErrorKind> {
     // `ContextWindowExceeded` bucket (CodeRabbit). Gated on the managed envelope
     // so a BYO provider's own context-overflow — genuine user-state, not our
     // guard — still flows to that matcher and stays demoted.
-    if crate::openhuman::inference::provider::is_managed_backend_envelope(message)
-        && crate::openhuman::inference::provider::is_backend_client_guard_leak(message)
+    if crate::alexander_ai_solutions::inference::provider::is_managed_backend_envelope(message)
+        && crate::alexander_ai_solutions::inference::provider::is_backend_client_guard_leak(message)
     {
         return None;
     }
@@ -444,7 +444,9 @@ pub fn expected_error_kind(message: &str) -> Option<ExpectedErrorKind> {
     // — recovery is reconnecting OpenAI; Sentry has no remediation path. The
     // markers are distinct from the backend "invalid token" session-expiry
     // wording matched below, so this does not shadow that arm.
-    if crate::openhuman::inference::provider::is_openai_oauth_session_expired_message(message) {
+    if crate::alexander_ai_solutions::inference::provider::is_openai_oauth_session_expired_message(
+        message,
+    ) {
         return Some(ExpectedErrorKind::ProviderUserState);
     }
     // TAURI-RUST-5MV — ollama.com hosted-inference 500 (`Internal Server Error
@@ -458,7 +460,9 @@ pub fn expected_error_kind(message: &str) -> Option<ExpectedErrorKind> {
     // reliable-provider layer retries + falls back over, with no client lever.
     // Delegates to the single-source provider matcher so the phrasing can't
     // drift. Distinct anchor from the matchers above, so it shadows nothing.
-    if crate::openhuman::inference::provider::is_ollama_cloud_internal_500_message(message) {
+    if crate::alexander_ai_solutions::inference::provider::is_ollama_cloud_internal_500_message(
+        message,
+    ) {
         return Some(ExpectedErrorKind::TransientUpstreamHttp);
     }
     if is_backend_user_error_message(&lower) {
@@ -511,13 +515,15 @@ pub fn expected_error_kind(message: &str) -> Option<ExpectedErrorKind> {
     // backend never emits these phrases. See the predicate's polarity
     // contract. Drops OPENHUMAN-TAURI-WJ / -QW / -HB / -NH re-reports
     // (#2079 / #2076 / #2202).
-    if crate::openhuman::inference::provider::is_provider_config_rejection_message(message) {
+    if crate::alexander_ai_solutions::inference::provider::is_provider_config_rejection_message(
+        message,
+    ) {
         return Some(ExpectedErrorKind::ProviderConfigRejection);
     }
     if is_local_ai_capability_unavailable_message(&lower) {
         return Some(ExpectedErrorKind::LocalAiCapabilityUnavailable);
     }
-    if crate::openhuman::inference::provider::is_budget_exhausted_message(message) {
+    if crate::alexander_ai_solutions::inference::provider::is_budget_exhausted_message(message) {
         return Some(ExpectedErrorKind::BudgetExhausted);
     }
     if is_prompt_injection_blocked_message(&lower) {
@@ -528,7 +534,9 @@ pub fn expected_error_kind(message: &str) -> Option<ExpectedErrorKind> {
     // emit; this catches the re-raise. Delegates to the single-source
     // provider matcher so the phrasing can't drift. Runs last so a more
     // specific matcher always wins.
-    if crate::openhuman::inference::provider::is_context_window_exceeded_message(message) {
+    if crate::alexander_ai_solutions::inference::provider::is_context_window_exceeded_message(
+        message,
+    ) {
         return Some(ExpectedErrorKind::ContextWindowExceeded);
     }
     if is_memory_store_breaker_open(&lower) {
@@ -664,8 +672,8 @@ fn is_disk_full_message(lower: &str) -> bool {
 }
 
 /// Detect the literal `"Config loading timed out"` string produced by
-/// [`crate::openhuman::config::ops::load_config_with_timeout`] /
-/// [`crate::openhuman::config::ops::reload_config_snapshot_with_timeout`]
+/// [`crate::alexander_ai_solutions::config::ops::load_config_with_timeout`] /
+/// [`crate::alexander_ai_solutions::config::ops::reload_config_snapshot_with_timeout`]
 /// when `tokio::time::timeout` elapses around `Config::load_or_init` /
 /// `Config::load_from_config_path`.
 fn is_config_load_timed_out_message(lower: &str) -> bool {
@@ -947,7 +955,7 @@ pub fn is_session_expired_message(msg: &str) -> bool {
 
 /// Detect a remote MCP server's connect-time 401 — the user must sign in to
 /// that server (OAuth), not a code defect. Anchored on the canonical
-/// [`crate::openhuman::mcp_client::McpUnauthorizedError`] `Display`
+/// [`crate::alexander_ai_solutions::mcp_client::McpUnauthorizedError`] `Display`
 /// body, which renders as `"MCP unauthorized for \`<endpoint>\` (HTTP 401…)"`.
 ///
 /// Conjunctive match — both anchors must hit (input already lower-cased):
@@ -1017,7 +1025,7 @@ fn is_loopback_unavailable(lower: &str) -> bool {
 /// (toast / settings page warning) where Sentry has no remediation path.
 ///
 /// Several canonical wire shapes are covered, all emitted by
-/// `openhuman::embeddings::ollama::OllamaEmbedding::embed` and the embed
+/// `alexander_ai_solutions::embeddings::ollama::OllamaEmbedding::embed` and the embed
 /// service fallback path:
 ///
 /// - **TAURI-RUST-XS** (~376 events on self-hosted Sentry): user pointed the
@@ -1287,8 +1295,8 @@ fn is_transient_upstream_http_message(lower: &str) -> bool {
 /// bugs Sentry can act on.
 ///
 /// The canonical wire format from
-/// [`crate::openhuman::integrations::client::IntegrationClient::post`] / `get`
-/// and [`crate::openhuman::composio::client::ComposioClient`] is:
+/// [`crate::alexander_ai_solutions::integrations::client::IntegrationClient::post`] / `get`
+/// and [`crate::alexander_ai_solutions::composio::client::ComposioClient`] is:
 /// `"Backend returned <status> <reason> for <METHOD> <url>: <detail>"` — e.g.
 /// `"Backend returned 400 Bad Request for POST https://api.tinyhumans.ai/agent-integrations/composio/authorize: Composio authorization failed: 400 …"`
 /// (OPENHUMAN-TAURI-BC: user submitted SharePoint authorize without filling in
@@ -1309,7 +1317,7 @@ fn is_transient_upstream_http_message(lower: &str) -> bool {
 /// 5xx is intentionally **not** classified here — server-side failures from
 /// our backend are real bugs that should reach Sentry. The transient
 /// 502/503/504 deduplication is handled by the threshold logic in callers
-/// (see e.g. `openhuman::socket::ws_loop::FAIL_ESCALATE_THRESHOLD`).
+/// (see e.g. `alexander_ai_solutions::socket::ws_loop::FAIL_ESCALATE_THRESHOLD`).
 fn is_backend_user_error_message(lower: &str) -> bool {
     let Some(rest) = lower.split_once("backend returned ").map(|(_, r)| r) else {
         return false;
@@ -1572,7 +1580,7 @@ fn is_prompt_injection_blocked_message(lower: &str) -> bool {
 ///   didn't exist or pointed at a file (Sentry TAURI-RUST-4QH). Kept as a
 ///   classifier fixture since the wire shape may recur from other callers.
 /// - `"hosted path is not a directory: <path>"` —
-///   [`crate::openhuman::http_host::path_utils`] when an HTTP host config
+///   [`crate::alexander_ai_solutions::http_host::path_utils`] when an HTTP host config
 ///   references a missing directory. Not yet observed in Sentry but
 ///   shares the same user-input failure mode; preempts a future ID.
 ///
@@ -2054,7 +2062,7 @@ fn report_expected_message(kind: ExpectedErrorKind, message: &str, domain: &str,
             // Sentry must not double-report (F2/F4). Demote at `warn!` so the
             // breadcrumb retains the code for triage without spawning an event.
             let code =
-                crate::openhuman::inference::provider::extract_backend_error_code_token(message)
+                crate::alexander_ai_solutions::inference::provider::extract_backend_error_code_token(message)
                     .unwrap_or_default();
             tracing::warn!(
                 domain = domain,
@@ -2086,7 +2094,7 @@ fn report_expected_message(kind: ExpectedErrorKind, message: &str, domain: &str,
 /// `sentry::capture_message` synchronously routes through the active hub
 /// and is deterministic, which keeps both production reporting and tests
 /// honest.
-pub const REPORT_ERROR_TRACING_TARGET: &str = "openhuman::observability::report_error";
+pub const REPORT_ERROR_TRACING_TARGET: &str = "alexander_ai_solutions::observability::report_error";
 
 pub(crate) fn report_error_message(
     message: &str,
@@ -2167,7 +2175,7 @@ pub(crate) fn report_warning_message(
 /// that the reliable-provider layer already handles via retry + fallback.
 ///
 /// The primary suppression lives at the call site
-/// (`openhuman::inference::provider::ops::should_report_provider_http_failure`),
+/// (`alexander_ai_solutions::inference::provider::ops::should_report_provider_http_failure`),
 /// which short-circuits transient codes before `report_error` ever fires.
 /// This helper is intended for use inside the `sentry::ClientOptions`
 /// `before_send` hook as defense-in-depth — it catches any future call
@@ -2204,7 +2212,7 @@ pub fn is_transient_provider_http_failure(event: &sentry::protocol::Event<'_>) -
 /// classifier (`expected_error_kind` → [`ExpectedErrorKind::BackendErrorCodeOwned`]).
 /// This catches any future call site that re-emits the same flattened error
 /// without routing through those funnels. Delegates the decision to the
-/// single-source [`crate::openhuman::inference::provider::managed_error_skips_sentry`]
+/// single-source [`crate::alexander_ai_solutions::inference::provider::managed_error_skips_sentry`]
 /// (managed-envelope gated, so a BYO payload carrying an `errorCode`-shaped
 /// field is not wrongly dropped) so the layers can't drift.
 pub fn is_backend_error_code_event(event: &sentry::protocol::Event<'_>) -> bool {
@@ -2214,7 +2222,7 @@ pub fn is_backend_error_code_event(event: &sentry::protocol::Event<'_>) -> bool 
     [direct, from_logentry, from_exception]
         .into_iter()
         .flatten()
-        .any(crate::openhuman::inference::provider::managed_error_skips_sentry)
+        .any(crate::alexander_ai_solutions::inference::provider::managed_error_skips_sentry)
 }
 
 /// Defense-in-depth `before_send` filter for transient streaming **transport**
@@ -2293,7 +2301,7 @@ fn all_provider_attempts_are_transient(message: &str) -> bool {
 
 /// Returns true when a Sentry event's message/exception text contains the
 /// canonical max-tool-iterations cap phrase (see
-/// `openhuman::agent::error::MAX_ITERATIONS_ERROR_PREFIX`).
+/// `alexander_ai_solutions::agent::error::MAX_ITERATIONS_ERROR_PREFIX`).
 ///
 /// Defense-in-depth filter for the Sentry `before_send` hook: the primary
 /// suppression lives at the call sites in `agent::harness::session::
@@ -2316,7 +2324,7 @@ pub fn is_max_iterations_event(event: &sentry::protocol::Event<'_>) -> bool {
     [direct, from_exception]
         .into_iter()
         .flatten()
-        .any(crate::openhuman::agent::error::is_max_iterations_error)
+        .any(crate::alexander_ai_solutions::agent::error::is_max_iterations_error)
 }
 
 /// Tag + body classifier for the `before_send` chain — drops Sentry events
@@ -2372,7 +2380,7 @@ pub fn is_session_expired_event(event: &sentry::protocol::Event<'_>) -> bool {
 /// RPC failures whose message body has been collapsed to just the bare
 /// HTTP method + path (`"GET /auth/me"`) with no underlying transport error.
 ///
-/// Pairs with the primary fix at `openhuman::credentials::ops::auth_get_me`,
+/// Pairs with the primary fix at `alexander_ai_solutions::credentials::ops::auth_get_me`,
 /// which replaced `e.to_string()` with `format!("{e:#}")` so the full
 /// `anyhow` context chain reaches the rpc dispatcher. Before that
 /// fix, every transient network failure under this RPC — reqwest timeout,
@@ -2509,10 +2517,10 @@ pub fn is_transient_backend_api_failure(event: &sentry::protocol::Event<'_>) -> 
 /// gateway hiccups).
 ///
 /// Accepts both `domain="integrations"` (the shared
-/// [`crate::openhuman::integrations::IntegrationClient`] HTTP wrapper that
+/// [`crate::alexander_ai_solutions::integrations::IntegrationClient`] HTTP wrapper that
 /// fronts every backend-proxied integration) and `domain="composio"` (errors
 /// reported from the Composio op layer in
-/// [`crate::openhuman::composio::ops`]). Composio routes through the same
+/// [`crate::alexander_ai_solutions::composio::ops`]). Composio routes through the same
 /// `IntegrationClient`, so the failure shape is identical — but op-level
 /// reporters that wrap and re-emit those errors with their own domain tag
 /// would otherwise escape the integrations-scoped filter (OPENHUMAN-TAURI-35
@@ -2643,7 +2651,7 @@ pub fn is_budget_event(event: &sentry::protocol::Event<'_>) -> bool {
 /// digits `402`) is not swallowed and keeps reaching Sentry.
 ///
 /// Single source of truth shared by the message-level cron halt
-/// (`openhuman::cron::scheduler`'s `is_insufficient_credits_failure`, which
+/// (`alexander_ai_solutions::cron::scheduler`'s `is_insufficient_credits_failure`, which
 /// stops retrying a permanent 402 and skips its `report_error`) and the
 /// event-level `before_send` filter [`is_insufficient_credits_event`] — the
 /// same split as [`is_session_expired_message`] ↔ [`is_session_expired_event`].
@@ -2670,7 +2678,7 @@ pub fn is_insufficient_credits_message(text: &str) -> bool {
     let body = lower
         .split_once("): ")
         .map_or(lower.as_str(), |(_, body)| body);
-    crate::openhuman::inference::provider::body_indicates_insufficient_credits(body)
+    crate::alexander_ai_solutions::inference::provider::body_indicates_insufficient_credits(body)
 }
 
 /// Defense-in-depth `before_send` filter for **insufficient-credits 402**
@@ -2712,11 +2720,11 @@ pub fn is_insufficient_credits_event(event: &sentry::protocol::Event<'_>) -> boo
 /// [`is_insufficient_credits_message`] it does NOT anchor on a 402 status,
 /// because the Kiro IDE proxy wraps its 402 inside a 500 envelope
 /// (TAURI-RUST-C9A). Delegates to the single-source quota-phrase set in
-/// [`crate::openhuman::inference::provider::body_indicates_quota_exhausted`], so
+/// [`crate::alexander_ai_solutions::inference::provider::body_indicates_quota_exhausted`], so
 /// the emit-site guard and this `before_send` net can't drift. Shared with the
 /// event-level filter [`is_quota_exhausted_event`].
 pub fn is_quota_exhausted_message(text: &str) -> bool {
-    crate::openhuman::inference::provider::body_indicates_quota_exhausted(text)
+    crate::alexander_ai_solutions::inference::provider::body_indicates_quota_exhausted(text)
 }
 
 /// Defense-in-depth `before_send` filter for provider **monthly-quota
@@ -2756,7 +2764,9 @@ pub fn is_quota_exhausted_event(event: &sentry::protocol::Event<'_>) -> bool {
 /// generic 500 from another provider, or a local Ollama daemon crash (which
 /// carries no `ref:` UUID), still reaches Sentry.
 pub fn is_ollama_cloud_internal_500_message_any(text: &str) -> bool {
-    if crate::openhuman::inference::provider::is_ollama_cloud_internal_500_message(text) {
+    if crate::alexander_ai_solutions::inference::provider::is_ollama_cloud_internal_500_message(
+        text,
+    ) {
         return true;
     }
     let lower = text.to_ascii_lowercase();
@@ -2834,19 +2844,16 @@ fn event_contains_channel_message_path(event: &sentry::protocol::Event<'_>) -> b
 }
 
 fn event_contains_budget_exhausted_message(event: &sentry::protocol::Event<'_>) -> bool {
-    if event
-        .message
-        .as_deref()
-        .is_some_and(crate::openhuman::inference::provider::is_budget_exhausted_message)
-    {
+    if event.message.as_deref().is_some_and(
+        crate::alexander_ai_solutions::inference::provider::is_budget_exhausted_message,
+    ) {
         return true;
     }
 
     event.exception.values.iter().any(|exception| {
-        exception
-            .value
-            .as_deref()
-            .is_some_and(crate::openhuman::inference::provider::is_budget_exhausted_message)
+        exception.value.as_deref().is_some_and(
+            crate::alexander_ai_solutions::inference::provider::is_budget_exhausted_message,
+        )
     })
 }
 
@@ -2942,7 +2949,7 @@ mod tests {
     /// the dispatcher.
     #[test]
     fn classifies_mcp_connect_401_as_needs_auth() {
-        use crate::openhuman::mcp_client::McpUnauthorizedError;
+        use crate::alexander_ai_solutions::mcp_client::McpUnauthorizedError;
 
         let bare = McpUnauthorizedError {
             endpoint: "https://youtube.run.tools".to_string(),
@@ -3427,7 +3434,7 @@ mod tests {
         // so a wording drift in the user-facing message (which is what gets
         // re-raised and re-reported up the stack) fails CI instead of silently
         // leaking the event to Sentry.
-        let err = crate::openhuman::agent::harness::token_budget::ContextPrefixTooLargeError {
+        let err = crate::alexander_ai_solutions::agent::harness::token_budget::ContextPrefixTooLargeError {
             prefix_tokens: 10_978,
             context_window: 8_192,
             max_input_tokens: 7_372,
@@ -3463,7 +3470,7 @@ mod tests {
     #[test]
     fn classifies_vault_create_root_path_not_a_directory_as_filesystem_user_path_invalid() {
         // TAURI-RUST-4QH: verbatim wire shape from
-        // `openhuman::vault::ops::vault_create` line 37 when the
+        // `alexander_ai_solutions::vault::ops::vault_create` line 37 when the
         // user-picked vault folder doesn't resolve to an existing
         // directory. Bubbles up as the RPC dispatcher's
         // `display_message` and reaches `report_error_or_expected` —
@@ -3490,7 +3497,7 @@ mod tests {
     #[test]
     fn classifies_http_host_hosted_path_not_a_directory_as_filesystem_user_path_invalid() {
         // Preempt the symmetric shape from
-        // `openhuman::http_host::path_utils:23` —
+        // `alexander_ai_solutions::http_host::path_utils:23` —
         // `"hosted path is not a directory: <path>"`. Not yet observed
         // in Sentry but shares the same RPC validation polarity as
         // vault_create's `root_path` check. Anchoring on
@@ -3610,13 +3617,13 @@ mod tests {
         // context so the substring matcher must survive that prefix.
         for raw in [
             // Canonical wire shape from `get_or_init_connection`.
-            "[memory_tree] circuit breaker open for /home/u/.openhuman/workspace/memory_tree/chunks.db: too many consecutive init failures",
+            "[memory_tree] circuit breaker open for /home/u/.alexanderai/workspace/memory_tree/chunks.db: too many consecutive init failures",
             // Canonical wire shape wrapped by the RPC handler's
             // `format!("chunk aggregates: {e:#}")` context.
             r"chunk aggregates: [memory_tree] circuit breaker open for C:\Users\u\.openhuman\users\6a09\workspace\memory_tree\chunks.db: too many consecutive init failures",
             // Wrapped further by the JSON-RPC dispatch layer before reaching
             // `report_error_or_expected`.
-            r"rpc.invoke_method failed: chunk aggregates: [memory_tree] circuit breaker open for /home/u/.openhuman/workspace/memory_tree/chunks.db: too many consecutive init failures",
+            r"rpc.invoke_method failed: chunk aggregates: [memory_tree] circuit breaker open for /home/u/.alexanderai/workspace/memory_tree/chunks.db: too many consecutive init failures",
         ] {
             assert_eq!(
                 expected_error_kind(raw),
@@ -3799,7 +3806,7 @@ mod tests {
         // (#3962): Windows access-denied on an existing config.toml.
         assert_eq!(
             expected_error_kind(
-                "Failed to read config file: C:\\Users\\u\\.openhuman\\users\\local-wb\\config.toml: Access is denied. (os error 5)"
+                "Failed to read config file: C:\\Users\\u\\.alexanderai\\users\\local-wb\\config.toml: Access is denied. (os error 5)"
             ),
             Some(ExpectedErrorKind::ConfigReadIoFailure),
         );
@@ -3807,14 +3814,14 @@ mod tests {
         // backup agent).
         assert_eq!(
             expected_error_kind(
-                "Failed to read config file: C:\\Users\\u\\.openhuman\\users\\local-wb\\config.toml: The process cannot access the file because it is being used by another process. (os error 32)"
+                "Failed to read config file: C:\\Users\\u\\.alexanderai\\users\\local-wb\\config.toml: The process cannot access the file because it is being used by another process. (os error 32)"
             ),
             Some(ExpectedErrorKind::ConfigReadIoFailure),
         );
         // Unix permission-denied wording.
         assert_eq!(
             expected_error_kind(
-                "Failed to read config file: /home/u/.openhuman/users/local/config.toml: Permission denied (os error 13)"
+                "Failed to read config file: /home/u/.alexanderai/users/local/config.toml: Permission denied (os error 13)"
             ),
             Some(ExpectedErrorKind::ConfigReadIoFailure),
         );
@@ -3822,7 +3829,7 @@ mod tests {
         // the same OS-denial family so a long-lived reloader can't leak either.
         assert_eq!(
             expected_error_kind(
-                "reading config.toml from C:\\Users\\u\\.openhuman\\users\\local-wb\\config.toml: Access is denied. (os error 5)"
+                "reading config.toml from C:\\Users\\u\\.alexanderai\\users\\local-wb\\config.toml: Access is denied. (os error 5)"
             ),
             Some(ExpectedErrorKind::ConfigReadIoFailure),
         );
@@ -3834,7 +3841,7 @@ mod tests {
         // it MUST keep paging, never demote.
         assert_ne!(
             expected_error_kind(
-                "Failed to read config file: C:\\Users\\u\\.openhuman\\users\\local-wb\\config.toml: The system cannot find the file specified. (os error 2)"
+                "Failed to read config file: C:\\Users\\u\\.alexanderai\\users\\local-wb\\config.toml: The system cannot find the file specified. (os error 2)"
             ),
             Some(ExpectedErrorKind::ConfigReadIoFailure),
         );
@@ -3842,7 +3849,7 @@ mod tests {
         // kind we have not enumerated) must NOT demote — fail open to paging.
         assert_ne!(
             expected_error_kind(
-                "Failed to read config file: C:\\Users\\u\\.openhuman\\users\\local-wb\\config.toml"
+                "Failed to read config file: C:\\Users\\u\\.alexanderai\\users\\local-wb\\config.toml"
             ),
             Some(ExpectedErrorKind::ConfigReadIoFailure),
         );
@@ -3858,13 +3865,13 @@ mod tests {
         // excluded by the `is a directory` / `not a file` guard.
         assert_ne!(
             expected_error_kind(
-                "Failed to read config file: /home/u/.openhuman/users/local/config.toml: Is a directory (os error 21)"
+                "Failed to read config file: /home/u/.alexanderai/users/local/config.toml: Is a directory (os error 21)"
             ),
             Some(ExpectedErrorKind::ConfigReadIoFailure),
         );
         assert_ne!(
             expected_error_kind(
-                "Config path is a directory, not a file: C:\\Users\\u\\.openhuman\\users\\local-wb\\config.toml: Access is denied. (os error 5)"
+                "Config path is a directory, not a file: C:\\Users\\u\\.alexanderai\\users\\local-wb\\config.toml: Access is denied. (os error 5)"
             ),
             Some(ExpectedErrorKind::ConfigReadIoFailure),
         );
@@ -3892,7 +3899,7 @@ mod tests {
             // SQLITE_CANTOPEN (14) — sibling variant from the user report.
             "failed to run subconscious schema DDL: unable to open database file: Error code 14: Unable to open the database file",
             // Failure surfaced at the open step rather than the DDL step.
-            "failed to open subconscious DB: /home/u/.openhuman/subconscious/subconscious.db: unable to open the database file",
+            "failed to open subconscious DB: /home/u/.alexanderai/subconscious/subconscious.db: unable to open the database file",
             // Wrapped in outer RPC context — classifier runs on the full chain.
             "rpc.invoke_method failed: failed to run subconscious schema DDL: disk I/O error: Error code 4618",
         ] {
@@ -4261,7 +4268,7 @@ mod tests {
     #[test]
     fn integrations_post_composio_timeout_dropped() {
         // OPENHUMAN-TAURI-18 / -G regression guard. The integrations
-        // client at `crate::openhuman::integrations::client::IntegrationClient::post`
+        // client at `crate::alexander_ai_solutions::integrations::client::IntegrationClient::post`
         // builds the reqwest error chain and routes it through
         // `report_error_or_expected(.., "integrations", "post", &[("failure",
         // "transport")])`. The chain text contains the
@@ -6410,7 +6417,7 @@ mod tests {
         // demote to `TransientUpstreamHttp` when re-reported at the agent / RPC
         // boundary (`provider_chat` → `report_error_or_expected`), so the
         // `domain=agent` half of the flood is suppressed too.
-        let reraise = crate::openhuman::inference::provider::ollama_cloud_internal_500_user_message(
+        let reraise = crate::alexander_ai_solutions::inference::provider::ollama_cloud_internal_500_user_message(
             Some("minimax-m3:cloud"),
             reqwest::StatusCode::INTERNAL_SERVER_ERROR,
         );
@@ -6431,7 +6438,7 @@ mod tests {
             &event_with_exception_value(raw)
         ));
 
-        let reraise = crate::openhuman::inference::provider::ollama_cloud_internal_500_user_message(
+        let reraise = crate::alexander_ai_solutions::inference::provider::ollama_cloud_internal_500_user_message(
             None,
             reqwest::StatusCode::INTERNAL_SERVER_ERROR,
         );
@@ -6911,7 +6918,9 @@ mod tests {
         // bypass `expected_error_kind` would have re-demoted it to the
         // suppressed `ContextWindowExceeded` bucket.
         assert!(
-            crate::openhuman::inference::provider::is_context_window_exceeded_message(context),
+            crate::alexander_ai_solutions::inference::provider::is_context_window_exceeded_message(
+                context
+            ),
             "test body must actually trigger the matcher the bypass guards against"
         );
     }
@@ -7096,7 +7105,7 @@ mod tests {
     // `operation=invoke_method`, `method=openhuman.auth_get_me`, message
     // body = exactly "GET /auth/me" (no underlying chain). See the
     // function docstring + the `auth_get_me` fix in
-    // `openhuman::credentials::ops::auth_get_me` for the broader
+    // `alexander_ai_solutions::credentials::ops::auth_get_me` for the broader
     // context.
 
     fn auth_get_me_tags() -> Vec<(&'static str, &'static str)> {

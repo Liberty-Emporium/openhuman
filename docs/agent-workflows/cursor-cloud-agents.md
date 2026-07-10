@@ -103,7 +103,7 @@ Cursor Cloud Agents inherit env from the workspace. For OpenHuman, the cloud wor
 - **No** `STAGING_*` / `PRODUCTION_*` secrets.
 - **No** `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or any other LLM provider key used by the production agent runtime — agents do code work, not LLM calls into production providers.
 - A scoped `GITHUB_TOKEN` with `contents:write` and `pull_requests:write` on the **fork** the workspace pushes to, plus `pull_requests:write` on `tinyhumansai/openhuman` for PR creation. **No `admin:*`, no `actions:write`, no `secrets:*`.**
-- `OPENHUMAN_APP_ENV` MUST be unset or set to `dev`. Never `staging` or `production` — staging writes `~/.openhuman-staging/core.token` referenced by [`AGENTS.md`](../../AGENTS.md) "Cursor Cloud specific instructions" and that token is **per-developer**, not for shared cloud workspaces.
+- `OPENHUMAN_APP_ENV` MUST be unset or set to `dev`. Never `staging` or `production` — staging writes `~/.alexanderai-staging/core.token` referenced by [`AGENTS.md`](../../AGENTS.md) "Cursor Cloud specific instructions" and that token is **per-developer**, not for shared cloud workspaces.
 - `.env.local`, `app/.env.local`, and `core.token` files are gitignored and must not be committed.
 
 The agent's own environment is the smallest blast-radius surface. Production credentials are out of scope for code-writing agents.

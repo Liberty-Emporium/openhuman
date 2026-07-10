@@ -14,8 +14,8 @@ use axum::http::header::AUTHORIZATION;
 use serde_json::{json, Value};
 use tempfile::tempdir;
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 const TEST_RPC_TOKEN: &str = "memory-sources-e2e-token";
 static AUTH_INIT: OnceLock<()> = OnceLock::new();
@@ -146,7 +146,7 @@ async fn memory_sources_crud_and_folder_read_flow() {
     let _guard = env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home = EnvVarGuard::set_to_path("HOME", home);
     let _ws = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -419,7 +419,7 @@ async fn memory_sources_validation_rejects_bad_input() {
     let _guard = env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home = EnvVarGuard::set_to_path("HOME", home);
     let _ws = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -500,7 +500,7 @@ async fn memory_sources_github_repo_activity_flow() {
     let _guard = env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home = EnvVarGuard::set_to_path("HOME", home);
     let _ws = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -681,7 +681,7 @@ async fn memory_sources_composio_registry_flow() {
     let _guard = env_lock();
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let _home = EnvVarGuard::set_to_path("HOME", home);
     let _ws = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");

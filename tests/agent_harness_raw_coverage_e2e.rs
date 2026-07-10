@@ -1,23 +1,25 @@
-use anyhow::Result;
-use async_trait::async_trait;
-use openhuman_core::openhuman::agent::dispatcher::NativeToolDispatcher;
-use openhuman_core::openhuman::agent::harness::definition::AgentDefinitionRegistry;
-use openhuman_core::openhuman::agent::harness::session::Agent;
-use openhuman_core::openhuman::agent::harness::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::NativeToolDispatcher;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::definition::AgentDefinitionRegistry;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::session::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::{
     run_subagent, with_parent_context, AgentDefinition, ParentExecutionContext, PromptSource,
     SandboxMode, SubagentRunOptions, ToolScope,
 };
-use openhuman_core::openhuman::agent::progress::AgentProgress;
-use openhuman_core::openhuman::config::AgentConfig;
-use openhuman_core::openhuman::context::prompt::ToolCallFormat;
-use openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities;
-use openhuman_core::openhuman::inference::provider::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::progress::AgentProgress;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::AgentConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::ToolCallFormat;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
     ChatMessage, ChatRequest, ChatResponse, Provider, ToolCall, UsageInfo,
 };
-use openhuman_core::openhuman::memory::{Memory, MemoryCategory, MemoryEntry, NamespaceSummary};
-use openhuman_core::openhuman::tokenjuice::AgentTokenjuiceCompression;
-use openhuman_core::openhuman::tools::SpawnSubagentTool;
-use openhuman_core::openhuman::tools::{Tool, ToolResult};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
+    Memory, MemoryCategory, MemoryEntry, NamespaceSummary,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::tokenjuice::AgentTokenjuiceCompression;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::SpawnSubagentTool;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{Tool, ToolResult};
+use anyhow::Result;
+use async_trait::async_trait;
 use parking_lot::Mutex;
 use serde_json::json;
 use std::path::{Path, PathBuf};
@@ -100,7 +102,7 @@ impl Memory for StubMemory {
         &self,
         _query: &str,
         _limit: usize,
-        _opts: openhuman_core::openhuman::memory::RecallOpts<'_>,
+        _opts: alexander_ai_solutions_core::alexander_ai_solutions::memory::RecallOpts<'_>,
     ) -> Result<Vec<MemoryEntry>> {
         Ok(Vec::new())
     }
@@ -491,7 +493,7 @@ async fn repeated_subagent_spawns_keep_cacheable_prefix_and_record_provider_cach
             },
         )
         .await?;
-        Ok::<_, openhuman_core::openhuman::agent::harness::SubagentRunError>((first, second))
+        Ok::<_, alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::SubagentRunError>((first, second))
     })
     .await?;
 

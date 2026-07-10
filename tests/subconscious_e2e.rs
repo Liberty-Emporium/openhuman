@@ -7,18 +7,21 @@ use std::sync::Arc;
 
 use serde_json::json;
 
-fn ci_safe_ingestion_config() -> openhuman_core::openhuman::memory::MemoryIngestionConfig {
-    openhuman_core::openhuman::memory::MemoryIngestionConfig::default()
+fn ci_safe_ingestion_config(
+) -> alexander_ai_solutions_core::alexander_ai_solutions::memory::MemoryIngestionConfig {
+    alexander_ai_solutions_core::alexander_ai_solutions::memory::MemoryIngestionConfig::default()
 }
 
 async fn ingest_doc(
-    memory: &openhuman_core::openhuman::memory::UnifiedMemory,
+    memory: &alexander_ai_solutions_core::alexander_ai_solutions::memory::UnifiedMemory,
     namespace: &str,
     key: &str,
     title: &str,
     content: &str,
 ) -> String {
-    use openhuman_core::openhuman::memory::{MemoryIngestionRequest, NamespaceDocumentInput};
+    use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
+        MemoryIngestionRequest, NamespaceDocumentInput,
+    };
     let result = memory
         .ingest_document(MemoryIngestionRequest {
             document: NamespaceDocumentInput {
@@ -33,7 +36,7 @@ async fn ingest_doc(
                 category: "core".to_string(),
                 session_id: None,
                 document_id: None,
-                taint: openhuman_core::openhuman::memory::MemoryTaint::Internal,
+                taint: alexander_ai_solutions_core::alexander_ai_solutions::memory::MemoryTaint::Internal,
             },
             config: ci_safe_ingestion_config(),
         })
@@ -50,9 +53,9 @@ async fn ingest_doc(
 #[tokio::test]
 #[ignore] // requires running Ollama
 async fn two_tick_e2e_with_real_ollama() {
-    use openhuman_core::openhuman::embeddings::NoopEmbedding;
-    use openhuman_core::openhuman::memory::UnifiedMemory;
-    use openhuman_core::openhuman::subconscious::store;
+    use alexander_ai_solutions_core::alexander_ai_solutions::embeddings::NoopEmbedding;
+    use alexander_ai_solutions_core::alexander_ai_solutions::memory::UnifiedMemory;
+    use alexander_ai_solutions_core::alexander_ai_solutions::subconscious::store;
 
     let tmp = tempfile::tempdir().expect("tempdir");
     let workspace = tmp.path();
@@ -72,7 +75,7 @@ async fn two_tick_e2e_with_real_ollama() {
     )
     .await;
 
-    let mut config = openhuman_core::openhuman::config::Config::default();
+    let mut config = alexander_ai_solutions_core::alexander_ai_solutions::config::Config::default();
     config.workspace_dir = workspace.to_path_buf();
     config.heartbeat.enabled = true;
     config.heartbeat.inference_enabled = true;
@@ -81,7 +84,10 @@ async fn two_tick_e2e_with_real_ollama() {
     config.local_ai.runtime_enabled = true;
     config.local_ai.usage.subconscious = true;
 
-    let engine = openhuman_core::openhuman::subconscious::SubconsciousEngine::new(&config);
+    let engine =
+        alexander_ai_solutions_core::alexander_ai_solutions::subconscious::SubconsciousEngine::new(
+            &config,
+        );
 
     // Tick 1
     println!("\n=== TICK 1 ===");

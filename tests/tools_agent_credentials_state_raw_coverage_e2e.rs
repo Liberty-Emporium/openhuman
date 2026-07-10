@@ -9,6 +9,38 @@ use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::NativeToolDispatcher;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::session::Agent;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::{
+    run_subagent, with_parent_context, AgentDefinition, ParentExecutionContext, PromptSource,
+    SandboxMode, SubagentRunOptions, ToolScope,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::app_state::{
+    snapshot, update_local_state, StoredAppStatePatch, StoredOnboardingTasks,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::rpc as config_rpc;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::{
+    BrowserConfig, Config, HttpRequestConfig, McpAuthConfig, McpServerConfig,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::context::prompt::ToolCallFormat;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::profiles::{
+    AuthProfile, AuthProfileKind, AuthProfilesStore, TokenSet,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
+    AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities;
+use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
+    ChatMessage, ChatRequest, ChatResponse, Provider, ToolCall, UsageInfo,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::memory::{
+    Memory, MemoryCategory, MemoryEntry, NamespaceSummary,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::security::{AuditLogger, SecurityPolicy};
+use alexander_ai_solutions_core::alexander_ai_solutions::tokenjuice::AgentTokenjuiceCompression;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
+    all_tools, BrowserTool, ComputerUseConfig, SpawnSubagentTool, Tool, ToolResult,
+};
 use anyhow::Result;
 use async_trait::async_trait;
 use axum::extract::State;
@@ -16,36 +48,6 @@ use axum::response::IntoResponse;
 use axum::routing::post;
 use axum::{Json, Router};
 use chrono::{Duration as ChronoDuration, Utc};
-use openhuman_core::openhuman::agent::dispatcher::NativeToolDispatcher;
-use openhuman_core::openhuman::agent::harness::session::Agent;
-use openhuman_core::openhuman::agent::harness::{
-    run_subagent, with_parent_context, AgentDefinition, ParentExecutionContext, PromptSource,
-    SandboxMode, SubagentRunOptions, ToolScope,
-};
-use openhuman_core::openhuman::app_state::{
-    snapshot, update_local_state, StoredAppStatePatch, StoredOnboardingTasks,
-};
-use openhuman_core::openhuman::config::rpc as config_rpc;
-use openhuman_core::openhuman::config::{
-    BrowserConfig, Config, HttpRequestConfig, McpAuthConfig, McpServerConfig,
-};
-use openhuman_core::openhuman::context::prompt::ToolCallFormat;
-use openhuman_core::openhuman::credentials::profiles::{
-    AuthProfile, AuthProfileKind, AuthProfilesStore, TokenSet,
-};
-use openhuman_core::openhuman::credentials::{
-    AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
-};
-use openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities;
-use openhuman_core::openhuman::inference::provider::{
-    ChatMessage, ChatRequest, ChatResponse, Provider, ToolCall, UsageInfo,
-};
-use openhuman_core::openhuman::memory::{Memory, MemoryCategory, MemoryEntry, NamespaceSummary};
-use openhuman_core::openhuman::security::{AuditLogger, SecurityPolicy};
-use openhuman_core::openhuman::tokenjuice::AgentTokenjuiceCompression;
-use openhuman_core::openhuman::tools::{
-    all_tools, BrowserTool, ComputerUseConfig, SpawnSubagentTool, Tool, ToolResult,
-};
 use parking_lot::Mutex as ParkingMutex;
 use serde_json::{json, Value};
 use tempfile::{Builder, TempDir};
@@ -172,7 +174,7 @@ impl Memory for StubMemory {
         &self,
         _query: &str,
         _limit: usize,
-        _opts: openhuman_core::openhuman::memory::RecallOpts<'_>,
+        _opts: alexander_ai_solutions_core::alexander_ai_solutions::memory::RecallOpts<'_>,
     ) -> Result<Vec<MemoryEntry>> {
         Ok(Vec::new())
     }
@@ -367,7 +369,7 @@ fn parent_context(workspace: PathBuf, provider: Arc<ScriptedProvider>) -> Parent
         temperature: 0.0,
         workspace_dir: workspace,
         memory: Arc::new(StubMemory),
-        agent_config: openhuman_core::openhuman::config::AgentConfig {
+        agent_config: alexander_ai_solutions_core::alexander_ai_solutions::config::AgentConfig {
             max_tool_iterations: 3,
             ..Default::default()
         },
@@ -605,7 +607,7 @@ fn round16_all_tools_registry_branches_and_browser_allowlist() {
         &harness.workspace,
         &HashMap::from([(
             "researcher".to_string(),
-            openhuman_core::openhuman::config::DelegateAgentConfig {
+            alexander_ai_solutions_core::alexander_ai_solutions::config::DelegateAgentConfig {
                 model: "round16-delegate-model".to_string(),
                 system_prompt: Some("Delegate test prompt".to_string()),
                 temperature: Some(0.0),
@@ -739,10 +741,12 @@ async fn round16_agent_builder_turn_uses_public_harness_paths() {
         .tools(vec![Box::new(EchoTool)])
         .memory(Arc::new(StubMemory))
         .tool_dispatcher(Box::new(NativeToolDispatcher))
-        .config(openhuman_core::openhuman::config::AgentConfig {
-            max_tool_iterations: 3,
-            ..Default::default()
-        })
+        .config(
+            alexander_ai_solutions_core::alexander_ai_solutions::config::AgentConfig {
+                max_tool_iterations: 3,
+                ..Default::default()
+            },
+        )
         .model_name("round16-model".to_string())
         .temperature(0.0)
         .workspace_dir(harness.workspace.clone())
@@ -759,7 +763,7 @@ async fn round16_agent_builder_turn_uses_public_harness_paths() {
     assert_eq!(answer, "builder final");
     assert!(agent.history().iter().any(|message| matches!(
         message,
-        openhuman_core::openhuman::inference::provider::ConversationMessage::ToolResults(results)
+        alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::ConversationMessage::ToolResults(results)
             if results.iter().any(|result| result.content.contains("echo:builder"))
     )));
 }

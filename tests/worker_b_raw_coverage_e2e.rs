@@ -19,17 +19,21 @@ use reqwest::StatusCode;
 use serde_json::{json, Value};
 use tempfile::{tempdir, TempDir};
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
-use openhuman_core::openhuman::agent::turn_origin::{self, AgentTurnOrigin};
-use openhuman_core::openhuman::approval::gate::{
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::turn_origin::{
+    self, AgentTurnOrigin,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::approval::gate::{
     ApprovalChatContext, ApprovalGate, APPROVAL_CHAT_CONTEXT,
 };
-use openhuman_core::openhuman::approval::types::{ExecutionOutcome, GateOutcome};
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::credentials::{
+use alexander_ai_solutions_core::alexander_ai_solutions::approval::types::{
+    ExecutionOutcome, GateOutcome,
+};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::credentials::{
     AuthService, APP_SESSION_PROVIDER, DEFAULT_AUTH_PROFILE_NAME,
 };
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 const TEST_RPC_TOKEN: &str = "worker-b-raw-coverage-e2e-token";
 
@@ -212,7 +216,7 @@ async fn mock_parallel_search(
 }
 
 fn write_min_config(openhuman_dir: &Path) {
-    std::fs::create_dir_all(openhuman_dir).expect("create .openhuman");
+    std::fs::create_dir_all(openhuman_dir).expect("create .alexanderai");
     let cfg = r#"api_url = "http://127.0.0.1:9"
 default_model = "e2e-model"
 default_temperature = 0.2
@@ -239,7 +243,7 @@ embedding_strict = false
 async fn setup() -> TestHarness {
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
     write_min_config(&openhuman_home);
 
     let guards = vec![
@@ -258,7 +262,7 @@ async fn setup() -> TestHarness {
     ];
 
     let _ =
-        openhuman_core::openhuman::agent::harness::AgentDefinitionRegistry::init_global_builtins();
+        alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::AgentDefinitionRegistry::init_global_builtins();
 
     let (addr, rpc_join) = serve_rpc().await;
     TestHarness {

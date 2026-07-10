@@ -16,15 +16,17 @@ use axum::{Json, Router};
 use serde_json::{json, Value};
 use tempfile::{Builder, TempDir};
 
-use openhuman_core::openhuman::composio::ops::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::ops::{
     cached_active_integrations, composio_authorize, composio_execute, composio_list_connections,
     composio_list_toolkits, composio_list_tools, fetch_connected_integrations_status,
 };
-use openhuman_core::openhuman::composio::{
+use alexander_ai_solutions_core::alexander_ai_solutions::composio::{
     invalidate_connected_integrations_cache, FetchConnectedIntegrationsStatus,
 };
-use openhuman_core::openhuman::config::Config;
-use openhuman_core::openhuman::tools::{ComposioListToolsTool, Tool, ToolCallOptions};
+use alexander_ai_solutions_core::alexander_ai_solutions::config::Config;
+use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
+    ComposioListToolsTool, Tool, ToolCallOptions,
+};
 
 static ENV_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
 

@@ -22,7 +22,7 @@ describe('workflowsApi.createWorkflow', () => {
         tags: ['alpha'],
         tools: ['mcp/fs'],
         prompts: [],
-        location: '/home/u/.openhuman/skills/my-skill/SKILL.md',
+        location: '/home/u/.alexanderai/skills/my-skill/SKILL.md',
         resources: [],
         scope: 'user',
         legacy: false,
@@ -345,7 +345,7 @@ describe('workflowsApi.uninstallWorkflow', () => {
     const { callCoreRpc } = await import('../../coreRpcClient');
     vi.mocked(callCoreRpc).mockResolvedValueOnce({
       name: 'weather-helper',
-      removed_path: '/home/u/.openhuman/skills/weather-helper',
+      removed_path: '/home/u/.alexanderai/skills/weather-helper',
       scope: 'user',
     });
 
@@ -357,7 +357,7 @@ describe('workflowsApi.uninstallWorkflow', () => {
     });
     expect(result).toEqual({
       name: 'weather-helper',
-      removedPath: '/home/u/.openhuman/skills/weather-helper',
+      removedPath: '/home/u/.alexanderai/skills/weather-helper',
       scope: 'user',
     });
   });

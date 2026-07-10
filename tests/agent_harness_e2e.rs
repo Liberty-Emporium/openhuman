@@ -27,9 +27,9 @@ use futures_util::StreamExt;
 use serde_json::{json, Value};
 use tempfile::tempdir;
 
-use openhuman_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
-use openhuman_core::core::jsonrpc::build_core_http_router;
-use openhuman_core::openhuman::agent::harness::AgentDefinitionRegistry;
+use alexander_ai_solutions_core::alexander_ai_solutions::agent::harness::AgentDefinitionRegistry;
+use alexander_ai_solutions_core::core::auth::{init_rpc_token, CORE_TOKEN_ENV_VAR};
+use alexander_ai_solutions_core::core::jsonrpc::build_core_http_router;
 
 const TEST_RPC_TOKEN: &str = "json-rpc-e2e-local-token";
 
@@ -310,11 +310,11 @@ super_context_enabled = {super_context_enabled}
     write_config_file(openhuman_dir, &cfg);
     if openhuman_dir
         .file_name()
-        .is_some_and(|name| name == std::ffi::OsStr::new(".openhuman"))
+        .is_some_and(|name| name == std::ffi::OsStr::new(".alexanderai"))
     {
         write_config_file(&openhuman_dir.join("users").join("local"), &cfg);
     }
-    let _: openhuman_core::openhuman::config::Config =
+    let _: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
         toml::from_str(&cfg).expect("config toml must match Config schema");
 }
 
@@ -461,7 +461,7 @@ async fn boot_stack_with_super_context(super_context_enabled: bool) -> Stack {
 
     let tmp = tempdir().expect("tempdir");
     let home = tmp.path().to_path_buf();
-    let openhuman_home = home.join(".openhuman");
+    let openhuman_home = home.join(".alexanderai");
 
     let home_guard = EnvVarGuard::set_to_path("HOME", &home);
     let workspace_guard = EnvVarGuard::unset("OPENHUMAN_WORKSPACE");
@@ -579,11 +579,13 @@ where
 {
     std::thread::Builder::new()
         .name(name.to_string())
-        .stack_size(openhuman_core::core::runtime::AGENT_WORKER_STACK_BYTES)
+        .stack_size(alexander_ai_solutions_core::core::runtime::AGENT_WORKER_STACK_BYTES)
         .spawn(move || {
             let rt = tokio::runtime::Builder::new_multi_thread()
                 .worker_threads(2)
-                .thread_stack_size(openhuman_core::core::runtime::AGENT_WORKER_STACK_BYTES)
+                .thread_stack_size(
+                    alexander_ai_solutions_core::core::runtime::AGENT_WORKER_STACK_BYTES,
+                )
                 .enable_all()
                 .build()
                 .expect("build agent harness e2e runtime");
@@ -1262,16 +1264,17 @@ async fn subagent_clarification_flow_inner() {
 // restore it on drop via EnvVarGuard.
 
 fn ensure_approval_gate() {
-    use openhuman_core::core::event_bus;
-    use openhuman_core::openhuman::approval::ApprovalGate;
+    use alexander_ai_solutions_core::alexander_ai_solutions::approval::ApprovalGate;
+    use alexander_ai_solutions_core::core::event_bus;
 
     // The global event bus must be initialized before registering subscribers.
     // `build_core_http_router` does NOT call `bootstrap_core_runtime`, so the bus
     // is not initialized by boot_stack. Initialize it here (idempotent: OnceLock).
     event_bus::init_global(event_bus::DEFAULT_CAPACITY);
 
-    let mut cfg: openhuman_core::openhuman::config::Config = toml::from_str(
-        r#"api_url = "http://127.0.0.1:1"
+    let mut cfg: alexander_ai_solutions_core::alexander_ai_solutions::config::Config =
+        toml::from_str(
+            r#"api_url = "http://127.0.0.1:1"
 default_model = "e2e-mock-model"
 default_temperature = 0.7
 chat_onboarding_completed = true
@@ -1279,8 +1282,8 @@ chat_onboarding_completed = true
 [secrets]
 encrypt = false
 "#,
-    )
-    .expect("gate config must parse");
+        )
+        .expect("gate config must parse");
 
     // `toml::from_str` leaves `workspace_dir` empty (it is `#[serde(skip)]`).
     // Without this fix the gate's SQLite audit store writes to `./approval/approval.db`
@@ -1318,8 +1321,9 @@ encrypt = false
 /// drops (end of the first test), the task is cancelled and all subsequent tests in the
 /// same binary lose the bridge silently. This per-test helper avoids the issue by
 /// registering a fresh subscription on each test's own runtime.
-fn register_approval_bridge() -> Option<openhuman_core::core::event_bus::SubscriptionHandle> {
-    openhuman_core::openhuman::channels::providers::web::fresh_approval_surface_subscription()
+fn register_approval_bridge(
+) -> Option<alexander_ai_solutions_core::core::event_bus::SubscriptionHandle> {
+    alexander_ai_solutions_core::alexander_ai_solutions::channels::providers::web::fresh_approval_surface_subscription()
 }
 
 /// Pre-create a file in the action_dir so file_write sees it as an existing
@@ -1349,7 +1353,7 @@ fn approval_gate_installed_after_ensure() {
 
 async fn approval_gate_installed_after_ensure_inner() {
     let _lock = env_lock();
-    use openhuman_core::openhuman::approval::ApprovalGate;
+    use alexander_ai_solutions_core::alexander_ai_solutions::approval::ApprovalGate;
     ensure_approval_gate();
     assert!(
         ApprovalGate::try_global().is_some(),
@@ -2311,20 +2315,22 @@ async fn multi_hop_delegation_chain_inner() {
 //   4. Final answer is "stream final".
 
 mod streaming_support {
-    use async_trait::async_trait;
-    use openhuman_core::openhuman::agent::dispatcher::NativeToolDispatcher;
-    use openhuman_core::openhuman::agent::memory_loader::MemoryLoader;
-    use openhuman_core::openhuman::agent::Agent;
-    use openhuman_core::openhuman::config::{AgentConfig, ContextConfig, MemoryConfig};
-    use openhuman_core::openhuman::inference::provider::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::agent::dispatcher::NativeToolDispatcher;
+    use alexander_ai_solutions_core::alexander_ai_solutions::agent::memory_loader::MemoryLoader;
+    use alexander_ai_solutions_core::alexander_ai_solutions::agent::Agent;
+    use alexander_ai_solutions_core::alexander_ai_solutions::config::{
+        AgentConfig, ContextConfig, MemoryConfig,
+    };
+    use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
         ChatRequest, ChatResponse, Provider, ProviderDelta, ToolCall, UsageInfo,
     };
-    use openhuman_core::openhuman::memory::Memory;
-    use openhuman_core::openhuman::memory_store;
-    use openhuman_core::openhuman::tools::traits::ToolCallOptions;
-    use openhuman_core::openhuman::tools::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::memory::Memory;
+    use alexander_ai_solutions_core::alexander_ai_solutions::memory_store;
+    use alexander_ai_solutions_core::alexander_ai_solutions::tools::traits::ToolCallOptions;
+    use alexander_ai_solutions_core::alexander_ai_solutions::tools::{
         PermissionLevel, Tool, ToolContent, ToolResult, ToolScope as RuntimeToolScope,
     };
+    use async_trait::async_trait;
     use serde_json::json;
     use std::collections::VecDeque;
     use std::path::{Path, PathBuf};
@@ -2345,8 +2351,8 @@ mod streaming_support {
     impl Provider for ScriptedProvider {
         fn capabilities(
             &self,
-        ) -> openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities {
-            openhuman_core::openhuman::inference::provider::traits::ProviderCapabilities {
+        ) -> alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities{
+            alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::traits::ProviderCapabilities {
                 native_tool_calling: self.native_tools,
                 vision: false,
             }
@@ -2598,8 +2604,8 @@ mod streaming_support {
 ///   5. Final answer is "stream final".
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn streaming_tool_call_accumulation() {
-    use openhuman_core::openhuman::agent::progress::AgentProgress;
-    use openhuman_core::openhuman::inference::provider::ProviderDelta;
+    use alexander_ai_solutions_core::alexander_ai_solutions::agent::progress::AgentProgress;
+    use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::ProviderDelta;
     use std::sync::Mutex;
     use streaming_support::{
         agent_with_s, native_tool_response_s, text_response_s, workspace_s, EchoTool,
@@ -2781,7 +2787,7 @@ async fn streaming_tool_call_accumulation() {
 }
 
 /// Needed for streaming_tool_call_accumulation.
-use openhuman_core::openhuman::config::AgentConfig;
+use alexander_ai_solutions_core::alexander_ai_solutions::config::AgentConfig;
 
 // ─── Case 13 (provider-level): SSE tool-arg accumulation ──────────────────────
 //
@@ -2936,13 +2942,13 @@ fn sse_tool_args_router() -> Router {
 /// `ChatResponse.tool_calls[0].arguments`.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn provider_sse_tool_args_accumulation() {
-    use openhuman_core::openhuman::inference::provider::compatible::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::compatible::{
         AuthStyle, OpenAiCompatibleProvider,
     };
-    use openhuman_core::openhuman::inference::provider::{
+    use alexander_ai_solutions_core::alexander_ai_solutions::inference::provider::{
         ChatMessage, ChatRequest, Provider, ProviderDelta,
     };
-    use openhuman_core::openhuman::tools::ToolSpec;
+    use alexander_ai_solutions_core::alexander_ai_solutions::tools::ToolSpec;
 
     let _lock = env_lock();
 

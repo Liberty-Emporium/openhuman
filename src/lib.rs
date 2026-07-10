@@ -5,13 +5,13 @@
 //! - Core system services (CLI, configuration, monitoring).
 //! - Domain-specific logic for the OpenHuman agent runtime.
 
+pub mod alexander_ai_solutions;
 pub mod api;
 pub mod core;
-pub mod openhuman;
 pub mod rpc;
 
-pub use openhuman::config::DaemonConfig;
-pub use openhuman::memory_store::{MemoryClient, MemoryState};
+pub use alexander_ai_solutions::config::DaemonConfig;
+pub use alexander_ai_solutions::memory_store::{MemoryClient, MemoryState};
 
 /// Runs the core logic based on the provided command-line arguments.
 ///
@@ -27,7 +27,7 @@ pub use openhuman::memory_store::{MemoryClient, MemoryState};
 /// Returns an error if command execution fails.
 pub fn run_core_from_args(args: &[String]) -> anyhow::Result<()> {
     core::cli::load_dotenv_for_cli()?;
-    openhuman::service::apply_startup_restart_delay_from_env();
-    openhuman::keyring::init_master_key();
+    alexander_ai_solutions::service::apply_startup_restart_delay_from_env();
+    alexander_ai_solutions::keyring::init_master_key();
     core::cli::run_from_cli_args(args)
 }

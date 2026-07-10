@@ -98,7 +98,7 @@ export async function restartApp(): Promise<void> {
 }
 
 /**
- * Read the active user id from `~/.openhuman/active_user.toml` via Rust.
+ * Read the active user id from `~/.alexanderai/active_user.toml` via Rust.
  * Used at startup (before redux-persist hydrates) to seed
  * `userScopedStorage` from the profile-independent source of truth so
  * the UI always lands on the right user namespace, regardless of any

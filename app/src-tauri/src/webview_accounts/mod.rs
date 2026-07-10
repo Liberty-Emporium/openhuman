@@ -1111,7 +1111,7 @@ impl From<&NotificationBypassPrefs> for NotificationBypassPrefsPayload {
 }
 
 /// Title prefix applied to every OS toast fired from an embedded webview.
-/// Matches `openhuman_core::webview_notifications::OPENHUMAN_TITLE_PREFIX`
+/// Matches `alexander_ai_solutions_core::webview_notifications::OPENHUMAN_TITLE_PREFIX`
 /// — kept inline here so the shell crate doesn't take a build-time dep on
 /// the core library. Disambiguates from natively-installed apps (Slack,
 /// Discord, Telegram desktop) firing the same message twice.
