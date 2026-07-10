@@ -2883,11 +2883,11 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        // Auto-updater for the Tauri shell. Endpoint and minisign pubkey live
-        // in `tauri.conf.json` under `plugins.updater`. Releases are signed at
-        // build time with `TAURI_SIGNING_PRIVATE_KEY` (+ `_PASSWORD`); see
-        // gitbooks/overview/auto-update.md for the full pipeline.
-        .plugin(tauri_plugin_updater::Builder::new().build())
+        // Auto-updater removed: Alexander AI Solutions ships its own installers
+        // and does not phone home for updates. The `tauri_plugin_updater`
+        // plugin is intentionally NOT registered (no `plugins.updater` config
+        // in tauri.conf.json), so it must not be built here or the app panics
+        // at launch before the window opens.
         .manage(dictation_hotkeys::DictationHotkeyState(
             std::sync::Mutex::new(Vec::new()),
         ))
@@ -2897,9 +2897,7 @@ pub fn run() {
         ))
         .manage(webview_accounts::WebviewAccountsState::default())
         .manage(cdp::CdpRegistry::default())
-        .manage(notification_settings::NotificationSettingsState::new())
-        .manage(PendingAppUpdateState::default());
-    let builder = builder.manage(std::sync::Arc::new(imessage_scanner::ScannerRegistry::new()));
+        .manage(notification_settings::NotificationSettingsState::new());
     let builder = builder.manage(std::sync::Arc::new(
         gmessages_scanner::ScannerRegistry::new(),
     ));
@@ -3642,10 +3640,6 @@ pub fn run() {
             artifact_commands::download_artifact_to_downloads,
             check_core_update,
             apply_core_update,
-            check_app_update,
-            apply_app_update,
-            download_app_update,
-            install_app_update,
             restart_core_process,
             recover_port_conflict,
             force_quit_port_owner,
