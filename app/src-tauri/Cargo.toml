@@ -132,7 +132,7 @@ cef = { version = "=146.4.1", default-features = false }
 # by tying the core's lifetime to the GUI process. The existing port-7788
 # probe in `core_process::ensure_running` still attaches to a running
 # `alexander-ai-solutions-core run` harness when one is already listening.
-openhuman_core = { path = "../..", package = "alexander_ai_solutions", default-features = false }
+alexander_ai_solutions_core = { path = "../..", package = "alexander_ai_solutions", default-features = false }
 
 [target.'cfg(unix)'.dependencies]
 nix = { version = "0.29", default-features = false, features = ["signal", "user"] }
@@ -199,7 +199,7 @@ sandbox-bubblewrap = []
 # Forwarded to the core crate to expose `openhuman.test_reset`. Off by
 # default; the E2E build flips it on via `cargo tauri build --features
 # e2e-test-support`. See app/scripts/e2e-build.sh.
-e2e-test-support = ["openhuman_core/e2e-test-support"]
+e2e-test-support = ["alexander_ai_solutions_core/e2e-test-support"]
 
 [patch.crates-io]
 # `cargo tauri build` resolves dependencies from this manifest, so the
