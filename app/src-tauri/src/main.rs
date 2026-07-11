@@ -25,7 +25,7 @@ fn main() {
         #[cfg(target_os = "windows")]
         attach_parent_console();
 
-        if let Err(err) = alexander_ai_solutions::run_core_from_args(&args[2..]) {
+        if let Err(err) = alexander_ai_solutions_lib::run_core_from_args(&args[2..]) {
             eprintln!("core process failed: {err}");
             std::process::exit(1);
         }
@@ -42,14 +42,14 @@ fn main() {
         #[cfg(target_os = "windows")]
         attach_parent_console();
 
-        if let Err(err) = alexander_ai_solutions::run_core_from_args(&args[1..]) {
+        if let Err(err) = alexander_ai_solutions_lib::run_core_from_args(&args[1..]) {
             eprintln!("core mcp server failed: {err}");
             std::process::exit(1);
         }
         return;
     }
 
-    alexander_ai_solutions::run()
+    alexander_ai_solutions_lib::run()
 }
 
 #[cfg(target_os = "windows")]

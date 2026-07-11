@@ -10,7 +10,7 @@
 //! stderr-write errors. So this is a *primary* panic from an explicit
 //! diagnostic write hitting a dead stderr.
 //!
-//! In the GUI process (`alexander_ai_solutions::run`, the TAURI-RUST-F culprit) the
+//! In the GUI process (`alexander_ai_solutions_lib::run`, the TAURI-RUST-F culprit) the
 //! breakable handle is an inherited stderr *pipe*: the app is launched with its
 //! stderr wired to a parent process (or a now-closed parent console). When that
 //! parent end goes away, the next `eprintln!` anywhere in the `run()` call
