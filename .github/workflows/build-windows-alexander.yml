@@ -80,9 +80,9 @@ jobs:
         run: |
           PROFILE="${{ inputs.build_profile || 'release' }}"
           if [ "$PROFILE" = "debug" ]; then
-            cargo tauri build --debug --bundles nsis,msi -- --bin "Alexander AI Solutions"
+            cargo tauri build --debug --bundles nsis,msi -- --bin alexander-ai-solutions
           else
-            cargo tauri build --bundles nsis,msi -- --bin "Alexander AI Solutions"
+            cargo tauri build --bundles nsis,msi -- --bin alexander-ai-solutions
           fi
 
       - name: Upload installer artifacts

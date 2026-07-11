@@ -43,7 +43,7 @@
       "icons/icon.ico"
     ],
     "resources": [
-      "../../src/openhuman/agent/prompts",
+      "../../src/alexander_ai_solutions/agent/prompts",
       "recipes/**/*"
     ],
     "createUpdaterArtifacts": false,
