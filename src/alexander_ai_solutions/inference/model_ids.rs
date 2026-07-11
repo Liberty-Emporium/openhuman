@@ -196,7 +196,7 @@ pub(crate) fn effective_tts_voice_id(config: &Config) -> String {
     // cloud TTS API such as ElevenLabs, which rejects unknown ids. For Piper
     // we keep the bundled default; for cloud/OpenAI/ElevenLabs we return empty
     // and let the provider supply its own built-in default voice.
-    if crate::alexander_ai_solutions::voice::factory::helpers::effective_tts_provider(config) == "piper" {
+    if crate::alexander_ai_solutions::voice::factory::effective_tts_provider(config) == "piper" {
         crate::alexander_ai_solutions::voice::DEFAULT_PIPER_VOICE.to_string()
     } else {
         String::new()
