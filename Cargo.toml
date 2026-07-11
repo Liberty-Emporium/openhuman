@@ -1,6 +1,6 @@
 [package]
 name = "alexander_ai_solutions"
-version = "1.0.0"
+version = "2.0.0"
 edition = "2021"
 description = "Alexander AI Solutions core business logic and RPC server"
 autobins = false

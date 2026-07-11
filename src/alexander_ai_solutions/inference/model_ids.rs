@@ -188,10 +188,18 @@ pub(crate) fn effective_stt_model_id(config: &Config) -> String {
 
 pub(crate) fn effective_tts_voice_id(config: &Config) -> String {
     let raw = config.local_ai.tts_voice_id.trim();
-    if raw.is_empty() {
-        "en_US-lessac-medium".to_string()
+    if !raw.is_empty() {
+        return raw.to_string();
+    }
+    // No explicit voice configured: return a provider-appropriate default so
+    // we never inject a Piper voice id (e.g. `en_US-lessac-medium`) into a
+    // cloud TTS API such as ElevenLabs, which rejects unknown ids. For Piper
+    // we keep the bundled default; for cloud/OpenAI/ElevenLabs we return empty
+    // and let the provider supply its own built-in default voice.
+    if crate::alexander_ai_solutions::voice::factory::helpers::effective_tts_provider(config) == "piper" {
+        crate::alexander_ai_solutions::voice::DEFAULT_PIPER_VOICE.to_string()
     } else {
-        raw.to_string()
+        String::new()
     }
 }
 
@@ -390,10 +398,22 @@ mod tests {
         let mut config = test_config();
         config.local_ai.stt_model_id.clear();
         config.local_ai.tts_voice_id.clear();
+        // Piper keeps its bundled default voice when none is configured.
+        config.local_ai.tts_provider = "piper".to_string();
         config.local_ai.quantization = "Q5_K_M".to_string();
 
         assert_eq!(effective_stt_model_id(&config), "ggml-base-q5_1.bin");
         assert_eq!(effective_tts_voice_id(&config), "en_US-lessac-medium");
         assert_eq!(effective_quantization(&config), "q5_k_m");
+    }
+
+    #[test]
+    fn tts_voice_id_default_is_provider_aware() {
+        let mut config = test_config();
+        config.local_ai.tts_voice_id.clear();
+        // A cloud/ElevenLabs provider must NOT receive a Piper voice id; the
+        // default falls back to empty so the provider supplies its own voice.
+        config.local_ai.tts_provider = "elevenlabs".to_string();
+        assert_eq!(effective_tts_voice_id(&config), "");
     }
 }
